@@ -2,9 +2,9 @@
 
 #include "styx/serialise_json.hpp"
 
+#include "hades/mkstr.hpp"
 #include "jsonrpc/request.hpp"
 #include "jsonrpc/result.hpp"
-#include "mkstr.hpp"
 
 atlas::api::async_method_type atlas::api::detail::make_async(method_type method)
 {
@@ -100,7 +100,7 @@ void atlas::api::server::install_async(
 {
     if(m_methods.find(name) != m_methods.end())
         throw std::runtime_error(
-                mkstr() << "method already installed (" << name << ")"
+                hades::mkstr() << "method already installed (" << name << ")"
                 );
     m_methods.insert(
             name,
@@ -119,7 +119,7 @@ void atlas::api::server::install(
 {
     if(m_methods.find(name) != m_methods.end())
         throw std::runtime_error(
-                mkstr() << "method already installed (" << name << ")"
+                hades::mkstr() << "method already installed (" << name << ")"
                 );
     m_methods.insert(
             name,

@@ -6,8 +6,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "error.hpp"
+#include "hades/mkstr.hpp"
 #include "log/log.hpp"
-#include "mkstr.hpp"
 
 namespace
 {
@@ -93,7 +93,7 @@ void atlas::http::handler::install(
 {
     if(m_functions.count(uri))
         throw std::runtime_error(
-            mkstr() << "uri handler already registered (" << uri << ")"
+            hades::mkstr() << "uri handler already registered (" << uri << ")"
             );
     m_functions[uri] = uri_function;
 }
