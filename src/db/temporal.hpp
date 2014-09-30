@@ -37,20 +37,18 @@ namespace atlas
          * stored, atlas::db::date_log is more appropriate.
          */
         template<
-            typename HasCandidateKey,
+            typename Id,
             const char *Relation,
             const char *Attribute=attr::temporal::date>
         class semi_temporal :
-            public hades::crud<semi_temporal<HasCandidateKey, Relation, Attribute>>,
-            public virtual HasCandidateKey::tuple_type::template extend<Attribute>,
-            public virtual HasCandidateKey,
+            public hades::crud<semi_temporal<Id, Relation, Attribute>>,
+            public virtual Id::template extend<Attribute>,
+            public virtual Id::candidate_key_type,
             public virtual hades::relation<Relation>
         {
             public:
-                typedef typename HasCandidateKey::key_attribute_list::
-                    template extend<Attribute>::tuple_type
-                    tuple_type;
-                typedef hades::crud<semi_temporal<HasCandidateKey, Relation, Attribute>>
+                typedef typename Id::template extend<Attribute> tuple_type;
+                typedef hades::crud<semi_temporal<Id, Relation, Attribute>>
                     crud_type;
 
                 semi_temporal()
