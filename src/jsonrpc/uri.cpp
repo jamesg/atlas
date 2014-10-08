@@ -23,7 +23,9 @@ void atlas::jsonrpc::uri(
     }
 
     styx::element request_o;
-    styx::parse_json(std::string(conn->content), request_o);
+    std::string json(conn->content, (conn->content + conn->content_len));
+    if(!styx::parse_json(json, request_o))
+        log::warning("jsonrpc::uri") << "parsing json: " << json;
     jsonrpc::request request(request_o);
 
     callback_io->post(
