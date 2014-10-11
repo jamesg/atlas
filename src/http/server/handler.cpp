@@ -46,7 +46,10 @@ int atlas::http::handler::operator()(
         int status = ((http_connection*)(conn->connection_param))->status;
         delete (http_connection*)(conn->connection_param);
         conn->connection_param = nullptr;
-        return status;
+        atlas::log::information("http::handler") << "finish " << conn->uri;
+        if(status != MG_TRUE)
+            http::error(500, "fail", conn);
+        return MG_TRUE;
     }
 
     if(ev == MG_AUTH)
@@ -58,14 +61,14 @@ int atlas::http::handler::operator()(
         m_functions.find(conn->uri);
     if(i == m_functions.cend())
     {
-        http_connection *http_conn = new http_connection;
-        conn->connection_param = http_conn;
+        //http_connection *http_conn = new http_connection;
+        //conn->connection_param = http_conn;
         http::error(
                 404,
                 "function not found",
-                conn,
-                boost::bind(&http_connection::report_success, http_conn),
-                boost::bind(&http_connection::report_failure, http_conn)
+                conn
+                //boost::bind(&http_connection::report_success, http_conn),
+                //boost::bind(&http_connection::report_failure, http_conn)
                 );
     }
     else

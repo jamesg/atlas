@@ -18,6 +18,11 @@ namespace atlas
                 http::uri_callback_type success,
                 http::uri_callback_type error
                 );
+        void error(
+                int code,
+                const std::string& message,
+                mg_connection*
+                );
     }
 }
 
