@@ -28,8 +28,8 @@ exports.rpc = function(options) {
 
     req.open('post', '/api_call', true);
 
-    if(window.localStorage.getItem('token'))
-        req.setRequestHeader('Authorization', window.localStorage.getItem('token'));
+    //if(window.localStorage.getItem('token'))
+        //req.setRequestHeader('Authorization', window.localStorage.getItem('token'));
     req.onload = reqListener;
     req.send(requestContent);
 

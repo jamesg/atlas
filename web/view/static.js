@@ -12,6 +12,10 @@ exports.StaticView = Backbone.View.extend(
             this.$el.empty();
             this.el.appendChild(domjs.build(this.template.bind(this)));
             return this;
+        },
+        setModel: function(model) {
+            this.model = model;
+            this.render();
         }
     }
     );
