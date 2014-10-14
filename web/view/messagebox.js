@@ -57,6 +57,11 @@ var MessageView = StaticView.extend(
 var MessageCollectionView = CollectionView.extend(
     {
         view: MessageView,
+        initialize: function() {
+            console.log('init message collection view', this.view);
+            console.log('init message collection', MessageView);
+            CollectionView.prototype.initialize.apply(this, arguments);
+        },
         initializeView: function(view) {
             this.listenTo(view.model, 'fadeout', view.fadeout.bind(view));
         }

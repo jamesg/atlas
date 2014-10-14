@@ -16,7 +16,7 @@ exports.rpc = function(options) {
     var reqListener = function() {
         console.log('api response: ' + this.responseText);
         var jsonIn = JSON.parse(this.responseText);
-        if(jsonIn['result'])
+        if(_.has(jsonIn, 'result'))
             deferred.resolve(jsonIn['result']);
         else
             deferred.reject(jsonIn['error']);
