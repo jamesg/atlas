@@ -56,6 +56,9 @@ exports.GenericListView = Backbone.View.extend(
             this.$el.empty();
             this.el.appendChild(this.ulView.el);
             return this;
+        },
+        collectionView: function() {
+            return this.ulView;
         }
     }
     );

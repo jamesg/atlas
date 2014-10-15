@@ -2,7 +2,7 @@ var StaticView = require('./static').StaticView;
 
 exports.PageView = StaticView.extend(
     {
-        pageName: 'unnamed',
+        pageTitle: 'Untitled Page',
         fullPage: false
     }
     );

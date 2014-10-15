@@ -36,6 +36,17 @@ exports.CollectionView = Backbone.View.extend(
         },
         reset: function() {
             this._views = [];
+            this._rendered = false;
+            this.model.each(
+                function(model) {
+                    var view = new this.view({
+                        model: model
+                    });
+                    this._views.push(view);
+                    this.initializeView(view);
+                    },
+                this
+                );
             this.render();
         },
         render: function() {
