@@ -25,6 +25,10 @@ namespace atlas
         }
         namespace detail
         {
+            /*!
+             * \brief Get the current date/time formatted as an ISO extended
+             * string (ready for insertion into a SQLite database).
+             */
             std::string utc_date_iso_extended();
         }
         /*!
@@ -103,6 +107,64 @@ namespace atlas
                 }
         };
 
+        /*!
+         * \brief Make a date log type from an existing key type.  The
+         * type contains the key given as a template argument and an additional
+         * date attribute.  The given key and the date attribute become a key
+         * in the new type.
+         *
+         * \note This type is suitable for storing any number of tuples with a
+         * date attribute.  If only one date should be stored for each tuple of
+         * the associated relation, db::temporal is more appropriate.
+         */
+        template<
+            typename HasCandidateKey,
+            const char *Relation,
+            const char *Attribute=attr::temporal::date>
+        class date_log :
+            public hades::crud<date_log<HasCandidateKey, Relation, Attribute>>,
+            public HasCandidateKey::key_attribute_list::template extend<Attribute>::tuple_type,
+            public HasCandidateKey::key_attribute_list::template extend<Attribute>::has_candidate_key_type,
+            public hades::relation<Relation>
+        {
+            public:
+                typedef typename HasCandidateKey::key_attribute_list::template extend<Attribute>::tuple_type
+                    tuple_type;
+                typedef typename HasCandidateKey::key_attribute_list::template extend<Attribute>::has_candidate_key_type
+                    has_candidate_key_type;
+                typedef hades::crud<date_log<HasCandidateKey, Relation, Attribute>> crud_type;
+
+                date_log(styx::element& e) :
+                    styx::object_accessor(e)
+                {
+                }
+
+                std::string& date()
+                {
+                    return tuple_type::template get_string<Attribute>();
+                }
+
+                /*!
+                 * \brief Update the record to the given date.
+                 *
+                 * \post The date attribute of this tuple has been updated.
+                 */
+                void update_date(const std::string& date_, hades::connection& conn)
+                {
+                    date() = date_;
+                    crud_type::insert(conn);
+                }
+
+                /*!
+                 * \brief Update the record to the current date.
+                 *
+                 * \post The date attribute of this tuple has been updated.
+                 */
+                void update_now(hades::connection& conn)
+                {
+                    update_date(detail::utc_date_iso_extended(), conn);
+                }
+        };
     }
 }
 
