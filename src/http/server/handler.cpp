@@ -57,18 +57,15 @@ int atlas::http::handler::operator()(
     if(ev != MG_REQUEST)
         return MG_FALSE;
     log::information("http::handler") << "request " << conn->uri;
+
     std::map<std::string, uri_type>::const_iterator i =
         m_functions.find(conn->uri);
     if(i == m_functions.cend())
     {
-        //http_connection *http_conn = new http_connection;
-        //conn->connection_param = http_conn;
         http::error(
                 404,
-                "function not found",
+                hades::mkstr() << "uri handler not found for " << conn->uri,
                 conn
-                //boost::bind(&http_connection::report_success, http_conn),
-                //boost::bind(&http_connection::report_failure, http_conn)
                 );
     }
     else
