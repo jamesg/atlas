@@ -28,6 +28,10 @@ void atlas::jsonrpc::uri(
         log::warning("jsonrpc::uri") << "parsing json: " << json;
     jsonrpc::request request(request_o);
 
+    const char *token = mg_get_header(conn, "Authorization");
+    if(token != nullptr)
+        request.token() = std::string(token);
+
     callback_io->post(
         boost::bind(
             &api::server::serve,

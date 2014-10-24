@@ -1,6 +1,33 @@
 var _ = require('underscore');
 var Q = require('q');
 
+var hasLocalStorage = (function() {
+    console.log('testing localStorage');
+    try {
+        localStorage.setItem(mod, mod);
+        localStorage.removeItem(mod);
+        console.log('found localStorage');
+        return true;
+    } catch(exception) {
+        console.log('did not find localStorage');
+        return false;
+    }
+}());
+
+var getStorage = function(key) {
+    if(hasLocalStorage)
+        return window.localStorage.get(key);
+    else
+        return gStorage[key];
+};
+
+var setStorage = function(key, value) {
+    if(hasLocalStorage)
+        window.localStorage.setItem(key, value);
+    else
+        gStorage[key] = value;
+};
+
 /*!
  * \brief Make a JSON remote procedure call.
  *
@@ -28,8 +55,7 @@ exports.rpc = function(options) {
 
     req.open('post', '/api_call', true);
 
-    //if(window.localStorage.getItem('token'))
-        //req.setRequestHeader('Authorization', window.localStorage.getItem('token'));
+    req.setRequestHeader('Authorization', getStorage('auth_token'));
     req.onload = reqListener;
     req.send(requestContent);
 
