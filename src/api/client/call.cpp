@@ -16,6 +16,7 @@ void atlas::api::call(
        )
 {
     log::information("api::call") << "making request to " << endpoint;
+    //log::information("api::call") << "making request " << styx::serialise_json(request.get_element());
     http::client::create(
             io,
             endpoint,

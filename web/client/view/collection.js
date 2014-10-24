@@ -8,9 +8,9 @@ exports.CollectionView = Backbone.View.extend(
         initialize: function(options) {
             this.render();
             _(this).bindAll('add', 'remove');
+            if(_.has(options, 'view')) this.view = options.view;
             //if(!_.has(this, 'view') && !_.has(options, 'view'))
                 //throw 'no child view constructor provided';
-            if(_.has(options, 'view')) this.view = options.view;
             this._views = [];
             this.model.each(this.add);
             this.listenTo(this.model, 'add', this.add);
@@ -35,6 +35,7 @@ exports.CollectionView = Backbone.View.extend(
             if(this._rendered) viewToRemove.$el.remove();
         },
         reset: function() {
+            console.log('collection reset');
             this._views = [];
             this._rendered = false;
             this.model.each(
@@ -42,6 +43,7 @@ exports.CollectionView = Backbone.View.extend(
                     var view = new this.view({
                         model: model
                     });
+                    console.log('new view', view);
                     this._views.push(view);
                     this.initializeView(view);
                     },
