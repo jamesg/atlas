@@ -19,7 +19,7 @@ void atlas::api::auth::install(
     server.install<styx::list>(
             "user_list",
             boost::bind(
-                &hades::equi_join<
+                &hades::equi_outer_join<
                     atlas::user,
                     atlas::user_enabled,
                     atlas::user_super

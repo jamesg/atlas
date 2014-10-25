@@ -97,7 +97,8 @@ void atlas::db::auth::create(hades::connection& conn)
     hades::devoid(
             "CREATE TABLE IF NOT EXISTS user ( "
             " user_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-            " username VARCHAR "
+            " username VARCHAR, "
+            " UNIQUE(username) "
             " ) ",
             conn
             );
