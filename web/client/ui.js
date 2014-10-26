@@ -61,6 +61,10 @@ exports.icon = function(icon) {
         );
 };
 
+/*!
+ * \brief Construct a large menu button which, when clicked, pushes a page onto
+ * the application stack.
+ */
 exports.menuButton = function(application, constructor, content) {
     return div(
         { class: 'pure-u-12-24 pure-u-md-8-24 pure-u-lg-6-24 pure-u-xl-4-24' },
@@ -75,10 +79,30 @@ exports.menuButton = function(application, constructor, content) {
         );
 };
 
+/*!
+ * \brief Construct a 'main menu' containing large buttons.  Accepts any number
+ * of buttons, typically constructed with ui.menuButton, as parameters.
+ */
 exports.mainMenu = function() {
     var d = div({ class: 'pure-g mainmenu' });
     for(b in arguments)
         d(arguments[b]);
     return d;
+};
+
+exports.inlineInput = function(label_, input_) {
+    return div(
+            { class: 'pure-control-group' },
+            label({ for: input_().name }, label_),
+            input_
+            );
+};
+
+exports.inlineCheckInput = function(input_, label_) {
+    return div(
+            { class: 'pure-control-group' },
+            input_,
+            label({ for: input_().name }, label_)
+            );
 };
 

@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var domjs = require('domjs')(document);
 var Backbone = require('backbone');
+//Backbone.$ = require('jbone');
 
 exports.StaticView = Backbone.View.extend(
     {
@@ -12,7 +13,8 @@ exports.StaticView = Backbone.View.extend(
         template: function() {
         },
         render: function() {
-            this.$el.empty();
+            //this.$el.empty();
+            this.el.innerHTML = '';
             this.el.appendChild(domjs.build(this.template.bind(this)));
             return this;
         },
