@@ -165,5 +165,15 @@ void atlas::db::auth::create(hades::connection& conn)
             " ) ",
             conn
             );
+    auto where = hades::where<>("username = 'root'");
+    styx::list root_users = atlas::user::get_collection(conn, where);
+    if(root_users.empty())
+    {
+        atlas::user root;
+        root.get_string<db::attr::user::username>() = "root";
+        root.get_bool<db::flag::user::enabled>() = true;
+        root.get_bool<db::flag::user::super>() = true;
+        root.save(conn);
+    }
 }
 
