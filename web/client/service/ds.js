@@ -75,7 +75,9 @@ exports.coalesce = function() {
 };
 
 exports.errorString = function(errors) {
-    return 'Please fix the following errors: ' +
-        _.values(errors).join(', ') + '.';
+    if(_.isObject(errors))
+        return 'Please fix the following errors: ' +
+            _.values(errors).join(', ') + '.';
+    return errors;
 };
 

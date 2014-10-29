@@ -7,6 +7,7 @@ var Breadcrumb = require('./model/breadcrumb').Breadcrumb;
 var BreadcrumbCollection = require('./collection/breadcrumb').BreadcrumbCollection;
 var HomePage = require('./page/home').HomePage;
 var Navigation = require('./view/navigation').Navigation;
+var SigninPage = require('./page/signin').SigninPage;
 
 exports.StackedApplication = function() {
     this.breadcrumbs = new BreadcrumbCollection;
@@ -69,12 +70,23 @@ exports.StackedApplication.prototype.pushPage = function(constructor) {
     this._setPage(view);
 };
 
+exports.StackedApplication.prototype.setRoute = function() {
+    this.breadcrumbs.reset();
+    for(c in arguments)
+        this.pushPage(arguments[c]);
+};
+
 exports.StackedApplication.prototype.popPage = function() {
     this.breadcrumbs.pop();
     if(this.breadcrumbs.length == 0)
         this.goHome();
     else
-        this._setPage(this.breadcrumbs.at(this.breadcrumbs.length-1).view);
+        this._setPage(this.breadcrumbs.at(this.breadcrumbs.length-1).get('view'));
+};
+
+exports.StackedApplication.prototype.currentPage = function() {
+    // warning: only valid if there is at least one page.
+    return this.breadcrumbs.at(this.breadcrumbs.length-1).get('view');
 };
 
 exports.StackedApplication.prototype.revisit = function(breadcrumb) {
@@ -86,6 +98,17 @@ exports.StackedApplication.prototype.revisit = function(breadcrumb) {
             return;
         }
         ++i;
+    }
+};
+
+/*!
+ * \brief Handle an authentication error by displaying a sign in page over the
+ * current page.  Will only display a sign in page if none is currently
+ * displayed.
+ */
+exports.StackedApplication.prototype.authenticationError = function() {
+    if(!(this.currentPage() instanceof SigninPage)) {
+        this.pushPage(SigninPage);
     }
 };
 

@@ -17,6 +17,9 @@ exports.User = Backbone.Model.extend(
             }
             ),
         validate: function(attrs) {
+            if(attrs['username'] == 'root')
+                return 'The root account cannot be edited';
+
             var errors = {};
             if(attrs['username'] == '')
                 errors['username'] = 'Name is required';

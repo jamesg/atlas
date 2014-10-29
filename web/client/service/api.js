@@ -29,6 +29,13 @@ var setStorage = function(key, value) {
 };
 
 /*!
+ * \brief Set the authentication token to be used in all future API requests.
+ */
+exports.setToken = function(token) {
+    setStorage('token', token);
+};
+
+/*!
  * \brief Make a JSON remote procedure call.
  *
  * \param options Map of JSONRPC request options.  Keys are method, params,
@@ -44,9 +51,9 @@ exports.rpc = function(options) {
         console.log('api response: ' + this.responseText);
         var jsonIn = JSON.parse(this.responseText);
         if(_.has(jsonIn, 'result'))
-            deferred.resolve(jsonIn['result']);
+            deferred.resolve(jsonIn);
         else
-            deferred.reject(jsonIn['error']);
+            deferred.reject(jsonIn);
     }
 
     var requestContent = JSON.stringify(_.pick(options, 'method', 'params'));
@@ -59,7 +66,17 @@ exports.rpc = function(options) {
     req.onload = reqListener;
     req.send(requestContent);
 
-    return deferred.promise;
+    return deferred.promise.then(
+            function(jsonIn) {
+                return jsonIn['result'];
+            },
+            function(jsonIn) {
+                if(_.has(jsonIn, 'unauthorised') && jsonIn.unauthorised) {
+                    gApplication.authenticationError();
+                }
+                throw jsonIn['error'];
+            }
+            );
 };
 
 exports.rpcFunction = function(api_function) {
