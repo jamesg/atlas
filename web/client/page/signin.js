@@ -1,6 +1,5 @@
 var MessageBox = require('../view/messagebox').MessageBox;
 var PageView = require('../view/page').PageView;
-var SigninPage = require('../page/signin').SigninPage;
 var StaticView = require('../view/static').StaticView;
 var api = require('../service/api');
 var ui = require('../ui');
@@ -38,14 +37,17 @@ var SigninForm = StaticView.extend(
     }
     );
 
+/*!
+ * \brief A basic sign in page.
+ */
 exports.SigninPage = PageView.extend(
     {
         pageTitle: 'Sign In',
         initialize: function() {
-            this._form = new SigninForm;
+            this.form = new SigninForm;
             this._messageBox = new MessageBox;
             this.listenTo(
-                this._form,
+                this.form,
                 'signin',
                 this.signin.bind(this)
                 );
@@ -73,7 +75,7 @@ exports.SigninPage = PageView.extend(
                 div(
                     { class: 'pure-u-1-1' },
                     h2('Sign In'),
-                    this._form.el
+                    this.form.el
                    )
                 );
         }

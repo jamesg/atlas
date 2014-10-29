@@ -48,6 +48,10 @@ exports.UsersAdmin = PageView.extend(
                 );
             PageView.prototype.initialize.apply(this, arguments);
         },
+        reset: function() {
+            console.log('reset users page');
+            this.users.fetch();
+        },
         gotoNewUser: function() {
             this.application.pushPage(UserAdmin);
         },
