@@ -9,6 +9,7 @@
 #include "hades/devoid.hpp"
 #include "hades/filter.hpp"
 #include "hades/get_collection.hpp"
+#include "hades/get_one.hpp"
 
 const char atlas::db::attr::user::user_id[] = "user_id";
 const char atlas::db::attr::user::username[] = "username";
@@ -53,18 +54,17 @@ std::vector<atlas::user_permission> atlas::db::user_permission::user_permissions
         atlas::user::id_type id
         )
 {
-    return hades::get_collection_vector<atlas::user_permission>(
-        conn,
+    auto where =
         hades::where<int>(
             "user_id = ?",
             hades::row<int>(id.get_int<db::attr::user::user_id>())
-            )
-        );
+            );
+    return hades::get_collection_vector<atlas::user_permission>(conn, where);
 }
 
 atlas::user_session atlas::db::user_session::start(
         hades::connection& conn,
-        atlas::user_session::id_type id
+        atlas::user::id_type id
         )
 {
     atlas::user_session session;
@@ -73,6 +73,18 @@ atlas::user_session atlas::db::user_session::start(
     session.get_string<db::attr::user_session::token>() = generate_token();
     session.save(conn);
     return session;
+}
+
+atlas::user_session atlas::db::user_session::token_session(
+        hades::connection& conn,
+        const std::string& token
+        )
+{
+    auto where = hades::where<std::string>(
+            "token = ?",
+            hades::row<std::string>(token)
+            );
+    return hades::get_one<atlas::user_session>(conn, where);
 }
 
 void atlas::db::user_session::delete_old(hades::connection& conn)

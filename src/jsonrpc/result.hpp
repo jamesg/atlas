@@ -22,8 +22,19 @@ namespace atlas
             {
             }
 
+            /*!
+             * \brief Standard JSONRPC error field.
+             */
             std::string& error() { return get_string("error"); }
+            /*!
+             * \brief Standard JSONRPC result data field.
+             */
             styx::element& data() { return get_element("result"); }
+            /*!
+             * \brief Non-standard error field.  Set to true if there was an
+             * authentiation error.
+             */
+            bool& unauthorised() { return get_bool("unauthorised"); }
         };
     }
 }

@@ -3,19 +3,49 @@
 #include <boost/bind.hpp>
 
 #include "hades/get_by_id.hpp"
-#include "hades/get_collection.hpp"
+#include "hades/get_one.hpp"
 #include "hades/join.hpp"
 
 #include "hades/crud.ipp"
 
 #include "api/server.hpp"
 #include "db/auth.hpp"
+#include "jsonrpc/auth.hpp"
+#include "log/log.hpp"
 
 void atlas::api::auth::install(
         hades::connection& conn,
         atlas::api::server& server
         )
 {
+    server.install<std::string, std::string, std::string>(
+            "user_signin",
+            [&conn](std::string username, std::string password) {
+                atlas::user user;
+                auto where = hades::where<std::string>(
+                    "user.username = ?",
+                    hades::row<std::string>(username)
+                    );
+                try
+                {
+                    user = hades::get_one<atlas::user>(conn, where);
+                }
+                catch(const std::exception&)
+                {
+                    throw api::exception("User not found");
+                }
+
+                atlas::user_password user_password;
+                user_password.from_id(conn, user.id());
+                if(user_password.get_string<db::attr::user_password::password>() !=
+                    password)
+                    throw api::exception("The password is incorrect");
+
+                atlas::user_session session =
+                    db::user_session::start(conn, user.id());
+                return session.get_string<db::attr::user_session::token>();
+            }
+            );
     server.install<styx::list>(
             "user_list",
             boost::bind(
@@ -25,7 +55,8 @@ void atlas::api::auth::install(
                     atlas::user_super
                     >,
                 boost::ref(conn)
-                )
+                ),
+            boost::bind(jsonrpc::auth::is_superuser, boost::ref(conn), _1)
             );
     server.install<styx::element, int>(
             "user_get",
@@ -41,6 +72,22 @@ void atlas::api::auth::install(
             "user_save",
             [&conn](styx::element e) {
                 atlas::user user(e);
+                if(user.exists(conn))
+                {
+                    atlas::user existing;
+                    existing.from_id(conn, user.id());
+
+                    if(existing.get_string<db::attr::user::username>() !=
+                        user.get_string<db::attr::user::username>())
+                        throw api::exception("Changing usernames is not allowed");
+                }
+                if(user.get_string<db::attr::user::username>() == "root" &&
+                    !user.get_bool<db::flag::user::enabled>())
+                    throw api::exception("The root account cannot be disabled");
+                if(user.get_string<db::attr::user::username>() == "root" &&
+                    !user.get_bool<db::flag::user::super>())
+                    throw api::exception("The root account must be a superuser");
+
                 user.save(conn);
                 return user.get_element();
             }
@@ -49,6 +96,8 @@ void atlas::api::auth::install(
             "user_destroy",
             [&conn](styx::element& e) {
                 atlas::user user(e);
+                if(user.get_string<db::attr::user::username>() == "root")
+                    throw api::exception("The root account cannot be removed");
                 return user.destroy(conn);
             }
             );

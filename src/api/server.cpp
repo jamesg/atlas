@@ -53,6 +53,7 @@ void atlas::api::detail::basic_method::serve(
     {
         jsonrpc::result result;
         result.error() = "Not authorised";
+        result.unauthorised() = true;
         callback(result);
         return;
     }

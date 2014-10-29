@@ -153,15 +153,19 @@ namespace atlas
              * \brief Create a new session with a randomly generated session
              * token.
              */
-            atlas::user_session start(
-                    hades::connection&,
-                    atlas::user_session::id_type
-                    );
+            atlas::user_session start(hades::connection&, atlas::user::id_type);
             /*!
              * \brief Check that a session token is valid.  If the token is
              * valid, its last updated time is set to the current time.
              */
             bool validate(hades::connection&, const std::string& token);
+            /*!
+             * \brief Get a session object from a session token.
+             */
+            atlas::user_session token_session(
+                    hades::connection&,
+                    const std::string& token
+                    );
             void delete_old(hades::connection&);
         }
         namespace auth
