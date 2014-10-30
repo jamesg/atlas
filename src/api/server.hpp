@@ -136,7 +136,7 @@ namespace atlas
                  * header).
                  */
                 typedef boost::function<
-                    bool(Arguments..., jsonrpc::request)
+                    bool(jsonrpc::request, Arguments...)
                     > unwrapped_auth_type;
 
                 unwrapped_method(unwrapped_method_type method, unwrapped_auth_type check_auth) :
@@ -167,7 +167,7 @@ namespace atlas
                                     .copy(request.params(), arg_values);
 
                                 // Append the JSONRPC request to the argument list.
-                                auto args = boost::fusion::push_back(arg_values, request);
+                                auto args = boost::fusion::push_front(arg_values, request);
                                 // Invoke the check_auth function with the argument list.
                                 return boost::fusion::invoke(
                                     check_auth,
@@ -220,7 +220,7 @@ namespace atlas
                         static_cast<detail::basic_method*>(
                             new detail::unwrapped_method<Return, Arguments...>(
                                 method,
-                                [](Arguments..., jsonrpc::request&) { return true; }
+                                [](jsonrpc::request&, Arguments...) { return true; }
                                 )
                             )
                         );

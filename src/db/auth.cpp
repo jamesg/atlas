@@ -27,7 +27,6 @@ const char atlas::db::relvar::user_session_updated[] = "user_session_updated";
 
 namespace
 {
-    constexpr const int token_length = 64;
     constexpr const int session_expiry_hours = 24;
     /*!
      * \brief Generate a random token of length token_length.
@@ -43,7 +42,7 @@ namespace
              "0123456789";//+/";
         boost::variate_generator<boost::random_device&, boost::uniform_int<>>
             gen(rng, boost::uniform_int<>(0, chars.size()-1));
-        for(int i = 0; i < token_length; ++i)
+        for(int i = 0; i < atlas::db::auth::token_length; ++i)
             oss << chars[gen()];
         return oss.str();
     }

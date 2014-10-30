@@ -3,7 +3,11 @@
 #include "hades/crud.ipp"
 #include "hades/filter.hpp"
 
+#include "styx/serialise_json.hpp"
+
 #include "db/auth.hpp"
+#include "jsonrpc/request.hpp"
+#include "log/log.hpp"
 
 bool atlas::jsonrpc::auth::has_permission(
         hades::connection& conn,
@@ -30,7 +34,15 @@ bool atlas::jsonrpc::auth::is_logged_in(
         jsonrpc::request& request
         )
 {
-    return true;
+    atlas::log::information("jsonrpc::auth::is_logged_in") << "checking " << styx::serialise_json(request.get_element());
+    atlas::log::information("jsonrpc::auth::is_logged_in") << "checking " << request.token();
+    auto where = hades::where<std::string>(
+            "token = ?",
+            hades::row<std::string>(request.token())
+            );
+    styx::list sessions = atlas::user_session::get_collection(conn, where);
+    atlas::log::information("jsonrpc::auth::is_logged_in") << "sessions " << styx::serialise_json(sessions);
+    return (sessions.size() == 1);
 }
 
 bool atlas::jsonrpc::auth::is_superuser(

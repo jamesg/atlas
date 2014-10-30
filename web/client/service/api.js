@@ -4,8 +4,8 @@ var Q = require('q');
 var hasLocalStorage = (function() {
     console.log('testing localStorage');
     try {
-        localStorage.setItem(mod, mod);
-        localStorage.removeItem(mod);
+        localStorage.setItem('mod', 'mod');
+        localStorage.removeItem('mod');
         console.log('found localStorage');
         return true;
     } catch(exception) {
@@ -16,7 +16,7 @@ var hasLocalStorage = (function() {
 
 var getStorage = function(key) {
     if(hasLocalStorage)
-        return window.localStorage.get(key);
+        return window.localStorage.getItem(key);
     else
         return gStorage[key];
 };
@@ -32,6 +32,7 @@ var setStorage = function(key, value) {
  * \brief Set the authentication token to be used in all future API requests.
  */
 exports.setToken = function(token) {
+    console.log('set local token', token);
     setStorage('token', token);
 };
 
@@ -56,13 +57,15 @@ exports.rpc = function(options) {
             deferred.reject(jsonIn);
     }
 
-    var requestContent = JSON.stringify(_.pick(options, 'method', 'params'));
+    console.log('request token', getStorage('token'));
+    options.token = getStorage('token');
+    var requestContent = JSON.stringify(options);//_.pick(options, 'method', 'params', 'token'));
 
     console.log('api request: ' + requestContent);
 
     req.open('post', '/api_call', true);
 
-    req.setRequestHeader('Authorization', getStorage('auth_token'));
+    req.setRequestHeader('Authorization', getStorage('token'));
     req.onload = reqListener;
     req.send(requestContent);
 

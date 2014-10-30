@@ -106,3 +106,10 @@ exports.inlineCheckInput = function(input_, label_) {
             );
 };
 
+exports.saveButton = function(text) {
+    return button(
+            { type: 'submit' },
+            span(exports.icon('data-transfer-download'), text)
+            );
+};
+

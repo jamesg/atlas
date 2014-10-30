@@ -138,7 +138,8 @@ void atlas::api::server::serve(
 {
     log::information("api::server::serve") << "request " <<
         "method: " << request.method() << " params: " <<
-        std::string(styx::serialise_json(request.params()));
+        std::string(styx::serialise_json(request.params())) <<
+        "token: " << request.token();
 
     auto method_it = m_methods.find(request.method());
     if(method_it == m_methods.end())

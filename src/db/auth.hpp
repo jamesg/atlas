@@ -170,6 +170,8 @@ namespace atlas
         }
         namespace auth
         {
+            constexpr const int token_length = 64;
+
             void create(hades::connection&);
         }
     }
