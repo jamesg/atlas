@@ -32,7 +32,6 @@ var setStorage = function(key, value) {
  * \brief Set the authentication token to be used in all future API requests.
  */
 exports.setToken = function(token) {
-    console.log('set local token', token);
     setStorage('token', token);
 };
 
@@ -49,7 +48,6 @@ exports.rpc = function(options) {
 
     var req = _.has(options, 'xhr')?options.xhr:new XMLHttpRequest;
     var reqListener = function() {
-        console.log('api response: ' + this.responseText);
         var jsonIn = JSON.parse(this.responseText);
         if(_.has(jsonIn, 'result'))
             deferred.resolve(jsonIn);
@@ -57,11 +55,9 @@ exports.rpc = function(options) {
             deferred.reject(jsonIn);
     }
 
-    console.log('request token', getStorage('token'));
     options.token = getStorage('token');
     var requestContent = JSON.stringify(options);//_.pick(options, 'method', 'params', 'token'));
 
-    console.log('api request: ' + requestContent);
 
     req.open('post', '/api_call', true);
 
