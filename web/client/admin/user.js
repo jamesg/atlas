@@ -91,7 +91,9 @@ var UserForm = StaticView.extend(
 
 exports.UserAdmin = PageView.extend(
     {
-        pageTitle: 'User',
+        pageTitle: function() {
+            return this.model.get('username');
+        },
         initialize: function(options) {
             if(_.has(this.options, 'model'))
                 this.model = options.model;
