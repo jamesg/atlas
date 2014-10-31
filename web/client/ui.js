@@ -108,8 +108,8 @@ exports.inlineCheckInput = function(input_, label_) {
 
 exports.saveButton = function(text) {
     return button(
-            { type: 'submit' },
-            span(exports.icon('data-transfer-download'), text)
+            { class: 'pure-button pure-button-primary', type: 'submit' },
+            span(exports.icon('data-transfer-download'), _.isUndefined(text)?'Save':text)
             );
 };
 
