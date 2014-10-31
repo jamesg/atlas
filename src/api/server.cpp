@@ -43,6 +43,7 @@ void atlas::api::detail::basic_method::serve(
         styx::element result_e;
         jsonrpc::result result(result_e);
         result.error() = "Checking authentication";
+        result.unauthorised() = true;
         log::error("api::detail::basic_method::serve") <<
             "error checking authentication: " << e.what();
         callback(result);
