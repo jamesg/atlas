@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include "hades/connection.hpp"
+#include "hades/crud.ipp"
 #include "hades/filter.hpp"
 
 #include "db/auth.hpp"
