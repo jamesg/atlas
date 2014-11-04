@@ -15,9 +15,17 @@ void atlas::jsonrpc::uri(
         http::uri_callback_type error
         )
 {
+    if(std::string(conn->request_method) != "POST")
+    {
+        log::warning("atlas::jsonrpc::uri") <<
+            "conn->request_method != \"POST\"";
+        error();
+        return;
+    }
+
     if(conn->content == nullptr)
     {
-        log::warning("jsonrpc::uri") << "conn->content is null";
+        log::warning("atlas::jsonrpc::uri") << "conn->content is null";
         error();
         return;
     }
@@ -25,7 +33,11 @@ void atlas::jsonrpc::uri(
     styx::element request_o;
     std::string json(conn->content, (conn->content + conn->content_len));
     if(!styx::parse_json(json, request_o))
-        log::warning("jsonrpc::uri") << "parsing json: " << json;
+    {
+        log::warning("atlas::jsonrpc::uri") << "parsing json: " << json;
+        error();
+        return;
+    }
     jsonrpc::request request(request_o);
 
     const char *token = mg_get_header(conn, "Authorization");

@@ -15,11 +15,13 @@ void atlas::api::call(
        boost::function<void(const std::string&)> failure
        )
 {
-    log::information("api::call") << "making request to " << endpoint;
-    //log::information("api::call") << "making request " << styx::serialise_json(request.get_element());
-    http::client::create(
+    log::information("atlas::api::call") << "making request to " << endpoint;
+    log::information("atlas::api::call") << "making request " <<
+            styx::serialise_json(request.get_element());
+    http::post(
             io,
             endpoint,
+            styx::serialise_json(request.get_element()),
             [success, failure](const std::string& str) {
                 jsonrpc::result result;
                 if(styx::parse_json(str, result.get_element()))
@@ -35,9 +37,10 @@ void atlas::api::call(
                 }
             },
             [failure](const std::string& str) {
-                log::warning("api::call") << "request unsuccessful";
+                log::warning("atlas::api::call") << "request unsuccessful: " <<
+                        str;
                 failure(str);
             }
-            )->post(styx::serialise_json(request.get_element()));
+            );
 }
 
