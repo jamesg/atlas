@@ -1,5 +1,7 @@
 #include "client.hpp"
 
+#include "hades/mkstr.hpp"
+
 #include "log/log.hpp"
 
 namespace
@@ -87,7 +89,8 @@ void atlas::http::client::go()
                 boost::bind(
                     &client::failure,
                     shared_from_this(),
-                    std::string(m_curl_error_buf)
+                    (hades::mkstr() << "CURL error: " <<
+                        std::string(m_curl_error_buf)).str()
                     )
                 );
     m_work.reset();

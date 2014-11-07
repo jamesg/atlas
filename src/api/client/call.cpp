@@ -29,7 +29,7 @@ void atlas::api::call(
                     if(result.error().empty())
                         success(result.data());
                     else
-                        failure(result.error());
+                        failure(hades::mkstr() << "API call: " << result.error());
                 }
                 else
                 {
