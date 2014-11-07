@@ -29,6 +29,9 @@ atlas::http::client::client(
         throw std::runtime_error("initialising curl handle");
     // Null-terminated string.
     m_curl_error_buf[0] = '\0';
+    // CURL installs a signal handler to be used when DNS lookups fail.  This
+    // does not work on all platforms, so disable signals in CURL.
+    curl_easy_setopt(m_curl, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(m_curl, CURLOPT_URL, uri.c_str());
     curl_easy_setopt(m_curl, CURLOPT_ERRORBUFFER, &m_curl_error_buf);
 }
