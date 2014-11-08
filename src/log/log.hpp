@@ -98,7 +98,7 @@ namespace atlas
         {
             public:
                 error(const char *source) :
-                    basic_log(source, "error")
+                    basic_log(source, "ERR ")
                 {
                 }
         };
@@ -107,7 +107,16 @@ namespace atlas
         {
             public:
                 information(const char *source) :
-                    basic_log(source, "information")
+                    basic_log(source, "INFO")
+                {
+                }
+        };
+
+        class test : public detail::basic_log
+        {
+            public:
+                test(const char *source) :
+                    basic_log(source, "TEST")
                 {
                 }
         };
@@ -116,7 +125,7 @@ namespace atlas
         {
             public:
                 warning(const char *source) :
-                    basic_log(source, "warning")
+                    basic_log(source, "WARN")
                 {
                 }
         };
