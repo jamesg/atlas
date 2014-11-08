@@ -59,6 +59,12 @@ namespace atlas
                 {
                 }
 
+                semi_temporal(const Id& id, const std::string& date)
+                {
+                    this->get_element() = id.get_element();
+                    tuple_type::template get_string<Attribute>() = date;
+                }
+
                 std::string& date()
                 {
                     return tuple_type::template get_string<Attribute>();
