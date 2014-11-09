@@ -75,9 +75,6 @@ void atlas::http::client::post(const std::string& body)
 
 void atlas::http::client::go()
 {
-    //atlas::log::test("atlas::http::client::go") << "start work";
-    //m_work.reset(new boost::asio::io_service::work(*m_callback_io));
-    atlas::log::test("atlas::http::client::go") << "curl_easy_perform";
     auto result = curl_easy_perform(m_curl);
     if(result == CURLE_OK)
         m_callback_io->post(
@@ -96,7 +93,6 @@ void atlas::http::client::go()
                         std::string(m_curl_error_buf)).str()
                     )
                 );
-    atlas::log::test("atlas::http::client::go") << "reset";
     m_work.reset();
 }
 
