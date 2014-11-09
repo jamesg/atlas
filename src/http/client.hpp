@@ -19,6 +19,14 @@ namespace atlas
         typedef boost::shared_ptr<http::client> ptr_type;
         typedef boost::function<void(const std::string&)> callback_type;
 
+        /*!
+         * \brief HTTP client for managing a single HTTP request.
+         *
+         * \internal
+         * \note Constructing a client instantiates a Boost ASIO work object
+         * which will prevent the connected IO service finishing until the
+         * request is complete.
+         */
         class client :
             public boost::noncopyable,
             public boost::enable_shared_from_this<client>
@@ -27,6 +35,10 @@ namespace atlas
 
                 /*!
                  * \brief Prepare a HTTP request.
+                 *
+                 * \note A Boost ASIO work object will be instantiated which
+                 * will prevent the IO service stopping until the request is
+                 * complete.
                  *
                  * \param io io_service which should be used to call the
                  * success and failure callbacks and destroy the request
