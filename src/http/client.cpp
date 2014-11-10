@@ -1,5 +1,7 @@
 #include "client.hpp"
 
+#include <boost/bind.hpp>
+
 #include "hades/mkstr.hpp"
 
 #include "log/log.hpp"
@@ -98,29 +100,13 @@ void atlas::http::client::go()
 
 void atlas::http::client::success(const std::string& str)
 {
-    try
-    {
-        m_success(str);
-    }
-    catch(const std::exception& e)
-    {
-        log::error("atlas::http::client::success") <<
-            "success callback threw exception: " << e.what();
-    }
+    m_callback_io->post(boost::bind(m_success, str));
     m_work.reset();
 }
 
 void atlas::http::client::failure(const std::string& str)
 {
-    try
-    {
-        m_failure(str);
-    }
-    catch(const std::exception& e)
-    {
-        log::error("atlas::http::client::failure") <<
-            "failure callback threw exception: " << e.what();
-    }
+    m_callback_io->post(boost::bind(m_failure, str));
     m_work.reset();
 }
 
