@@ -24,11 +24,13 @@ var TbodyView = CollectionView.extend(
  * header.  Provide a view constructor for the table header (thead) as the
  * theadView option and a view constructor for the table rows (tr) as the
  * trView option.
+ *
+ * \param emptyTemplate Template to use if the table is empty (defaults to
+ * displaying no rows).
  */
 exports.TableView = Backbone.View.extend(
     {
-        tagName: 'table',
-        className: 'pure-table',
+        tagName: 'div',
         initialize: function(options) {
             if(_.has(options, 'model'))
                 this.model = options.model;
@@ -38,6 +40,8 @@ exports.TableView = Backbone.View.extend(
                 this.trView = options.trView;
             if(_.has(options, 'initializeTrView'))
                 this.initializeTrView = options.initializeTrView;
+            if(_.has(options, 'emptyTemplate'))
+                this.emptyTemplate = options.emptyTemplate;
 
             this._thead = new this.theadView;
             this._thead.render();
@@ -55,12 +59,24 @@ exports.TableView = Backbone.View.extend(
 
             this.render();
         },
+        fullTemplate: function() {
+            return table(
+                    { class: 'pure-table' },
+                    this._thead.el,
+                    this._tbody.el
+                    );
+        },
+        emptyTemplate: function() {
+            this.fullTemplate();
+        },
         initializeTrView: function(trView) {
         },
         render: function() {
             this.$el.empty();
-            this.$el.append(this._thead.el);
-            this.$el.append(this._tbody.el);
+            if(this.model.length)
+                this.$el.append(domjs.build(this.fullTemplate.bind(this)));
+            else
+                this.$el.append(domjs.build(this.emptyTemplate.bind(this)));
             return this;
         }
     }
