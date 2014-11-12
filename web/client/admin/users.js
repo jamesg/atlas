@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var ui = require('../ui');
 var PageView = require('../view/page').PageView;
 var StaticView = require('../view/static').StaticView;
 var TableView = require('../view/table').TableView;
@@ -6,7 +7,6 @@ var TrView = require('../view/tr').TrView;
 var User = require('../model/user').User;
 var UserAdmin = require('../admin/user').UserAdmin;
 var UserCollection = require('../collection/user').UserCollection;
-var ui = require('../ui');
 
 var UsersTable = TableView.extend(
     {

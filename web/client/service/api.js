@@ -113,18 +113,20 @@ exports.backboneSyncFunction = function(rpcFunctions) {
                             params: [model.toJSON()]
                         }
                         );
-            return function_().then(
-                function(data) {
-                    console.log('sync success', data);
-                    options.success(data);
-                    return data;
-                },
-                function(err) {
-                    console.log('sync error', err);
-                    options.error(err);
-                    return err;
-                }
-                );
+            var promise = function_();
+            if(promise)
+                return promise.then(
+                    function(data) {
+                        console.log('sync success', data);
+                        options.success(data);
+                        return data;
+                    },
+                    function(err) {
+                        console.log('sync error', err);
+                        options.error(err);
+                        return err;
+                    }
+                    );
         }
         else
             throw 'no function for method ' + method;
