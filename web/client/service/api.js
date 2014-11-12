@@ -124,7 +124,7 @@ exports.backboneSyncFunction = function(rpcFunctions) {
                     function(err) {
                         console.log('sync error', err);
                         options.error(err);
-                        return err;
+                        throw err;
                     }
                     );
         }

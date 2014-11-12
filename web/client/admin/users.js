@@ -38,6 +38,7 @@ exports.UsersAdmin = PageView.extend(
     {
         pageTitle: 'Users',
         initialize: function() {
+            PageView.prototype.initialize.apply(this, arguments);
             this.users = new UserCollection;
             this.users.fetch();
             this.usersTable = new UsersTable({ model: this.users });
@@ -46,7 +47,7 @@ exports.UsersAdmin = PageView.extend(
                 'click',
                 this.gotoUser.bind(this)
                 );
-            PageView.prototype.initialize.apply(this, arguments);
+            this.render();
         },
         reset: function() {
             console.log('reset users page');

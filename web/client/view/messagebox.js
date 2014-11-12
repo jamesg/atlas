@@ -31,6 +31,10 @@ var MessageCollection = Backbone.Collection.extend(
 
 var MessageView = StaticView.extend(
     {
+        initialize: function() {
+            StaticView.prototype.initialize.apply(this, arguments);
+            this.render();
+        },
         model: Message,
         className: function() {
             return 'messagebox messagebox-' + this.model.get('severity');
@@ -68,11 +72,10 @@ var MessageCollectionView = CollectionView.extend(
     }
     );
 
-exports.MessageBox = Backbone.View.extend(
+exports.MessageBox = StaticView.extend(
     {
         initialize: function(options) {
-            if(_.has(options, 'model'))
-                this.model = options.model;
+            StaticView.prototype.initialize.apply(this, arguments);
             if(!_.has(this, 'model'))
                 this.model = new MessageCollection;
             this.collectionView = new MessageCollectionView({ model: this.model });
