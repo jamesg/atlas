@@ -163,7 +163,7 @@ namespace atlas
                  *
                  * \post The date attribute of this tuple has been updated.
                  */
-                void update_now(hades::connection& conn)
+                void update(hades::connection& conn)
                 {
                     update_date(detail::utc_date_iso_extended(), conn);
                 }
