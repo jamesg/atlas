@@ -1,39 +1,6 @@
 var _ = require('underscore');
 var Q = require('q');
-
-var hasLocalStorage = (function() {
-    console.log('testing localStorage');
-    try {
-        localStorage.setItem('mod', 'mod');
-        localStorage.removeItem('mod');
-        console.log('found localStorage');
-        return true;
-    } catch(exception) {
-        console.log('did not find localStorage');
-        return false;
-    }
-}());
-
-var getStorage = function(key) {
-    if(hasLocalStorage)
-        return window.localStorage.getItem(key);
-    else
-        return gStorage[key];
-};
-
-var setStorage = function(key, value) {
-    if(hasLocalStorage)
-        window.localStorage.setItem(key, value);
-    else
-        gStorage[key] = value;
-};
-
-/*!
- * \brief Set the authentication token to be used in all future API requests.
- */
-exports.setToken = function(token) {
-    setStorage('token', token);
-};
+var storage = require('./storage');
 
 /*!
  * \brief Make a JSON remote procedure call.
@@ -55,13 +22,13 @@ exports.rpc = function(options) {
             deferred.reject(jsonIn);
     }
 
-    options.token = getStorage('token');
+    options.token = storage.get('token');
     var requestContent = JSON.stringify(options);//_.pick(options, 'method', 'params', 'token'));
 
 
     req.open('post', '/api_call', true);
 
-    req.setRequestHeader('Authorization', getStorage('token'));
+    req.setRequestHeader('Authorization', storage.get('token'));
     req.onload = reqListener;
     req.send(requestContent);
 
