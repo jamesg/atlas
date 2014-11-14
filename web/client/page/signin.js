@@ -1,11 +1,17 @@
+var api = require('../service/api');
+var auth = require('../service/auth');
+var ui = require('../ui');
+var storage = require('../service/storage');
 var MessageBox = require('../view/messagebox').MessageBox;
 var PageView = require('../view/page').PageView;
 var StaticView = require('../view/static').StaticView;
-var api = require('../service/api');
-var ui = require('../ui');
 
 var SigninForm = StaticView.extend(
     {
+        initialize: function() {
+            StaticView.prototype.initialize.apply(this, arguments);
+            this.render();
+        },
         template: function() {
             var username = input({ type: 'text', placeholder: 'Username' });
             var password = input({ type: 'password', placeholder: 'Password' });
@@ -44,29 +50,43 @@ exports.SigninPage = PageView.extend(
     {
         pageTitle: 'Sign In',
         initialize: function() {
+            PageView.prototype.initialize.apply(this, arguments);
             this.form = new SigninForm;
-            this._messageBox = new MessageBox;
+            this.messageBox = new MessageBox;
             this.listenTo(
                 this.form,
                 'signin',
                 this.signin.bind(this)
                 );
-            PageView.prototype.initialize.apply(this, arguments);
+            this.render();
         },
-        signin: function(auth) {
+        signin: function(values) {
             api.rpcFunction('user_signin')(
-                auth.username, auth.password
+                values.username, values.password
                 ).then(
-                    (function(token) {
-                        api.setToken(token);
-                        this.application.popPage();
-                        this.application.currentPage().reset();
+                    (function(user) {
+                        auth.setToken(user['token']);
+                        console.log('signed in', user);
+                        storage.set('user', JSON.stringify(user));
+                        auth.user().set(user);
+                        this.messageBox.displaySuccess(
+                            'You are now signed in as ' +
+                            auth.user().get('username') + '.'
+                            );
+                        this.trigger('signedin');
+                        this.render();
                     }).bind(this),
                     (function(error) {
-                        this._messageBox.displayError(
+                        this.messageBox.displayError(
                             'Sign in failed: ' + error
                             );
                     }).bind(this)
+                    );
+        },
+        signedInMessage: function() {
+            return p(
+                    'You are already signed in as ' +
+                    auth.user().get('username') + '.'
                     );
         },
         template: function() {
@@ -75,7 +95,8 @@ exports.SigninPage = PageView.extend(
                 div(
                     { class: 'pure-u-1-1' },
                     h2('Sign In'),
-                    this.form.el
+                    this.messageBox.el,
+                    auth.user().isNew()?this.form.el:this.signedInMessage()
                    )
                 );
         }

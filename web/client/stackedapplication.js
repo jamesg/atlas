@@ -83,6 +83,7 @@ exports.StackedApplication.prototype.popPage = function() {
         this.goHome();
     else
         this._setPage(this.breadcrumbs.at(this.breadcrumbs.length-1).get('view'));
+    this.currentPage().reset();
 };
 
 exports.StackedApplication.prototype.currentPage = function() {

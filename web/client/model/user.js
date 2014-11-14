@@ -5,6 +5,14 @@ var api = require('../service/api');
 
 exports.User = Backbone.Model.extend(
     {
+        initialize: function() {
+            Backbone.Model.prototype.initialize.apply(this, arguments);
+            console.log('initialize user model');
+        },
+        set: function(attributes) {
+            Backbone.Model.prototype.set.apply(this, arguments);
+            console.log('set', attributes);
+        },
         defaults: {
             username: ''
         },
@@ -13,6 +21,7 @@ exports.User = Backbone.Model.extend(
             {
                 create: 'user_save',
                 delete: 'user_destroy',
+                read: 'user_get',
                 update: 'user_save'
             }
             ),
