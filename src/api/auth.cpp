@@ -18,7 +18,7 @@ void atlas::api::auth::install(
         atlas::api::server& server
         )
 {
-    server.install<std::string, std::string, std::string>(
+    server.install<styx::object, std::string, std::string>(
             "user_signin",
             [&conn](std::string username, std::string password) {
                 atlas::user user;
@@ -43,7 +43,11 @@ void atlas::api::auth::install(
 
                 atlas::user_session session =
                     db::user_session::start(conn, user.id());
-                return session.get_string<db::attr::user_session::token>();
+
+                styx::object user_o = user.get_object();
+                user_o.get_string("token") =
+                    session.get_string<db::attr::user_session::token>();
+                return user_o;
             }
             );
     server.install<styx::list>(
@@ -58,13 +62,11 @@ void atlas::api::auth::install(
                 ),
             boost::bind(jsonrpc::auth::is_superuser, boost::ref(conn), _1)
             );
-    server.install<styx::element, int>(
+    server.install<styx::element, styx::element>(
             "user_get",
-            [&conn](int user_id) {
-                atlas::user out = hades::get_by_id<atlas::user>(
-                    conn,
-                    atlas::user::id_type{user_id}
-                    );
+            [&conn](styx::element user_id_e) {
+                atlas::user::id_type user_id(user_id_e);
+                atlas::user out = hades::get_by_id<atlas::user>(conn, user_id);
                 return out.get_element();
             }
             );
