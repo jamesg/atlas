@@ -117,5 +117,33 @@ void atlas::api::auth::install(
                 return out;
             }
             );
+    server.install<bool, styx::object>(
+            "user_change_password",
+            [&conn](styx::object change_password) {
+                atlas::user::id_type user_id{
+                    change_password.get_int("user_id")
+                };
+                atlas::user_password user_password =
+                    hades::get_by_id<atlas::user_password>(conn, user_id);
+                if(
+                    change_password.get_string("current") !=
+                    user_password.get_string<db::attr::user_password::password>()
+                    )
+                    throw api::exception("Current password doesn't match.");
+                if(
+                    change_password.get_string("password") !=
+                    change_password.get_string("repeat")
+                    )
+                    throw api::exception("New passwords don't match.");
+                if(change_password.get_string("password").size() < 6)
+                    throw api::exception(
+                        "New password must be at least 6 characters."
+                        );
+                user_password.get_string<db::attr::user_password::password>() =
+                    change_password.get_string("password");
+                user_password.save(conn);
+                return true;
+            }
+            );
 }
 
