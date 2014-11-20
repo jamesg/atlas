@@ -57,7 +57,10 @@ var InlineInput = StaticView.extend(
                     }
                     );
             return div(
-                    { class: 'pure-control-group' },
+                    {
+                        class: 'pure-control-group ' +
+                            ((this._error == null)?'group-valid':'group-invalid')
+                    },
                     label({ for: this._name }, this._label),
                     this._input,
                     this._error
@@ -101,6 +104,12 @@ exports.FormView = StaticView.extend(
             this._setAttrs();
             if(this.model.isValid())
             {
+                _.each(
+                    this._inputs,
+                    function(input_) {
+                        input_.setError(null);
+                    }
+                    );
                 // Update the model on the server.
                 return this.model.save().then(
                     (function(result) {
