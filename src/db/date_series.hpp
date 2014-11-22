@@ -2,6 +2,7 @@
 #define ATLAS_DB_DATE_SERIES_HPP
 
 #include "hades/crud.hpp"
+#include "hades/filter.hpp"
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
 
@@ -41,6 +42,7 @@ namespace atlas
                 typedef typename Id::attribute_list_type::
                     template extend<DateAttribute>::template extend<Attribute>::
                     tuple_type tuple_type;
+                typedef Id base_id_type;
                 date_series()
                 {
                 }
@@ -48,6 +50,61 @@ namespace atlas
                     styx::object_accessor(e)
                 {
                 }
+
+                // Accessor functions.
+                std::string& date()
+                {
+                    tuple_type& t = static_cast<tuple_type&>(*this);
+                    return t.template get_string<DateAttribute>();
+                }
+
+                // Database functions.
+
+                /*!
+                 * \brief Get a list of all series data newer than the given
+                 * date, ordered by date ascending.
+                 * \param limit Maximum number of series to return.
+                 */
+                static styx::list newer_than(
+                        hades::connection& conn,
+                        const std::string& date,
+                        const int limit=-1
+                        )
+                {
+                    auto where = hades::where(
+                            hades::mkstr() << DateAttribute << " > ?",
+                            hades::row<std::string>(date)
+                            );
+                    auto order_by = hades::order_by(
+                            hades::mkstr() << DateAttribute << " ASC",
+                            limit
+                            );
+                    auto filter = hades::filter(
+                            where,
+                            order_by
+                            );
+                    return date_series<Id, Relation, Attribute, DateAttribute>
+                        ::get_collection(conn, filter);
+                }
+
+                /*!
+                 * \brief Get the earliest date series recorded in ascending date order.
+                 * \param limit Number of date series to return.  Leave as
+                 * default to return all date series.
+                 */
+                static styx::list first(
+                        hades::connection& conn,
+                        const int limit=-1
+                        )
+                {
+                    auto order_by = hades::order_by(
+                            hades::mkstr() << DateAttribute << " ASC",
+                            limit
+                            );
+                    return date_series<Id, Relation, Attribute, DateAttribute>
+                        ::get_collection(conn, order_by);
+                }
+
                 void set_base_id(Id id)
                 {
                     typedef typename Id::attribute_list_type attrl;

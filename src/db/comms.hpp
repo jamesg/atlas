@@ -15,6 +15,12 @@ namespace atlas
         {
             static constexpr const char * const save_method = SaveMethod;
         };
+        template<const char *SaveListMethod>
+        struct has_save_list_method
+        {
+            static constexpr const char * const save_list_method =
+                SaveListMethod;
+        };
         template<const char *ListMethod>
         struct has_list_method
         {
