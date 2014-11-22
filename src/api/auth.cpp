@@ -22,7 +22,7 @@ void atlas::api::auth::install(
             "user_signin",
             [&conn](std::string username, std::string password) {
                 atlas::user user;
-                auto where = hades::where<std::string>(
+                auto where = hades::where(
                     "user.username = ?",
                     hades::row<std::string>(username)
                     );

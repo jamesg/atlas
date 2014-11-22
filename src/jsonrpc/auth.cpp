@@ -20,7 +20,7 @@ bool atlas::jsonrpc::auth::has_permission(
     if(is_superuser(conn, request))
         return true;
 
-    auto where = hades::where<std::string>(
+    auto where = hades::where(
             "permission = ? AND user.user_id = ?",
             hades::row<std::string>(permission)
             );
@@ -35,7 +35,7 @@ bool atlas::jsonrpc::auth::is_logged_in(
         jsonrpc::request& request
         )
 {
-    auto where = hades::where<std::string>(
+    auto where = hades::where(
             "token = ?",
             hades::row<std::string>(request.token())
             );
@@ -53,7 +53,7 @@ bool atlas::jsonrpc::auth::is_superuser(
             conn,
             request.token()
             );
-    auto where = hades::where<int>(
+    auto where = hades::where(
             "user.user_id = ? AND "
             "user_enabled.user_id IS NOT NULL AND "
             "user_super.user_id IS NOT NULL ",

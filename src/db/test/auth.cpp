@@ -27,7 +27,7 @@ SCENARIO("the root user exists in a new database") {
         WHEN("the database is created") {
             atlas::db::auth::create(conn);
             THEN("the root user is present") {
-                auto where = hades::where<>("username = 'root'");
+                auto where = hades::where("username = 'root'");
                 styx::list root_users =
                     atlas::user::get_collection(conn, where);
                 REQUIRE(root_users.size() == 1);
