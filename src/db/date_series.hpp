@@ -58,6 +58,12 @@ namespace atlas
                     return t.template get_string<DateAttribute>();
                 }
 
+                double& attribute()
+                {
+                    tuple_type& t = static_cast<tuple_type&>(*this);
+                    return t.template get_double<Attribute>();
+                }
+
                 // Database functions.
 
                 /*!
@@ -122,7 +128,6 @@ namespace atlas
                     tuple_type& t = static_cast<tuple_type&>(*this);
                     t.template get_string<DateAttribute>() = date;
                     t.template get_double<Attribute>() = attr;
-                    //crud_type::insert(conn);
                     hades::crud<
                         date_series<Id, Relation, Attribute, DateAttribute>
                         >::insert(conn);
