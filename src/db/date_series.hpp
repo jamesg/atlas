@@ -7,6 +7,7 @@
 #include "hades/tuple.hpp"
 
 #include "db/detail.hpp"
+#include "log/log.hpp"
 
 namespace atlas
 {
@@ -49,6 +50,10 @@ namespace atlas
                 date_series(const styx::element& e) :
                     styx::object_accessor(e)
                 {
+                }
+                date_series(const Id& id)
+                {
+                    set_base_id(id);
                 }
 
                 // Accessor functions.
@@ -107,8 +112,9 @@ namespace atlas
                             hades::mkstr() << DateAttribute << " ASC",
                             limit
                             );
-                    return date_series<Id, Relation, Attribute, DateAttribute>
+                    styx::list series = date_series<Id, Relation, Attribute, DateAttribute>
                         ::get_collection(conn, order_by);
+                    return series;
                 }
 
                 void set_base_id(Id id)
@@ -130,7 +136,7 @@ namespace atlas
                     t.template get_double<Attribute>() = attr;
                     hades::crud<
                         date_series<Id, Relation, Attribute, DateAttribute>
-                        >::insert(conn);
+                        >::save(conn);
                 }
                 /*!
                  * \brief Record a value for the date series at the current
