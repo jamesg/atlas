@@ -18,11 +18,11 @@ void atlas::api::auth::install(
         atlas::api::server& server
         )
 {
-    server.install<std::string, std::string, std::string>(
+    server.install<styx::object, std::string, std::string>(
             "user_signin",
             [&conn](std::string username, std::string password) {
                 atlas::user user;
-                auto where = hades::where<std::string>(
+                auto where = hades::where(
                     "user.username = ?",
                     hades::row<std::string>(username)
                     );
@@ -43,7 +43,11 @@ void atlas::api::auth::install(
 
                 atlas::user_session session =
                     db::user_session::start(conn, user.id());
-                return session.get_string<db::attr::user_session::token>();
+
+                styx::object user_o = user.get_object();
+                user_o.get_string("token") =
+                    session.get_string<db::attr::user_session::token>();
+                return user_o;
             }
             );
     server.install<styx::list>(
@@ -58,13 +62,11 @@ void atlas::api::auth::install(
                 ),
             boost::bind(jsonrpc::auth::is_superuser, boost::ref(conn), _1)
             );
-    server.install<styx::element, int>(
+    server.install<styx::element, styx::element>(
             "user_get",
-            [&conn](int user_id) {
-                atlas::user out = hades::get_by_id<atlas::user>(
-                    conn,
-                    atlas::user::id_type{user_id}
-                    );
+            [&conn](styx::element user_id_e) {
+                atlas::user::id_type user_id(user_id_e);
+                atlas::user out = hades::get_by_id<atlas::user>(conn, user_id);
                 return out.get_element();
             }
             );
@@ -113,6 +115,34 @@ void atlas::api::auth::install(
                 for(const atlas::user_permission& permission : permissions)
                     out.append(permission.get_element());
                 return out;
+            }
+            );
+    server.install<bool, styx::object>(
+            "user_change_password",
+            [&conn](styx::object change_password) {
+                atlas::user::id_type user_id{
+                    change_password.get_int("user_id")
+                };
+                atlas::user_password user_password =
+                    hades::get_by_id<atlas::user_password>(conn, user_id);
+                if(
+                    change_password.get_string("current") !=
+                    user_password.get_string<db::attr::user_password::password>()
+                    )
+                    throw api::exception("Current password doesn't match.");
+                if(
+                    change_password.get_string("password") !=
+                    change_password.get_string("repeat")
+                    )
+                    throw api::exception("New passwords don't match.");
+                if(change_password.get_string("password").size() < 6)
+                    throw api::exception(
+                        "New password must be at least 6 characters."
+                        );
+                user_password.get_string<db::attr::user_password::password>() =
+                    change_password.get_string("password");
+                user_password.save(conn);
+                return true;
             }
             );
 }

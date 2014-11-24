@@ -7,7 +7,8 @@ var Breadcrumb = require('./model/breadcrumb').Breadcrumb;
 var BreadcrumbCollection = require('./collection/breadcrumb').BreadcrumbCollection;
 var HomePage = require('./page/home').HomePage;
 var Navigation = require('./view/navigation').Navigation;
-var SigninPage = require('./page/signin').SigninPage;
+var AuthenticationRequiredPage =
+        require('./page/authenticationrequired').AuthenticationRequiredPage;
 
 exports.StackedApplication = function() {
     this.breadcrumbs = new BreadcrumbCollection;
@@ -82,6 +83,7 @@ exports.StackedApplication.prototype.popPage = function() {
         this.goHome();
     else
         this._setPage(this.breadcrumbs.at(this.breadcrumbs.length-1).get('view'));
+    this.currentPage().reset();
 };
 
 exports.StackedApplication.prototype.currentPage = function() {
@@ -95,6 +97,7 @@ exports.StackedApplication.prototype.revisit = function(breadcrumb) {
         if(this.breadcrumbs.at(i) == breadcrumb) {
             this.breadcrumbs.remove(this.breadcrumbs.slice(i+1, this.breadcrumbs.length));
             this._setPage(this.breadcrumbs.at(i).get('view'));
+            this.currentPage().reset();
             return;
         }
         ++i;
@@ -107,8 +110,8 @@ exports.StackedApplication.prototype.revisit = function(breadcrumb) {
  * displayed.
  */
 exports.StackedApplication.prototype.authenticationError = function() {
-    if(!(this.currentPage() instanceof SigninPage)) {
-        this.pushPage(SigninPage);
+    if(!(this.currentPage() instanceof AuthenticationRequiredPage)) {
+        this.pushPage(AuthenticationRequiredPage);
     }
 };
 

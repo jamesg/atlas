@@ -2,6 +2,7 @@
 
 #include "hades/crud.ipp"
 #include "hades/filter.hpp"
+#include "hades/join.hpp"
 
 #include "styx/serialise_json.hpp"
 
@@ -19,7 +20,7 @@ bool atlas::jsonrpc::auth::has_permission(
     if(is_superuser(conn, request))
         return true;
 
-    auto where = hades::where<std::string>(
+    auto where = hades::where(
             "permission = ? AND user.user_id = ?",
             hades::row<std::string>(permission)
             );
@@ -34,14 +35,11 @@ bool atlas::jsonrpc::auth::is_logged_in(
         jsonrpc::request& request
         )
 {
-    atlas::log::information("jsonrpc::auth::is_logged_in") << "checking " << styx::serialise_json(request.get_element());
-    atlas::log::information("jsonrpc::auth::is_logged_in") << "checking " << request.token();
-    auto where = hades::where<std::string>(
+    auto where = hades::where(
             "token = ?",
             hades::row<std::string>(request.token())
             );
     styx::list sessions = atlas::user_session::get_collection(conn, where);
-    atlas::log::information("jsonrpc::auth::is_logged_in") << "sessions " << styx::serialise_json(sessions);
     return (sessions.size() == 1);
 }
 
@@ -50,6 +48,25 @@ bool atlas::jsonrpc::auth::is_superuser(
         jsonrpc::request& request
         )
 {
-    return false;
+    atlas::log::information("jsonrpc::auth::is_superuser") << "is_superuser";
+    atlas::user_session session = atlas::db::user_session::token_session(
+            conn,
+            request.token()
+            );
+    auto where = hades::where(
+            "user.user_id = ? AND "
+            "user_enabled.user_id IS NOT NULL AND "
+            "user_super.user_id IS NOT NULL ",
+            hades::row<int>(session.get_int<db::attr::user::user_id>())
+            );
+    styx::list users = hades::equi_outer_join<
+        atlas::user,
+        atlas::user_enabled,
+        atlas::user_super
+        >(
+                conn,
+                where
+                );
+    return (users.size() == 1);
 }
 

@@ -1,3 +1,4 @@
+var auth = require('../service/auth');
 var SigninPage = require('../page/signin').SigninPage;
 
 /*!
@@ -5,16 +6,21 @@ var SigninPage = require('../page/signin').SigninPage;
  */
 exports.NewsigninPage = SigninPage.extend(
     {
+        initialize: function() {
+            SigninPage.prototype.initialize.apply(this, arguments);
+            this.render();
+        },
         template: function() {
             return div(
                 { class: 'pure-g' },
                 div(
                     { class: 'pure-u-1-1' },
                     h2('Sign In'),
+                    this.messageBox.el,
                     p(
                         'Please enter a valid username and password.'
                         ),
-                    this.form.el
+                    auth.user().isNew()?this.form.el:this.signedInMessage()
                    )
                 );
         }

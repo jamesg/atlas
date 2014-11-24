@@ -54,7 +54,7 @@ std::vector<atlas::user_permission> atlas::db::user_permission::user_permissions
         )
 {
     auto where =
-        hades::where<int>(
+        hades::where(
             "user_id = ?",
             hades::row<int>(id.get_int<db::attr::user::user_id>())
             );
@@ -79,7 +79,7 @@ atlas::user_session atlas::db::user_session::token_session(
         const std::string& token
         )
 {
-    auto where = hades::where<std::string>(
+    auto where = hades::where(
             "token = ?",
             hades::row<std::string>(token)
             );
@@ -176,7 +176,7 @@ void atlas::db::auth::create(hades::connection& conn)
             " ) ",
             conn
             );
-    auto where = hades::where<>("username = 'root'");
+    auto where = hades::where("username = 'root'");
     styx::list root_users = atlas::user::get_collection(conn, where);
     if(root_users.empty())
     {

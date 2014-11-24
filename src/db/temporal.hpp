@@ -4,8 +4,11 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "hades/crud.hpp"
+#include "hades/has_candidate_key.hpp"
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
+
+#include "db/detail.hpp"
 
 namespace atlas
 {
@@ -22,14 +25,6 @@ namespace atlas
                  */
                 extern const char date[];
             }
-        }
-        namespace detail
-        {
-            /*!
-             * \brief Get the current date/time formatted as an ISO extended
-             * string (ready for insertion into a SQLite database).
-             */
-            std::string utc_date_iso_extended();
         }
         /*!
          * \brief Make a semi-temporal type from an existing key type.  The
@@ -62,6 +57,12 @@ namespace atlas
                 explicit semi_temporal(const styx::element& e) :
                     styx::object_accessor(e)
                 {
+                }
+
+                semi_temporal(const Id& id, const std::string& date)
+                {
+                    this->get_element() = id.get_element();
+                    tuple_type::template get_string<Attribute>() = date;
                 }
 
                 std::string& date()
@@ -118,21 +119,23 @@ namespace atlas
          * the associated relation, db::temporal is more appropriate.
          */
         template<
-            typename HasCandidateKey,
+            typename Id,
             const char *Relation,
             const char *Attribute=attr::temporal::date>
         class date_log :
-            public hades::crud<date_log<HasCandidateKey, Relation, Attribute>>,
-            public HasCandidateKey::key_attribute_list::template extend<Attribute>::tuple_type,
-            public HasCandidateKey::key_attribute_list::template extend<Attribute>::has_candidate_key_type,
+            public hades::crud<date_log<Id, Relation, Attribute>>,
+            public Id::attribute_list_type::template extend<Attribute>::tuple_type,
+            public Id::attribute_list_type::template extend<Attribute>::has_candidate_key_type,
             public hades::relation<Relation>
         {
             public:
-                typedef typename HasCandidateKey::key_attribute_list::template extend<Attribute>::tuple_type
+                typedef typename Id::attribute_list_type::
+                    template extend<Attribute>::tuple_type
                     tuple_type;
-                typedef typename HasCandidateKey::key_attribute_list::template extend<Attribute>::has_candidate_key_type
+                typedef typename Id::attribute_list_type::
+                    template extend<Attribute>::has_candidate_key_type
                     has_candidate_key_type;
-                typedef hades::crud<date_log<HasCandidateKey, Relation, Attribute>> crud_type;
+                typedef hades::crud<date_log<Id, Relation, Attribute>> crud_type;
 
                 date_log(styx::element& e) :
                     styx::object_accessor(e)
@@ -160,7 +163,7 @@ namespace atlas
                  *
                  * \post The date attribute of this tuple has been updated.
                  */
-                void update_now(hades::connection& conn)
+                void update(hades::connection& conn)
                 {
                     update_date(detail::utc_date_iso_extended(), conn);
                 }

@@ -1,15 +1,37 @@
 var _ = require('underscore');
 var ds = require('../service/ds');
+var FormView = require('../view/form').FormView;
 var MessageBox = require('../view/messagebox').MessageBox;
 var PageView = require('../view/page').PageView;
 var StaticView = require('../view/static').StaticView;
 var User = require('../model/user').User;
 var ui = require('../ui');
 
-var UserForm = StaticView.extend(
+var UserForm = FormView.extend(
     {
         initialize: function() {
+            FormView.prototype.initialize.apply(this, arguments);
             this._messageBox = new MessageBox;
+            this._username = this.createInput(
+                {
+                    name: 'username',
+                    label: 'Username'
+                }
+                );
+            this._enabled = this.createInput(
+                {
+                    type: 'checkbox',
+                    name: 'user_enabled',
+                    label: 'Account enabled'
+                }
+                );
+            this._super = this.createInput(
+                {
+                    type: 'checkbox',
+                    name: 'user_super',
+                    label: 'Superuser'
+                }
+                );
             this.render();
         },
         setModel: function(model) {
@@ -17,9 +39,6 @@ var UserForm = StaticView.extend(
             this.render();
         },
         template: function() {
-            var username = input({ type: 'text', value: this.model.get('username') });
-            var enabled = input({ type: 'checkbox', checked: this.model.get('user_enabled') });
-            var super_ = input({ type: 'checkbox', checked: this.model.get('user_super') });
             var buttonBox = div(
                     { class: 'buttonbox' },
                     button(
@@ -59,30 +78,21 @@ var UserForm = StaticView.extend(
                 {
                     class: 'pure-form pure-form-aligned',
                     onsubmit: (function() {
-                        this.model.set('username', username().value);
-                        this.model.set('user_enabled', enabled().checked)
-                        this.model.set('user_super', super_().checked);
-                        if(this.model.isValid()) {
-                            this.model.save().then(
-                                (function() {
-                                    this._messageBox.displaySuccess('User details saved');
-                                    this.trigger('saved');
-                                }).bind(this)
-                                );
-                        } else {
-                            this._messageBox.displayError(
-                                ds.errorString(this.model.validationError)
-                                );
-                        }
+                        this.save().then(
+                            (function() {
+                                this._messageBox.displaySuccess('User details saved');
+                            }).bind(this),
+                            (function(errors) {
+                                this._messageBox.displayError(
+                                    ds.errorString(errors)
+                                    );
+                            }).bind(this)
+                            );
                         return false;
                     }).bind(this)
                 },
                 this._messageBox.el,
-                fieldset(
-                    ui.inlineInput('Username', username),
-                    ui.inlineCheckInput(enabled, 'Account enabled'),
-                    ui.inlineCheckInput(super_, 'Superuser')
-                    ),
+                fieldset(this._username.el, this._enabled.el, this._super.el),
                 buttonBox
                 );
         }
@@ -91,21 +101,22 @@ var UserForm = StaticView.extend(
 
 exports.UserAdmin = PageView.extend(
     {
-        pageTitle: 'User',
+        pageTitle: function() {
+            return this.model.get('username');
+        },
         initialize: function(options) {
-            if(_.has(this.options, 'model'))
-                this.model = options.model;
+            PageView.prototype.initialize.apply(this, arguments);
             if(!_.has(this, 'model'))
                 this.model = new User;
-            this.form = new UserForm({ model: this.model });
-
-            PageView.prototype.initialize.apply(this, arguments);
+            this._form = new UserForm({ model: this.model });
 
             this.listenTo(
-                this.form,
+                this._form,
                 'saved',
                 this.application.popPage.bind(this.application)
                 );
+
+            this.render();
         },
         template: function() {
             return div(
@@ -113,7 +124,7 @@ exports.UserAdmin = PageView.extend(
                 div(
                     { class: 'pure-u-1-1' },
                     h2('User'),
-                    this.form.el
+                    this._form.el
                    )
                 );
         }
