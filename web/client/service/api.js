@@ -89,7 +89,7 @@ exports.backboneSyncFunction = function(rpcFunctions) {
                         return data;
                     },
                     function(err) {
-                        console.log('sync error', err);
+                        console.log('sync error', err, rpcFunctions[method], [model.toJSON()]);
                         options.error(err);
                         throw err;
                     }
