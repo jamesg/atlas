@@ -61,7 +61,7 @@ void atlas::jsonrpc::uri(
 
                 // TODO: is Connection: close required?
                 mg_send_header(conn, "Connection", "close");
-                mg_send_header(conn, "Content-Type", "text/json");
+                mg_send_header(conn, "Content-Type", "application/json");
 
                 std::string result_str(
                     styx::serialise_json(jsonrpc_result.get_element())

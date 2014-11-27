@@ -15,6 +15,7 @@ atlas::api::async_method_type atlas::api::detail::make_async(method_type method)
     {
         jsonrpc::result result;
         method(request, result);
+        result.id() = request.id();
         callback(result);
     };
 }
@@ -40,12 +41,12 @@ void atlas::api::detail::basic_method::serve(
     }
     catch(const std::exception& e)
     {
-        styx::element result_e;
-        jsonrpc::result result(result_e);
+        jsonrpc::result result;
         result.error() = "Checking authentication";
         result.unauthorised() = true;
         log::error("api::detail::basic_method::serve") <<
             "error checking authentication: " << e.what();
+        result.id() = request.id();
         callback(result);
         return;
     }
@@ -55,6 +56,7 @@ void atlas::api::detail::basic_method::serve(
         jsonrpc::result result;
         result.error() = "Not authorised";
         result.unauthorised() = true;
+        result.id() = request.id();
         callback(result);
         return;
     }
@@ -71,22 +73,22 @@ void atlas::api::detail::basic_method::serve(
     }
     catch(const api::exception& e)
     {
-        styx::element result_e;
-        jsonrpc::result result(result_e);
+        jsonrpc::result result;
         result.error() = e.what();
         log::error("api::detail::basic_method::serve") <<
             "api exception " << request.method() <<
             ": " << e.what();
+        result.id() = request.id();
         callback(result);
     }
     catch(const std::exception& e)
     {
-        styx::element result_e;
-        jsonrpc::result result(result_e);
+        jsonrpc::result result;
         result.error() = "Unknown error";
         log::error("api::detail::basic_method::serve") <<
             "in api function " << request.method() <<
             ": " << e.what();
+        result.id() = request.id();
         callback(result);
     }
 }
@@ -150,6 +152,7 @@ void atlas::api::server::serve(
         log::warning("api::server::serve") <<
             "jsonrpc request for unknown method: " << std::string(request.method());
         result.error() = "Method unknown";
+        result.id() = request.id();
         callback(result);
         return;
     }

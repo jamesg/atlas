@@ -25,6 +25,12 @@ namespace atlas
             std::string& method() { return get_string("method"); }
             styx::list& params() { return get_list("params"); }
             std::string& token() { return get_string("token"); }
+            /*!
+             * \brief JSONRPC allows the client to attach an id to each
+             * procedure call.  The id can be of any type and should be copied
+             * to the response.
+             */
+            styx::element& id() { return get_element("id"); }
         };
     }
 }
