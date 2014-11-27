@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 project("Atlas Components")
 enable_testing()
 
-file(GLOB atlas_db_sources *.cpp)
-add_library(atlas-com-db ${atlas_db_sources})
+file(GLOB atlas_com_db_sources *.cpp)
+add_library(atlas-com-db ${atlas_com_db_sources})
 target_link_libraries(
     atlas-com-db
     hades
