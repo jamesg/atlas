@@ -16,10 +16,31 @@ namespace atlas
         namespace date
         {
             /*!
+             * \brief Length of a date string returned by
+             * to_string(boost::gregorian::date).
+             */
+            static const int date_len = 10;
+            /*!
+             * \brief Length of a date time string returned by
+             * to_string(boost::posix_time::ptime).
+             */
+            static const int datetime_len = 19;
+
+            /*!
+             * \brief Convert a boost::gregorian::date to a standard string
+             * format.
+             */
+            std::string to_string(const boost::gregorian::date&);
+            /*!
              * \brief Convert a boost::posix_time::ptime to a standard string
              * format.
              */
             std::string to_string(const boost::posix_time::ptime&);
+            /*!
+             * \brief Convert a string in the standard date format to a
+             * boost::gregorian::date.
+             */
+            boost::gregorian::date to_date(const std::string&);
             /*!
              * \brief Convert a string in the standard format to a
              * boost::posix_time::ptime.
