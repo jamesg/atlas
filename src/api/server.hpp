@@ -12,6 +12,9 @@
 #include <boost/mpl/range_c.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
+#include "hades/mkstr.hpp"
+#include "styx/cast.hpp"
+#include "styx/get_default.hpp"
 #include "styx/styx.hpp"
 
 #include "api/auth_function_type.hpp"
@@ -73,7 +76,7 @@ namespace atlas
              * Copy a single element from a JSON list to a vector.
              */
             template<int Index, typename Container>
-            void copy_element_to_vector(styx::list& list, Container& container)
+            void copy_element_to_vector(const styx::list& list, Container& container)
             {
                 // Type of the element at index 'Index' in the Container.
                 typedef
@@ -82,15 +85,22 @@ namespace atlas
                             Container, boost::mpl::int_<Index>
                             >::type
                         >::type json_type;
-                if(list.size() > Index)
+                try
                 {
-                    styx::element o = list.at(Index);
-                    boost::fusion::at_c<Index>(container) =
-                        styx::cast<json_type>(o);
+                    if(list.size() > Index)
+                    {
+                        styx::element o = list.at(Index);
+                        boost::fusion::at_c<Index>(container) =
+                            styx::cast<json_type>(o);
+                    }
+                    else
+                        boost::fusion::at_c<Index>(container) =
+                            styx::get_default<json_type>();
                 }
-                else
-                    boost::fusion::at_c<Index>(container) =
-                        styx::get_default<json_type>();
+                catch(const std::exception& e)
+                {
+                    throw std::runtime_error(hades::mkstr() << "check_auth exception: " << e.what());
+                }
             }
             /*!
              * \brief Copy all elements in a styx::list to a
@@ -103,7 +113,7 @@ namespace atlas
             struct copy_list_to_vector
             {
                 template<typename Container>
-                void copy(styx::list& list, Container& container)
+                void copy(const styx::list& list, Container& container)
                 {
                     copy_element_to_vector<from, Container>(list, container);
                     copy_list_to_vector<from+1, to>().template copy<Container>(list, container);
@@ -113,7 +123,7 @@ namespace atlas
             struct copy_list_to_vector<to, to>
             {
                 template<typename Container>
-                void copy(styx::list& list, Container& container)
+                void copy(const styx::list& list, Container& container)
                 {
                 };
             };
@@ -161,10 +171,11 @@ namespace atlas
                                 jsonrpc::request& request
                                 ) -> bool
                             {
+                                styx::list& l = request.params();
                                 typedef boost::fusion::vector<Arguments...> arg_values_type;
                                 arg_values_type arg_values;
                                 copy_list_to_vector<0, sizeof...(Arguments)>()
-                                    .copy(request.params(), arg_values);
+                                    .copy(l, arg_values);
 
                                 // Append the JSONRPC request to the argument list.
                                 auto args = boost::fusion::push_front(arg_values, request);

@@ -1,6 +1,7 @@
 #include "call.hpp"
 
 #include "hades/mkstr.hpp"
+#include "styx/serialise_json.hpp"
 
 #include "http/client.hpp"
 #include "jsonrpc/request.hpp"
@@ -23,15 +24,16 @@ void atlas::api::call(
             endpoint,
             styx::serialise_json(request.get_element()),
             [success, failure](const std::string& str) {
-                jsonrpc::result result;
-                if(styx::parse_json(str, result.get_element()))
+                try
                 {
+                    styx::element e = styx::parse_json(str);
+                    jsonrpc::result result(e);
                     if(result.error().empty())
                         success(result.data());
                     else
                         failure(hades::mkstr() << "API call: " << result.error());
                 }
-                else
+                catch(const std::exception&)
                 {
                     failure("parsing json");
                 }
