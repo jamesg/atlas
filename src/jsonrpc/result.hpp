@@ -2,7 +2,7 @@
 #define ATLAS_JSONRPC_RESULT_HPP
 
 #include "styx/styx.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 namespace atlas
 {
@@ -11,7 +11,7 @@ namespace atlas
         /*!
          * Accessor struct for the result of a JSONRPC result.
          */
-        struct result : public styx::object_accessor
+        struct result : public styx::object
         {
             /*!
              * \brief Create a result with the JSONRPC version preset.
@@ -26,7 +26,7 @@ namespace atlas
              * JSONRPC version attribute will not be set.
              */
             explicit result(styx::element& e) :
-                styx::object_accessor(e)
+                styx::object(e)
             {
             }
 

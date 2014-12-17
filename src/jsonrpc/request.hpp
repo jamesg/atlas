@@ -2,7 +2,7 @@
 #define ATLAS_JSONRPC_REQUEST_HPP
 
 #include "styx/styx.hpp"
-#include "styx/object_accessor.hpp"
+#include "styx/object.hpp"
 
 namespace atlas
 {
@@ -11,14 +11,14 @@ namespace atlas
         /*!
          * Accessor for a JSONRPC request.
          */
-        struct request : public styx::object_accessor
+        struct request : public styx::object
         {
             request()
             {
             }
 
             explicit request(const styx::element& e) :
-                styx::object_accessor(e)
+                styx::object(e)
             {
             }
 

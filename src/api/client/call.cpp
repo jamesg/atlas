@@ -18,11 +18,11 @@ void atlas::api::call(
 {
     log::information("atlas::api::call") << "making request to " << endpoint;
     log::information("atlas::api::call") << "making request " <<
-            styx::serialise_json(request.get_element());
+            styx::serialise_json(request);
     http::post(
             io,
             endpoint,
-            styx::serialise_json(request.get_element()),
+            styx::serialise_json(request),
             [success, failure](const std::string& str) {
                 try
                 {

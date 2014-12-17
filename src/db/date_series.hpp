@@ -59,7 +59,7 @@ namespace atlas
                 {
                 }
                 date_series(const styx::element& e) :
-                    styx::object_accessor(e)
+                    styx::object(e)
                 {
                 }
                 date_series(const Id& id)

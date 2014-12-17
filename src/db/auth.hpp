@@ -67,7 +67,7 @@ namespace atlas
         {
         }
         user(const styx::element& e) :
-            styx::object_accessor(e)
+            styx::object(e)
         {
         }
     };
@@ -87,7 +87,7 @@ namespace atlas
         {
         }
         user_password(const styx::element& e) :
-            styx::object_accessor(e)
+            styx::object(e)
         {
         }
         bool check(const std::string& password)
@@ -109,7 +109,7 @@ namespace atlas
         {
         }
         user_permission(const styx::element& e) :
-            styx::object_accessor(e)
+            styx::object(e)
         {
         }
     };
@@ -127,7 +127,7 @@ namespace atlas
         {
         }
         user_session(const styx::element& e) :
-            styx::object_accessor(e)
+            styx::object(e)
         {
         }
     };

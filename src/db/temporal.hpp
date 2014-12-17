@@ -55,13 +55,13 @@ namespace atlas
                 }
 
                 explicit semi_temporal(const styx::element& e) :
-                    styx::object_accessor(e)
+                    styx::object(e)
                 {
                 }
 
                 semi_temporal(const Id& id, const std::string& date)
                 {
-                    this->get_element() = id.get_element();
+                    *this = id;
                     tuple_type::template get_string<Attribute>() = date;
                 }
 
@@ -138,7 +138,7 @@ namespace atlas
                 typedef hades::crud<date_log<Id, Relation, Attribute>> crud_type;
 
                 date_log(styx::element& e) :
-                    styx::object_accessor(e)
+                    styx::object(e)
                 {
                 }
 

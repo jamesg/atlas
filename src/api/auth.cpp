@@ -44,7 +44,7 @@ void atlas::api::auth::install(
                 atlas::user_session session =
                     db::user_session::start(conn, user.id());
 
-                styx::object user_o = user.get_object();
+                styx::object user_o = (styx::object)user;
                 user_o.get_string("token") =
                     session.get_string<db::attr::user_session::token>();
                 return user_o;
@@ -67,7 +67,7 @@ void atlas::api::auth::install(
             [&conn](styx::element user_id_e) {
                 atlas::user::id_type user_id(user_id_e);
                 atlas::user out = hades::get_by_id<atlas::user>(conn, user_id);
-                return out.get_element();
+                return out;
             }
             );
     server.install<styx::element, styx::element>(
@@ -91,7 +91,7 @@ void atlas::api::auth::install(
                     throw api::exception("The root account must be a superuser");
 
                 user.save(conn);
-                return user.get_element();
+                return user;
             }
             );
     server.install<bool, styx::element>(
@@ -113,7 +113,7 @@ void atlas::api::auth::install(
                         );
                 styx::list out;
                 for(const atlas::user_permission& permission : permissions)
-                    out.append(permission.get_element());
+                    out.append(permission);
                 return out;
             }
             );
