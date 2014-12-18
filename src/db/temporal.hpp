@@ -61,7 +61,7 @@ namespace atlas
 
                 semi_temporal(const Id& id, const std::string& date)
                 {
-                    *this = id;
+                    styx::object::m_map = id.m_map;//semi_temporal<Id, Relation, Attribute>(id);
                     tuple_type::template get_string<Attribute>() = date;
                 }
 
