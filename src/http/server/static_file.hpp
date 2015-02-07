@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <boost/regex.hpp>
+
 #include "mongoose.h"
 
 #include "http/server/uri_type.hpp"
@@ -22,6 +24,7 @@ namespace atlas
                 const mimetypes& mime_information,
                 const std::string& filename,
                 mg_connection*,
+                boost::smatch,
                 http::uri_callback_type success,
                 http::uri_callback_type error
                 );

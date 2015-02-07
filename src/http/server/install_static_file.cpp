@@ -23,7 +23,8 @@ void atlas::http::install_static_file(
             std::string(hades::mkstr() << "web/static/" << filename),
             _1,
             _2,
-            _3
+            _3,
+            _4
             )
         );
 }
