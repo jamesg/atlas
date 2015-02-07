@@ -6,8 +6,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
-//#include "mongoose.h"
-
 extern "C"
 {
     struct mg_server;
@@ -23,7 +21,6 @@ namespace atlas
         {
         public:
             server(
-                    //boost::shared_ptr<boost::asio::io_service> http_io,
                     boost::shared_ptr<boost::asio::io_service> callback_io,
                     const char *address,
                     const char *port

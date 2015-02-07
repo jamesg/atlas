@@ -3,8 +3,6 @@
 
 #include <map>
 
-//#include <boost/network/protocol/http/server.hpp>
-
 #include "uri_type.hpp"
 
 namespace atlas
