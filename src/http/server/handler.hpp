@@ -6,6 +6,7 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/invoke.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include "hades/mkstr.hpp"
@@ -30,24 +31,24 @@ namespace atlas
              */
             class basic_function
             {
-                public:
-                    basic_function(uri_type);
+            public:
+                basic_function(uri_type);
 
-                    /*!
-                     * \brief Handle a request from the client for an API
-                     * function.
-                     *
-                     * \throws None.
-                     */
-                    void serve(
-                            boost::smatch,
-                            mg_connection*,
-                            uri_callback_type sucess,
-                            uri_callback_type failure
-                            ) const;
+                /*!
+                 * \brief Handle a request from the client for an API
+                 * function.
+                 *
+                 * \throws None.
+                 */
+                void serve(
+                        boost::smatch,
+                        mg_connection*,
+                        uri_callback_type sucess,
+                        uri_callback_type failure
+                        ) const;
 
-                private:
-                    uri_type m_serve;
+            private:
+                uri_type m_serve;
             };
 
             /*!
@@ -62,24 +63,25 @@ namespace atlas
                 // Type of the element at index 'Index' in the Container.
                 // TODO: enable parsing of ints, etc.
                 // For now, only strings are supported.
-                //typedef
-                    //typename std::remove_reference<
-                        //typename boost::fusion::result_of::at<
-                            //Container, boost::mpl::int_<Index>
-                            //>::type
-                        //>::type element_type;
-                typedef std::string element_type;
+                typedef
+                    typename std::remove_reference<
+                        typename boost::fusion::result_of::at<
+                            Container, boost::mpl::int_<Index>
+                            >::type
+                        >::type element_type;
                 try
                 {
-                    if(match.size() > Index)
+                    if(match.size() > Index+1)
                     {
-                        std::string s = match[Index];
-                        boost::fusion::at_c<Index>(container) = s;
+                        element_type e = boost::lexical_cast<element_type>(
+                                match[Index+1]
+                                );
+                        boost::fusion::at_c<Index>(container) = e;
                     }
                     else
-                        boost::fusion::at_c<Index>(container) = std::string();
+                        boost::fusion::at_c<Index>(container) = element_type();
                 }
-                catch(const std::exception& e)
+                catch(const boost::bad_lexical_cast& e)
                 {
                     throw std::runtime_error(hades::mkstr() << "casting uri handler: " << e.what());
                 }
@@ -146,60 +148,60 @@ namespace atlas
          */
         class handler
         {
-            public:
-                /*!
-                 * Route an HTTP request to a handler function.
-                 */
-                int operator()(mg_connection*, mg_event);
-                /*!
-                 * \brief Install a function to respond to a specific URI.
-                 *
-                 * \param uri_function Function to execute when the URI is
-                 * requested.  The function will be provided with cpp-netlib
-                 * request and connection_ptr objects.
-                 *
-                 * \note The URI function will be called in the current thread
-                 * (from the web server's thread pool).
-                 *
-                 * \throws std::runtime_error if a function has already been
-                 * installed for this URI.
-                 */
-                void install(
-                    std::string uri,
-                    uri_type uri_function
-                    );
+        public:
+            /*!
+             * Route an HTTP request to a handler function.
+             */
+            int operator()(mg_connection*, mg_event);
+            /*!
+             * \brief Install a function to respond to a specific URI.
+             *
+             * \param uri_function Function to execute when the URI is
+             * requested.  The function will be provided with cpp-netlib
+             * request and connection_ptr objects.
+             *
+             * \note The URI function will be called in the current thread
+             * (from the web server's thread pool).
+             *
+             * \throws std::runtime_error if a function has already been
+             * installed for this URI.
+             */
+            void install(
+                std::string uri,
+                uri_type uri_function
+                );
 
-                /*!
-                 * \brief Install a function to respond to a URI matched by a regular expression.
-                 *
-                 * \param uri Regular expression to match URIs that should be
-                 * served by this function.
-                 * \param function Method accepting the URI parameters and
-                 * returning a string.
-                 */
-                template<typename ...Arguments>
-                void install(
-                    std::string uri,
-                    typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function
-                    )
-                {
-                    log::information("atlas::http::handler::install") <<
-                        "installing " << uri;
-                    if(m_functions.count(uri))
-                        throw std::runtime_error(
-                            hades::mkstr() <<
-                            "uri handler already registered (" << uri << ")"
-                            );
-                    m_functions.insert(
-                        uri,
-                        static_cast<detail::basic_function*>(
-                            new detail::unwrapped_function<Arguments...>(function)
-                            )
+            /*!
+             * \brief Install a function to respond to a URI matched by a regular expression.
+             *
+             * \param uri Regular expression to match URIs that should be
+             * served by this function.
+             * \param function Method accepting the URI parameters and
+             * returning a string.
+             */
+            template<typename ...Arguments>
+            void install(
+                std::string uri,
+                typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function
+                )
+            {
+                log::information("atlas::http::handler::install") <<
+                    "installing " << uri;
+                if(m_functions.count(uri))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered (" << uri << ")"
                         );
-                }
-            private:
-                //std::map<std::string, uri_type> m_functions;
-                boost::ptr_map<std::string, detail::basic_function> m_functions;
+                m_functions.insert(
+                    uri,
+                    static_cast<detail::basic_function*>(
+                        new detail::unwrapped_function<Arguments...>(function)
+                        )
+                    );
+            }
+        private:
+            //std::map<std::string, uri_type> m_functions;
+            boost::ptr_map<std::string, detail::basic_function> m_functions;
         };
     }
 }

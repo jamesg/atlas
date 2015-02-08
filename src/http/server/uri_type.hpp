@@ -6,6 +6,8 @@
 
 #include "mongoose.h"
 
+#include "http/server/response.hpp"
+
 namespace atlas
 {
     namespace http
@@ -17,7 +19,7 @@ namespace atlas
         /*!
          * \brief Synchronous URI function type.
          */
-        typedef boost::function<std::string(boost::smatch)> uri_function_type;
+        typedef boost::function<response(boost::smatch)> uri_function_type;
         /*!
          * \brief Function to handle URI requests.
          *

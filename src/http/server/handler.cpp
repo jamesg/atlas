@@ -41,8 +41,10 @@ atlas::http::uri_type atlas::http::detail::make_async(uri_function_type f)
             uri_callback_type failure
             )
     {
-        std::string result = f(match);
-        mg_send_data(conn, result.c_str(), result.length());
+        response r = f(match);
+        for(std::pair<std::string, std::string> header : r.headers)
+            mg_send_header(conn, header.first.c_str(), header.second.c_str());
+        mg_send_data(conn, r.data.c_str(), r.data.length());
         success();
     };
 }
