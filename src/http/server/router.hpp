@@ -102,7 +102,8 @@ namespace atlas
                 void copy(const boost::smatch& list, Container& container)
                 {
                     copy_string_to_vector<from, Container>(list, container);
-                    copy_to_vector<from+1, to>().template copy<Container>(list, container);
+                    copy_to_vector<from+1, to>()
+                        .template copy<Container>(list, container);
                 };
             };
             template<int to>
@@ -134,7 +135,8 @@ namespace atlas
                                 copy_to_vector<0, sizeof...(Arguments)>()
                                     .copy(match, arg_values);
 
-                                // Invoke the API function with the argument list.
+                                // Invoke the API function with the argument
+                                // list.
                                 http::response out =
                                     boost::fusion::invoke(function, arg_values);
                                 return out;

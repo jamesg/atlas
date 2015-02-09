@@ -20,7 +20,7 @@ void atlas::http::install_static_file(
         boost::bind(
             &atlas::http::static_file,
             boost::ref(mime_information),
-            std::string(hades::mkstr() << "static/" << filename),
+            filename,
             _1,
             _2,
             _3,
