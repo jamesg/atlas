@@ -1,4 +1,4 @@
-#include "handler.hpp"
+#include "router.hpp"
 
 #include <atomic>
 
@@ -61,11 +61,12 @@ void atlas::http::detail::basic_function::serve(
         uri_callback_type failure
         ) const
 {
-    log::test("atlas::http::detail::basic_function::serve") << "serving request";
+    log::test("atlas::http::detail::basic_function::serve") <<
+        "serving request";
     m_serve(conn, match, success, failure);
 }
 
-int atlas::http::handler::operator()(
+int atlas::http::router::operator()(
         mg_connection *conn,
         mg_event ev
         )
@@ -79,7 +80,7 @@ int atlas::http::handler::operator()(
         int status = ((http_connection*)(conn->connection_param))->status;
         delete (http_connection*)(conn->connection_param);
         conn->connection_param = nullptr;
-        atlas::log::information("http::handler") << "finish " << conn->uri;
+        atlas::log::information("http::router") << "finish " << conn->uri;
         if(status != MG_TRUE)
             http::error(500, "fail", conn);
         return MG_TRUE;
@@ -89,7 +90,7 @@ int atlas::http::handler::operator()(
         return MG_TRUE;
     if(ev != MG_REQUEST)
         return MG_FALSE;
-    log::information("http::handler") << "request " << conn->uri;
+    log::information("http::router") << "request " << conn->uri;
 
     http_connection *http_conn = new http_connection;
     conn->connection_param = http_conn;
@@ -108,7 +109,8 @@ int atlas::http::handler::operator()(
                 );
         if(matched)
         {
-            log::test("atlas::http::handler") << "handler found for " << conn->uri << " (" << i->first << ")";
+            log::test("atlas::http::router") << "handler found for " <<
+                conn->uri << " (" << i->first << ")";
             auto f = *i->second;
             f.serve(
                     match,
@@ -130,12 +132,12 @@ int atlas::http::handler::operator()(
     return MG_MORE;
 }
 
-void atlas::http::handler::install(
+void atlas::http::router::install(
     std::string uri,
     uri_type uri_function
     )
 {
-    log::information("atlas::http::handler::install") << "installing uri handler for " << uri;
+    log::information("atlas::http::router::install") << "installing uri handler for " << uri;
     if(m_functions.count(uri))
         throw std::runtime_error(
             hades::mkstr() << "uri handler already registered (" << uri << ")"

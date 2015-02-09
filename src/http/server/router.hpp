@@ -1,5 +1,5 @@
-#ifndef ATLAS_HTTP_HANDLER_HPP
-#define ATLAS_HTTP_HANDLER_HPP
+#ifndef ATLAS_HTTP_ROUTER_HPP
+#define ATLAS_HTTP_ROUTER_HPP
 
 #include <map>
 
@@ -21,13 +21,13 @@ namespace atlas
         namespace detail
         {
             /*!
-             * \brief Turn a synchronous URI handler function into an
+             * \brief Turn a synchronous URI router function into an
              * asynchronous one in order to make it compatible with the lower
              * level basic_function interface.
              */
             uri_type make_async(uri_function_type function);
             /*!
-             * \brief Wrapper for a handler function as stored by the handler.
+             * \brief Wrapper for a router function as stored by the router.
              */
             class basic_function
             {
@@ -83,7 +83,9 @@ namespace atlas
                 }
                 catch(const boost::bad_lexical_cast& e)
                 {
-                    throw std::runtime_error(hades::mkstr() << "casting uri handler: " << e.what());
+                    throw std::runtime_error(
+                        hades::mkstr() << "casting uri argument: " << e.what()
+                        );
                 }
             }
             /*!
@@ -144,13 +146,13 @@ namespace atlas
             };
         }
         /*!
-         * Route incoming HTTP requests to individual handler functions.
+         * Route incoming HTTP requests to individual router functions.
          */
-        class handler
+        class router
         {
         public:
             /*!
-             * Route an HTTP request to a handler function.
+             * Route an HTTP request to a router function.
              */
             int operator()(mg_connection*, mg_event);
             /*!
@@ -185,7 +187,7 @@ namespace atlas
                 typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function
                 )
             {
-                log::information("atlas::http::handler::install") <<
+                log::information("atlas::http::router::install") <<
                     "installing " << uri;
                 if(m_functions.count(uri))
                     throw std::runtime_error(

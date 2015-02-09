@@ -15,7 +15,7 @@ namespace atlas
 {
     namespace http
     {
-        class handler;
+        class router;
 
         class server
         {
@@ -30,12 +30,12 @@ namespace atlas
             void start();
             void stop();
 
-            handler& router() const;
+            http::router& router() const;
 
         private:
             void run();
 
-            boost::scoped_ptr<handler> m_handler;
+            boost::scoped_ptr<http::router> m_router;
             boost::thread m_thread;
             mg_server *m_mg_server;
         };

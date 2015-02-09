@@ -4,7 +4,7 @@
 
 #include "hades/mkstr.hpp"
 
-#include "http/server/handler.hpp"
+#include "http/server/router.hpp"
 #include "http/server/static_file.hpp"
 #include "http/server/server.hpp"
 

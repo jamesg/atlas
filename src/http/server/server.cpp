@@ -5,7 +5,7 @@
 
 #include "mongoose.h"
 
-#include "handler.hpp"
+#include "router.hpp"
 
 namespace
 {
@@ -19,10 +19,9 @@ atlas::http::server::server(
         boost::shared_ptr<boost::asio::io_service> callback_io,
         const char *address,
         const char *port
-        )
+        ) :
+    m_router(new http::router)
 {
-    m_handler.reset(new handler());
-
     m_mg_server = mg_create_server((void*)this, &accept);
     if(m_mg_server == nullptr)
         throw std::runtime_error("creating mongoose server");
@@ -34,9 +33,9 @@ atlas::http::server::~server()
     mg_destroy_server(&m_mg_server);
 }
 
-atlas::http::handler& atlas::http::server::router() const
+atlas::http::router& atlas::http::server::router() const
 {
-    return *m_handler;
+    return *m_router;
 }
 
 void atlas::http::server::start()
