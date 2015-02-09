@@ -13,5 +13,6 @@ atlas::http::response atlas::http::json_response(const styx::element& element)
     atlas::http::response out;
     out.data = styx::serialise_json(element);
     out.headers["Content-type"] = "text/plain";
+    return out;
 }
 

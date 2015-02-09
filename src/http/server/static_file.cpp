@@ -31,7 +31,6 @@ void atlas::http::static_file(
                 success,
                 error
                 );
-        success();
         return;
     }
     in.seekg(0, std::ios::end);

@@ -118,7 +118,7 @@ namespace atlas
             class unwrapped_function : public basic_function
             {
             public:
-                typedef boost::function<std::string(Arguments...)>
+                typedef boost::function<http::response(Arguments...)>
                     unwrapped_function_type;
 
                 unwrapped_function(unwrapped_function_type function) :
@@ -133,7 +133,7 @@ namespace atlas
                                     .copy(match, arg_values);
 
                                 // Invoke the API function with the argument list.
-                                std::string out =
+                                http::response out =
                                     boost::fusion::invoke(function, arg_values);
                                 return out;
                             }

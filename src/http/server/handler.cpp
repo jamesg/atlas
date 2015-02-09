@@ -91,6 +91,9 @@ int atlas::http::handler::operator()(
         return MG_FALSE;
     log::information("http::handler") << "request " << conn->uri;
 
+    http_connection *http_conn = new http_connection;
+    conn->connection_param = http_conn;
+
     for(
             boost::ptr_map<std::string, detail::basic_function>::iterator i =
                 m_functions.begin(), e = m_functions.end();
@@ -107,8 +110,6 @@ int atlas::http::handler::operator()(
         {
             log::test("atlas::http::handler") << "handler found for " << conn->uri << " (" << i->first << ")";
             auto f = *i->second;
-            http_connection *http_conn = new http_connection;
-            conn->connection_param = http_conn;
             f.serve(
                     match,
                     conn,
@@ -122,7 +123,9 @@ int atlas::http::handler::operator()(
     http::error(
             404,
             hades::mkstr() << "uri handler not found for " << conn->uri,
-            conn
+            conn,
+            boost::bind(&http_connection::report_success, http_conn),
+            boost::bind(&http_connection::report_failure, http_conn)
             );
     return MG_MORE;
 }
