@@ -96,21 +96,19 @@ int atlas::http::router::operator()(
     conn->connection_param = http_conn;
 
     for(
-            boost::ptr_map<std::string, detail::basic_function>::iterator i =
+            boost::ptr_map<matcher, detail::basic_function>::iterator i =
                 m_functions.begin(), e = m_functions.end();
             i != e; ++i
             )
     {
         boost::smatch match;
-        bool matched = boost::regex_match(
+        bool matched = i->first.matches(
                 std::string(conn->uri),
-                match,
-                boost::regex(i->first)
+                std::string(conn->request_method),
+                match
                 );
         if(matched)
         {
-            log::test("atlas::http::router") << "handler found for " <<
-                conn->uri << " (" << i->first << ")";
             auto f = *i->second;
             f.serve(
                     match,
@@ -133,15 +131,17 @@ int atlas::http::router::operator()(
 }
 
 void atlas::http::router::install(
-    std::string uri,
+    matcher m,
     uri_type uri_function
     )
 {
-    log::information("atlas::http::router::install") << "installing uri handler for " << uri;
-    if(m_functions.count(uri))
+    log::information("atlas::http::router::install") << "installing uri handler";
+    // This won't catch all conflicting handlers because they are based on
+    // regular expressions.
+    if(m_functions.count(m))
         throw std::runtime_error(
-            hades::mkstr() << "uri handler already registered (" << uri << ")"
+            hades::mkstr() << "uri handler already registered"
             );
-    m_functions.insert(uri, new detail::basic_function(uri_function));
+    m_functions.insert(m, new detail::basic_function(uri_function));
 }
 

@@ -12,6 +12,7 @@
 #include "hades/mkstr.hpp"
 
 #include "log/log.hpp"
+#include "matcher.hpp"
 #include "uri_type.hpp"
 
 namespace atlas
@@ -171,7 +172,7 @@ namespace atlas
              * installed for this URI.
              */
             void install(
-                std::string uri,
+                matcher m,
                 uri_type uri_function
                 );
 
@@ -185,27 +186,24 @@ namespace atlas
              */
             template<typename ...Arguments>
             void install(
-                std::string uri,
+                matcher m,
                 typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function
                 )
             {
-                log::information("atlas::http::router::install") <<
-                    "installing " << uri;
-                if(m_functions.count(uri))
+                if(m_functions.count(m))
                     throw std::runtime_error(
                         hades::mkstr() <<
-                        "uri handler already registered (" << uri << ")"
+                        "uri handler already registered"
                         );
                 m_functions.insert(
-                    uri,
+                    m,
                     static_cast<detail::basic_function*>(
                         new detail::unwrapped_function<Arguments...>(function)
                         )
                     );
             }
         private:
-            //std::map<std::string, uri_type> m_functions;
-            boost::ptr_map<std::string, detail::basic_function> m_functions;
+            boost::ptr_map<matcher, detail::basic_function> m_functions;
         };
     }
 }
