@@ -7,6 +7,10 @@ namespace atlas
 {
     namespace http
     {
+        /*!
+         * \brief Matches incoming request data (URI and method) and extracts
+         * URI parameters.
+         */
         class matcher
         {
         public:
@@ -28,6 +32,9 @@ namespace atlas
              */
             matcher(const std::string& regex, const std::string& method);
 
+            /*!
+             * \brief Determine whether or not the URI matches this object.
+             */
             bool matches(
                     const std::string& uri,
                     const std::string& method,

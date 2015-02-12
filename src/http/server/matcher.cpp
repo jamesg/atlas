@@ -3,7 +3,8 @@
 #include <boost/algorithm/string.hpp>
 
 atlas::http::matcher::matcher(const char *regex) :
-    m_regex(regex)
+    m_regex(regex),
+    m_method("get")
 {
 }
 
