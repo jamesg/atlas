@@ -41,6 +41,9 @@ namespace atlas
                     boost::smatch& match
                     ) const;
 
+            const std::string& regex() const;
+            const std::string& method() const;
+
             bool operator<(const matcher& o) const;
             bool operator==(const matcher& o) const;
 
