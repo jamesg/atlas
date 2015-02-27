@@ -4,18 +4,6 @@ project("Atlas Components")
 
 add_subdirectory(src)
 
-# Local copy of SQLite3
-add_library(
-    sqlite3
-    "lib/sqlite3/src/sqlite3.c"
-    )
-
-target_link_libraries(
-    sqlite3
-    "dl"
-    "pthread"
-    )
-
 # Local copy of Mongoose
 add_library(
     mongoose
