@@ -13,6 +13,7 @@ void atlas::http::error(
     mg_send_header(conn, "Connection", "close");
     mg_send_header(conn, "Content-Type", "text/plain");
     mg_send_data(conn, message.c_str(), message.length());
+    success();
 }
 
 void atlas::http::error(

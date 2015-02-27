@@ -20,7 +20,18 @@ target_link_libraries(
     atlas-com-common
     atlas-com-http
     mongoose
+    styx
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
     )
+file(GLOB atlas_http_server_test_sources server/test/*.cpp)
+add_executable(
+    atlas-http-server-test
+    ${atlas_http_server_test_sources}
+    )
+target_link_libraries(
+    atlas-http-server-test
+    atlas-com-http-server
+    )
+add_test(atlas-com-http-server-test atlas-com-http-server-test)
 

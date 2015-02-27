@@ -4,7 +4,7 @@
 
 #include "hades/mkstr.hpp"
 
-#include "http/server/handler.hpp"
+#include "http/server/router.hpp"
 #include "http/server/static_file.hpp"
 #include "http/server/server.hpp"
 
@@ -20,10 +20,11 @@ void atlas::http::install_static_file(
         boost::bind(
             &atlas::http::static_file,
             boost::ref(mime_information),
-            std::string(hades::mkstr() << "web/static/" << filename),
+            filename,
             _1,
             _2,
-            _3
+            _3,
+            _4
             )
         );
 }

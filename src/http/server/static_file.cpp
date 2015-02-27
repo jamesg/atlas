@@ -11,12 +11,14 @@ void atlas::http::static_file(
         const mimetypes& mime_information,
         const std::string& filename,
         mg_connection *conn,
+        boost::smatch,
         http::uri_callback_type success,
         http::uri_callback_type error
         )
 {
     //mg_send_file(conn, filename.c_str());
 
+    log::test("atlas::http::static_file") << "serving static file " << filename;
     std::string file_content;
     std::ifstream in(filename);
     if(!in.is_open())
@@ -29,7 +31,6 @@ void atlas::http::static_file(
                 success,
                 error
                 );
-        success();
         return;
     }
     in.seekg(0, std::ios::end);

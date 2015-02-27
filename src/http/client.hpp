@@ -7,6 +7,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/range.hpp>
 #include <boost/thread.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <curl/curl.h>
 
 namespace atlas
