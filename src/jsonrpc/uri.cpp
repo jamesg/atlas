@@ -13,6 +13,7 @@ void atlas::jsonrpc::uri(
         boost::shared_ptr<boost::asio::io_service> callback_io,
         api::server& server,
         mg_connection *conn,
+        boost::smatch,
         http::uri_callback_type success,
         http::uri_callback_type error
         )

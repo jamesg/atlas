@@ -107,6 +107,7 @@ int atlas::http::router::operator()(
                 std::string(conn->request_method),
                 match
                 );
+        log::test("http::router") << "match " << std::string(conn->uri) << " " << std::string(conn->request_method) << " against " << i->first.regex() << " " << i->first.method() << " "<< std::boolalpha << matched;
         if(matched)
         {
             auto f = *i->second;
