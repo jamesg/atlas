@@ -15,12 +15,6 @@ namespace atlas
                 const std::string& filename,
                 const std::string& uri
                 );
-
-        void install_static_file(
-                atlas::http::server& server,
-                const atlas::http::mimetypes& mime_information,
-                const std::string& filename
-                );
     }
 }
 

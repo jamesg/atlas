@@ -29,17 +29,3 @@ void atlas::http::install_static_file(
         );
 }
 
-void atlas::http::install_static_file(
-        atlas::http::server& server,
-        const atlas::http::mimetypes& mime_information,
-        const std::string& filename
-        )
-{
-    install_static_file(
-            server,
-            mime_information,
-            filename,
-            hades::mkstr() << "/" << filename
-            );
-}
-
