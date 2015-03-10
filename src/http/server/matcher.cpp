@@ -49,7 +49,8 @@ const std::string& atlas::http::matcher::method() const
 
 bool atlas::http::matcher::operator<(const matcher& o) const
 {
-    return m_regex < o.m_regex;
+    return m_regex < o.m_regex ||
+        (m_regex == o.m_regex && m_method < o.m_method);
 }
 
 bool atlas::http::matcher::operator==(const matcher& o) const
