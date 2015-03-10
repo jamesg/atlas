@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "http/fwd.hpp"
+#include "atlas/http/fwd.hpp"
 
 namespace atlas
 {

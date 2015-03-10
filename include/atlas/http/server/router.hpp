@@ -10,11 +10,11 @@
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include "hades/mkstr.hpp"
-
-#include "log/log.hpp"
-#include "matcher.hpp"
 #include "styx/styx.hpp"
-#include "uri_type.hpp"
+
+#include "atlas/log/log.hpp"
+#include "atlas/http/server/matcher.hpp"
+#include "atlas/http/server/uri_type.hpp"
 
 namespace atlas
 {

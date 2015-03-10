@@ -17,12 +17,12 @@
 #include "styx/get_default.hpp"
 #include "styx/styx.hpp"
 
-#include "api/auth_function_type.hpp"
-#include "api/exception.hpp"
-#include "api/method_type.hpp"
-#include "jsonrpc/request.hpp"
-#include "jsonrpc/result.hpp"
-#include "log/log.hpp"
+#include "atlas/api/auth_function_type.hpp"
+#include "atlas/api/exception.hpp"
+#include "atlas/api/method_type.hpp"
+#include "atlas/jsonrpc/request.hpp"
+#include "atlas/jsonrpc/result.hpp"
+#include "atlas/log/log.hpp"
 
 namespace atlas
 {

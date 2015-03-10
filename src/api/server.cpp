@@ -1,10 +1,10 @@
-#include "server.hpp"
-
-#include "styx/serialise_json.hpp"
+#include "atlas/api/server.hpp"
 
 #include "hades/mkstr.hpp"
-#include "jsonrpc/request.hpp"
-#include "jsonrpc/result.hpp"
+#include "styx/serialise_json.hpp"
+
+#include "atlas/jsonrpc/request.hpp"
+#include "atlas/jsonrpc/result.hpp"
 
 atlas::api::async_method_type atlas::api::detail::make_async(method_type method)
 {

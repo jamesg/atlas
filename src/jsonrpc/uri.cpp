@@ -1,13 +1,13 @@
-#include "uri.hpp"
+#include "atlas/jsonrpc/uri.hpp"
 
 #include <boost/bind.hpp>
 
 #include "styx/serialise_json.hpp"
 
-#include "api/server.hpp"
-#include "log/log.hpp"
-#include "request.hpp"
-#include "result.hpp"
+#include "atlas/api/server.hpp"
+#include "atlas/log/log.hpp"
+#include "atlas/jsonrpc/request.hpp"
+#include "atlas/jsonrpc/result.hpp"
 
 void atlas::jsonrpc::uri(
         boost::shared_ptr<boost::asio::io_service> callback_io,

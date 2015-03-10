@@ -1,10 +1,10 @@
-#include "client.hpp"
+#include "atlas/http/client.hpp"
 
 #include <boost/bind.hpp>
 
 #include "hades/mkstr.hpp"
 
-#include "log/log.hpp"
+#include "atlas/log/log.hpp"
 
 namespace
 {

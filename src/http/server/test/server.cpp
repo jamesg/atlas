@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include "http/client.hpp"
-#include "http/server/response.hpp"
-#include "http/server/router.hpp"
-#include "http/server/server.hpp"
+#include "atlas/http/client.hpp"
+#include "atlas/http/server/response.hpp"
+#include "atlas/http/server/router.hpp"
+#include "atlas/http/server/server.hpp"
 
 SCENARIO("atlas::http::server") {
     GIVEN("a server with some routes") {

@@ -1,13 +1,14 @@
-#include "router.hpp"
+#include "atlas/http/server/router.hpp"
 
 #include <atomic>
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "error.hpp"
 #include "hades/mkstr.hpp"
-#include "log/log.hpp"
+
+#include "atlas/http/server/error.hpp"
+#include "atlas/log/log.hpp"
 
 namespace
 {

@@ -1,11 +1,11 @@
-#include "server.hpp"
+#include "atlas/http/server/server.hpp"
 
 #include <iostream>
 #include <string>
 
 #include "mongoose.h"
 
-#include "router.hpp"
+#include "atlas/http/server/router.hpp"
 
 namespace
 {

@@ -1,12 +1,12 @@
-#include "install_static_file.hpp"
+#include "atlas/http/server/install_static_file.hpp"
 
 #include <boost/bind.hpp>
 
 #include "hades/mkstr.hpp"
 
-#include "http/server/router.hpp"
-#include "http/server/static_file.hpp"
-#include "http/server/server.hpp"
+#include "atlas/http/server/router.hpp"
+#include "atlas/http/server/static_file.hpp"
+#include "atlas/http/server/server.hpp"
 
 void atlas::http::install_static_file(
         atlas::http::server& server,

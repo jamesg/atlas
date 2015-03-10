@@ -1,11 +1,11 @@
-#include "mimetypes.hpp"
+#include "atlas/http/server/mimetypes.hpp"
 
 #include <fstream>
 #include <ios>
 
 #include <boost/tokenizer.hpp>
 
-#include "log/log.hpp"
+#include "atlas/log/log.hpp"
 
 atlas::http::mimetypes::mimetypes()
 {

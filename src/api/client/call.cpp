@@ -1,12 +1,12 @@
-#include "call.hpp"
+#include "atlas/api/client/call.hpp"
 
 #include "hades/mkstr.hpp"
 #include "styx/serialise_json.hpp"
 
-#include "http/client.hpp"
-#include "jsonrpc/request.hpp"
-#include "jsonrpc/result.hpp"
-#include "log/log.hpp"
+#include "atlas/http/client.hpp"
+#include "atlas/jsonrpc/request.hpp"
+#include "atlas/jsonrpc/result.hpp"
+#include "atlas/log/log.hpp"
 
 void atlas::api::call(
         boost::shared_ptr<boost::asio::io_service> io,

@@ -1,14 +1,13 @@
-#include "jsonrpc/auth.hpp"
+#include "atlas/jsonrpc/auth.hpp"
 
 #include "hades/crud.ipp"
 #include "hades/filter.hpp"
 #include "hades/join.hpp"
-
 #include "styx/serialise_json.hpp"
 
-#include "db/auth.hpp"
-#include "jsonrpc/request.hpp"
-#include "log/log.hpp"
+#include "atlas/db/auth.hpp"
+#include "atlas/jsonrpc/request.hpp"
+#include "atlas/log/log.hpp"
 
 bool atlas::jsonrpc::auth::has_permission(
         hades::connection& conn,

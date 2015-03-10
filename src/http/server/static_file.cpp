@@ -1,11 +1,11 @@
-#include "static_file.hpp"
+#include "atlas/http/server/static_file.hpp"
 
 #include <fstream>
 #include <streambuf>
 
-#include "error.hpp"
-#include "log/log.hpp"
-#include "mimetypes.hpp"
+#include "atlas/http/server/error.hpp"
+#include "atlas/log/log.hpp"
+#include "atlas/http/server/mimetypes.hpp"
 
 void atlas::http::static_file(
         const mimetypes& mime_information,

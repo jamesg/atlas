@@ -1,4 +1,4 @@
-#include "db/date.hpp"
+#include "atlas/db/date.hpp"
 
 std::string atlas::db::date::to_string(const boost::gregorian::date& date)
 {

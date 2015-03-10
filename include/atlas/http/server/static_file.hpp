@@ -7,7 +7,7 @@
 
 #include "mongoose.h"
 
-#include "http/server/uri_type.hpp"
+#include "atlas/http/server/uri_type.hpp"
 
 namespace atlas
 {

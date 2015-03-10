@@ -5,7 +5,7 @@
 
 #include "hades/connection.hpp"
 
-#include "jsonrpc/request.hpp"
+#include "atlas/jsonrpc/request.hpp"
 
 namespace atlas
 {

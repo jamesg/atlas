@@ -1,4 +1,4 @@
-#include "error.hpp"
+#include "atlas/http/server/error.hpp"
 
 void atlas::http::error(
         int code,

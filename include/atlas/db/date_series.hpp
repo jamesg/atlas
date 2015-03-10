@@ -10,9 +10,9 @@
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
 
-#include "db/date.hpp"
-#include "db/detail.hpp"
-#include "log/log.hpp"
+#include "atlas/db/date.hpp"
+#include "atlas/db/detail.hpp"
+#include "atlas/log/log.hpp"
 
 namespace atlas
 {

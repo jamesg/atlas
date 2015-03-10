@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project("Atlas Components")
 
+include_directories("lib/catch/include")
 add_subdirectory(src)
 
 # Local copy of Mongoose

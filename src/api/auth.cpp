@@ -1,4 +1,4 @@
-#include "auth.hpp"
+#include "atlas/api/auth.hpp"
 
 #include <boost/bind.hpp>
 
@@ -8,10 +8,10 @@
 
 #include "hades/crud.ipp"
 
-#include "api/server.hpp"
-#include "db/auth.hpp"
-#include "jsonrpc/auth.hpp"
-#include "log/log.hpp"
+#include "atlas/api/server.hpp"
+#include "atlas/db/auth.hpp"
+#include "atlas/jsonrpc/auth.hpp"
+#include "atlas/log/log.hpp"
 
 void atlas::api::auth::install(
         hades::connection& conn,

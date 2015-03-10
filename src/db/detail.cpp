@@ -1,4 +1,4 @@
-#include "db/detail.hpp"
+#include "atlas/db/detail.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 

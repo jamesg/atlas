@@ -4,7 +4,7 @@
 #include "hades/crud.ipp"
 #include "hades/filter.hpp"
 
-#include "db/auth.hpp"
+#include "atlas/db/auth.hpp"
 
 // Database tables are created every time an executable runs, so it must be
 // safe to call atlas::db::create on a database that has been initialised.

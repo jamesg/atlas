@@ -8,7 +8,7 @@
 #include "hades/tuple.hpp"
 #include "hades/relation.hpp"
 
-#include "db/temporal.hpp"
+#include "atlas/db/temporal.hpp"
 
 namespace atlas
 {
