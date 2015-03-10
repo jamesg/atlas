@@ -13,6 +13,7 @@
 
 #include "log/log.hpp"
 #include "matcher.hpp"
+#include "styx/styx.hpp"
 #include "uri_type.hpp"
 
 namespace atlas
@@ -27,6 +28,12 @@ namespace atlas
              * level basic_function interface.
              */
             uri_type make_async(uri_function_type function);
+            /*!
+             * \brief Turn a synchronous URI router function into an
+             * asynchronous one in order to make it compatible with the lower
+             * level basic_function interface.
+             */
+            uri_type make_async_with_data(data_uri_function_type function);
             /*!
              * \brief Wrapper for a router function as stored by the router.
              */
@@ -147,6 +154,42 @@ namespace atlas
                 {
                 }
             };
+
+            /*!
+             * \brief A function accepting POST or PUT data in addition to URI
+             * parameters.
+             */
+            template<typename ...Arguments>
+            class json_function : public basic_function
+            {
+            public:
+                typedef boost::function<http::response(styx::element, Arguments...)>
+                    unwrapped_function_type;
+
+                json_function(unwrapped_function_type function) :
+                    basic_function(
+                        detail::make_async_with_data(
+                            [function](std::string data, boost::smatch match)
+                            {
+                                typedef boost::fusion::vector<styx::element, Arguments...>
+                                    arg_values_type;
+                                arg_values_type arg_values;
+                                boost::fusion::at_c<0>(arg_values) =
+                                    styx::parse_json(data);
+                                copy_to_vector<1, sizeof...(Arguments)+1>()
+                                    .copy(match, arg_values);
+
+                                // Invoke the API function with the argument
+                                // list.
+                                http::response out =
+                                    boost::fusion::invoke(function, arg_values);
+                                return out;
+                            }
+                            )
+                        )
+                {
+                }
+            };
         }
         /*!
          * Route incoming HTTP requests to individual router functions.
@@ -179,8 +222,6 @@ namespace atlas
             /*!
              * \brief Install a function to respond to a URI matched by a regular expression.
              *
-             * \param uri Regular expression to match URIs that should be
-             * served by this function.
              * \param function Method accepting the URI parameters and
              * returning a string.
              */
@@ -199,6 +240,31 @@ namespace atlas
                     m,
                     static_cast<detail::basic_function*>(
                         new detail::unwrapped_function<Arguments...>(function)
+                        )
+                    );
+            }
+
+            /*!
+             * \brief Install a function to respond to a URI matched by a regular expression.
+             *
+             * \param function Method accepting the URI parameters and
+             * returning a string.
+             */
+            template<typename ...Arguments>
+            void install_json(
+                matcher m,
+                typename detail::json_function<Arguments...>::unwrapped_function_type function
+                )
+            {
+                if(m_functions.count(m))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered"
+                        );
+                m_functions.insert(
+                    m,
+                    static_cast<detail::basic_function*>(
+                        new detail::json_function<Arguments...>(function)
                         )
                     );
             }

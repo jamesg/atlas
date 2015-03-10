@@ -49,6 +49,23 @@ atlas::http::uri_type atlas::http::detail::make_async(uri_function_type f)
     };
 }
 
+atlas::http::uri_type atlas::http::detail::make_async_with_data(data_uri_function_type f)
+{
+    return [f](
+            mg_connection *conn,
+            boost::smatch match,
+            uri_callback_type success,
+            uri_callback_type failure
+            )
+    {
+        response r = f(std::string(conn->content, conn->content_len), match);
+        for(std::pair<std::string, std::string> header : r.headers)
+            mg_send_header(conn, header.first.c_str(), header.second.c_str());
+        mg_send_data(conn, r.data.c_str(), r.data.length());
+        success();
+    };
+}
+
 atlas::http::detail::basic_function::basic_function(uri_type function) :
     m_serve(function)
 {

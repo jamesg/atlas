@@ -21,6 +21,11 @@ namespace atlas
          */
         typedef boost::function<response(boost::smatch)> uri_function_type;
         /*!
+         * \brief Synchronous URI function type accepting POST or PUT data.
+         */
+        typedef boost::function<response(std::string, boost::smatch)>
+            data_uri_function_type;
+        /*!
          * \brief Function to handle URI requests.
          *
          * The function will be called with the incoming connection and success
