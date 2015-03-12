@@ -13,13 +13,19 @@ namespace atlas
         {
             std::string data;
             std::map<std::string, std::string> headers;
+            /*!
+             * \brief HTTP status code.
+             */
+            int status_code;
 
-            response()
+            response() :
+                status_code(200)
             {
             }
 
             response(const std::string& str) :
-                data(str)
+                data(str),
+                status_code(200)
             {
                 headers["Content-type"] = "text/plain";
             }
@@ -44,6 +50,10 @@ namespace atlas
          * named "data".
          */
         response json_response(const styx::element&);
+        /*!
+         * \brief Generate a simple JSON error response.
+         */
+        response json_error_response(const std::string& message);
     }
 }
 

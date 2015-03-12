@@ -30,3 +30,16 @@ atlas::http::response atlas::http::json_response(
     return raw_json_response(o);
 }
 
+atlas::http::response atlas::http::json_error_response(
+        const std::string& message
+        )
+{
+    styx::object o;
+    o["error"] = message;
+    atlas::http::response out;
+    out.data = styx::serialise_json(o);
+    out.headers["Content-type"] = "text/json";
+    out.status_code = 500;
+    return out;
+}
+

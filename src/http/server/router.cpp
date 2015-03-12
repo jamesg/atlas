@@ -43,6 +43,7 @@ atlas::http::uri_type atlas::http::detail::make_async(uri_function_type f)
             )
     {
         response r = f(match);
+        mg_send_status(conn, r.status_code);
         for(std::pair<std::string, std::string> header : r.headers)
             mg_send_header(conn, header.first.c_str(), header.second.c_str());
         mg_send_data(conn, r.data.c_str(), r.data.length());

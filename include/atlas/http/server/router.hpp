@@ -62,7 +62,7 @@ namespace atlas
             /*!
              * Copy a string from a regex match result to a Fusion vector.
              */
-            template<int Index, typename Container>
+            template<int src, int dest, typename Container>
             void copy_string_to_vector(
                     const boost::smatch& match,
                     Container& container
@@ -74,20 +74,20 @@ namespace atlas
                 typedef
                     typename std::remove_reference<
                         typename boost::fusion::result_of::at<
-                            Container, boost::mpl::int_<Index>
+                            Container, boost::mpl::int_<dest>
                             >::type
                         >::type element_type;
                 try
                 {
-                    if(match.size() > Index+1)
+                    if(match.size() > src+1)
                     {
                         element_type e = boost::lexical_cast<element_type>(
-                                match[Index+1]
+                                match[src+1]
                                 );
-                        boost::fusion::at_c<Index>(container) = e;
+                        boost::fusion::at_c<dest>(container) = e;
                     }
                     else
-                        boost::fusion::at_c<Index>(container) = element_type();
+                        boost::fusion::at_c<dest>(container) = element_type();
                 }
                 catch(const boost::bad_lexical_cast& e)
                 {
@@ -103,19 +103,19 @@ namespace atlas
              * the vector is too long for the boost::smatch, additional
              * elements are set to std::string().
              */
-            template<int from, int to>
+            template<int src_from, int src_to, int dest_from, int dest_to>
             struct copy_to_vector
             {
                 template<typename Container>
                 void copy(const boost::smatch& list, Container& container)
                 {
-                    copy_string_to_vector<from, Container>(list, container);
-                    copy_to_vector<from+1, to>()
+                    copy_string_to_vector<src_from, dest_from, Container>(list, container);
+                    copy_to_vector<src_from+1, src_to, dest_from+1, dest_to>()
                         .template copy<Container>(list, container);
                 };
             };
-            template<int to>
-            struct copy_to_vector<to, to>
+            template<int src_from, int src_to, int dest>
+            struct copy_to_vector<src_from, src_to, dest, dest>
             {
                 template<typename Container>
                 void copy(const boost::smatch&, Container&)
@@ -140,7 +140,7 @@ namespace atlas
                                 typedef boost::fusion::vector<Arguments...>
                                     arg_values_type;
                                 arg_values_type arg_values;
-                                copy_to_vector<0, sizeof...(Arguments)>()
+                                copy_to_vector<0, sizeof...(Arguments), 0, sizeof...(Arguments)>()
                                     .copy(match, arg_values);
 
                                 // Invoke the API function with the argument
@@ -176,7 +176,7 @@ namespace atlas
                                 arg_values_type arg_values;
                                 boost::fusion::at_c<0>(arg_values) =
                                     styx::parse_json(data);
-                                copy_to_vector<1, sizeof...(Arguments)+1>()
+                                copy_to_vector<0, sizeof...(Arguments), 1, sizeof...(Arguments)+1>()
                                     .copy(match, arg_values);
 
                                 // Invoke the API function with the argument
