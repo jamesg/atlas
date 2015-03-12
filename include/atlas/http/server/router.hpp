@@ -97,11 +97,6 @@ namespace atlas
                 }
             }
             /*!
-             * \brief Copy all elements in a boost::smatch to a
-             * boost::fusion::vector of std::string.  If the list is too long
-             * for the vector, only size(vector) elements will be copied.  If
-             * the vector is too long for the boost::smatch, additional
-             * elements are set to std::string().
              */
             template<int SrcFrom, int SrcTo, int DestFrom, int DestTo>
             struct copy_to_vector

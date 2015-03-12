@@ -80,8 +80,6 @@ void atlas::http::detail::basic_function::serve(
         uri_callback_type failure
         ) const
 {
-    log::test("atlas::http::detail::basic_function::serve") <<
-        "serving request";
     m_serve(conn, match, success, failure);
 }
 
@@ -99,7 +97,6 @@ int atlas::http::router::operator()(
         int status = ((http_connection*)(conn->connection_param))->status;
         delete (http_connection*)(conn->connection_param);
         conn->connection_param = nullptr;
-        atlas::log::information("http::router") << "finish " << conn->uri;
         if(status != MG_TRUE)
             http::error(500, "fail", conn);
         return MG_TRUE;
@@ -109,7 +106,7 @@ int atlas::http::router::operator()(
         return MG_TRUE;
     if(ev != MG_REQUEST)
         return MG_FALSE;
-    log::information("http::router") << "request " << conn->uri;
+    log::information("atlas::http::router") << "request " << conn->uri;
 
     http_connection *http_conn = new http_connection;
     conn->connection_param = http_conn;
@@ -126,7 +123,6 @@ int atlas::http::router::operator()(
                 std::string(conn->request_method),
                 match
                 );
-        log::test("http::router") << "match " << std::string(conn->uri) << " " << std::string(conn->request_method) << " against " << i->first.regex() << " " << i->first.method() << " "<< std::boolalpha << matched;
         if(matched)
         {
             auto f = *i->second;
@@ -155,7 +151,6 @@ void atlas::http::router::install(
     uri_type uri_function
     )
 {
-    log::information("atlas::http::router::install") << "installing uri handler";
     // This won't catch all conflicting handlers because they are based on
     // regular expressions.
     if(m_functions.count(m))
