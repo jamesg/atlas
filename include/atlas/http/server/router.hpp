@@ -62,7 +62,7 @@ namespace atlas
             /*!
              * Copy a string from a regex match result to a Fusion vector.
              */
-            template<int src, int dest, typename Container>
+            template<int Src, int Dest, typename Container>
             void copy_string_to_vector(
                     const boost::smatch& match,
                     Container& container
@@ -74,20 +74,20 @@ namespace atlas
                 typedef
                     typename std::remove_reference<
                         typename boost::fusion::result_of::at<
-                            Container, boost::mpl::int_<dest>
+                            Container, boost::mpl::int_<Dest>
                             >::type
                         >::type element_type;
                 try
                 {
-                    if(match.size() > src+1)
+                    if(match.size() > Src+1)
                     {
                         element_type e = boost::lexical_cast<element_type>(
-                                match[src+1]
+                                match[Src+1]
                                 );
-                        boost::fusion::at_c<dest>(container) = e;
+                        boost::fusion::at_c<Dest>(container) = e;
                     }
                     else
-                        boost::fusion::at_c<dest>(container) = element_type();
+                        boost::fusion::at_c<Dest>(container) = element_type();
                 }
                 catch(const boost::bad_lexical_cast& e)
                 {
@@ -103,19 +103,19 @@ namespace atlas
              * the vector is too long for the boost::smatch, additional
              * elements are set to std::string().
              */
-            template<int src_from, int src_to, int dest_from, int dest_to>
+            template<int SrcFrom, int SrcTo, int DestFrom, int DestTo>
             struct copy_to_vector
             {
                 template<typename Container>
                 void copy(const boost::smatch& list, Container& container)
                 {
-                    copy_string_to_vector<src_from, dest_from, Container>(list, container);
-                    copy_to_vector<src_from+1, src_to, dest_from+1, dest_to>()
+                    copy_string_to_vector<SrcFrom, DestFrom, Container>(list, container);
+                    copy_to_vector<SrcFrom+1, SrcTo, DestFrom+1, DestTo>()
                         .template copy<Container>(list, container);
                 };
             };
-            template<int src_from, int src_to, int dest>
-            struct copy_to_vector<src_from, src_to, dest, dest>
+            template<int SrcFrom, int SrcTo, int Dest>
+            struct copy_to_vector<SrcFrom, SrcTo, Dest, Dest>
             {
                 template<typename Container>
                 void copy(const boost::smatch&, Container&)
