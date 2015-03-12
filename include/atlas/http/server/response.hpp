@@ -18,17 +18,8 @@ namespace atlas
              */
             int status_code;
 
-            response() :
-                status_code(200)
-            {
-            }
-
-            response(const std::string& str) :
-                data(str),
-                status_code(200)
-            {
-                headers["Content-type"] = "text/plain";
-            }
+            response();
+            response(const std::string& str);
         };
 
         /*!

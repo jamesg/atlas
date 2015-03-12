@@ -5,6 +5,18 @@
 #include "styx/object.hpp"
 #include "styx/serialise_json.hpp"
 
+atlas::http::response::response() :
+    status_code(200)
+{
+}
+
+atlas::http::response::response(const std::string& str) :
+    data(str),
+    status_code(200)
+{
+    headers["Content-type"] = "text/plain";
+}
+
 atlas::http::response atlas::http::text_response(const std::string& str)
 {
     atlas::http::response out(str);
