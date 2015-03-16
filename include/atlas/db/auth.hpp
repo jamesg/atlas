@@ -155,6 +155,10 @@ namespace atlas
              */
             atlas::user_session start(hades::connection&, atlas::user::id_type);
             /*!
+             * \brief Destroy the session with the given token.
+             */
+            bool stop(const std::string& token, hades::connection&);
+            /*!
              * \brief Check that a session token is valid.  If the token is
              * valid, its last updated time is set to the current time.
              */

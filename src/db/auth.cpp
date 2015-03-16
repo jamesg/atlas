@@ -74,6 +74,18 @@ atlas::user_session atlas::db::user_session::start(
     return session;
 }
 
+bool atlas::db::user_session::stop(
+        const std::string& token,
+        hades::connection& conn
+        )
+{
+    return hades::devoid(
+            "DELETE FROM user_session WHERE token = ?",
+            hades::row<std::string>(token),
+            conn
+            ) > 0;
+}
+
 atlas::user_session atlas::db::user_session::token_session(
         hades::connection& conn,
         const std::string& token
