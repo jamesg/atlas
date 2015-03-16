@@ -68,8 +68,12 @@ atlas::http::uri_type atlas::http::detail::make_async_with_data(data_uri_functio
     };
 }
 
-atlas::http::detail::basic_function::basic_function(uri_type function) :
-    m_serve(function)
+atlas::http::detail::basic_function::basic_function(
+        uri_type function,
+        auth_function_type auth_function
+        ) :
+    m_serve(function),
+    m_auth_function(auth_function)
 {
 }
 
@@ -80,7 +84,16 @@ void atlas::http::detail::basic_function::serve(
         uri_callback_type failure
         ) const
 {
-    m_serve(conn, match, success, failure);
+    const char *token = mg_get_header(conn, "Authorization");
+    if(m_auth_function((token==nullptr)?"":token))
+    {
+        m_serve(conn, match, success, failure);
+    }
+    else
+    {
+        http::error(403, "unauthorised", conn);
+        success();
+    }
 }
 
 int atlas::http::router::operator()(
@@ -97,10 +110,13 @@ int atlas::http::router::operator()(
         int status = ((http_connection*)(conn->connection_param))->status;
         delete (http_connection*)(conn->connection_param);
         conn->connection_param = nullptr;
-        if(status != MG_TRUE)
-            http::error(500, "fail", conn);
-        return MG_TRUE;
+        return status;
+        //if(status != MG_TRUE)
+            //http::error(500, "fail", conn);
+        //return MG_TRUE;
     }
+    if(ev == MG_POLL)
+        return MG_MORE;
 
     if(ev == MG_AUTH)
         return MG_TRUE;
@@ -157,6 +173,30 @@ void atlas::http::router::install(
         throw std::runtime_error(
             hades::mkstr() << "uri handler already registered"
             );
-    m_functions.insert(m, new detail::basic_function(uri_function));
+    m_functions.insert(
+            m,
+            new detail::basic_function(
+                uri_function,
+                [](const auth::token_type&) { return true; }
+                )
+            );
+}
+
+void atlas::http::router::install(
+    matcher m,
+    uri_type uri_function,
+    auth_function_type auth_function
+    )
+{
+    // This won't catch all conflicting handlers because they are based on
+    // regular expressions.
+    if(m_functions.count(m))
+        throw std::runtime_error(
+            hades::mkstr() << "uri handler already registered"
+            );
+    m_functions.insert(
+            m,
+            new detail::basic_function(uri_function, auth_function)
+            );
 }
 

@@ -40,7 +40,7 @@ namespace atlas
             class basic_function
             {
             public:
-                basic_function(uri_type);
+                basic_function(uri_type, auth_function_type);
 
                 /*!
                  * \brief Handle a request from the client for an API
@@ -57,6 +57,7 @@ namespace atlas
 
             private:
                 uri_type m_serve;
+                auth_function_type m_auth_function;
             };
 
             /*!
@@ -127,7 +128,10 @@ namespace atlas
                 typedef boost::function<http::response(Arguments...)>
                     unwrapped_function_type;
 
-                unwrapped_function(unwrapped_function_type function) :
+                unwrapped_function(
+                        unwrapped_function_type function,
+                        auth_function_type auth_function
+                        ) :
                     basic_function(
                         detail::make_async(
                             [function](boost::smatch match)
@@ -144,7 +148,8 @@ namespace atlas
                                     boost::fusion::invoke(function, arg_values);
                                 return out;
                             }
-                            )
+                            ),
+                            auth_function
                         )
                 {
                 }
@@ -161,7 +166,10 @@ namespace atlas
                 typedef boost::function<http::response(styx::element, Arguments...)>
                     unwrapped_function_type;
 
-                json_function(unwrapped_function_type function) :
+                json_function(
+                        unwrapped_function_type function,
+                        auth_function_type auth_function
+                        ) :
                     basic_function(
                         detail::make_async_with_data(
                             [function](std::string data, boost::smatch match)
@@ -180,7 +188,8 @@ namespace atlas
                                     boost::fusion::invoke(function, arg_values);
                                 return out;
                             }
-                            )
+                            ),
+                            auth_function
                         )
                 {
                 }
@@ -213,6 +222,24 @@ namespace atlas
                 matcher m,
                 uri_type uri_function
                 );
+            /*!
+             * \brief Install a function to respond to a specific URI.
+             *
+             * \param uri_function Function to execute when the URI is
+             * requested.  The function will be provided with cpp-netlib
+             * request and connection_ptr objects.
+             *
+             * \note The URI function will be called in the current thread
+             * (from the web server's thread pool).
+             *
+             * \throws std::runtime_error if a function has already been
+             * installed for this URI.
+             */
+            void install(
+                matcher m,
+                uri_type uri_function,
+                auth_function_type auth_function
+                );
 
             /*!
              * \brief Install a function to respond to a URI matched by a regular expression.
@@ -234,7 +261,35 @@ namespace atlas
                 m_functions.insert(
                     m,
                     static_cast<detail::basic_function*>(
-                        new detail::unwrapped_function<Arguments...>(function)
+                        new detail::unwrapped_function<Arguments...>(
+                            function,
+                            [](const auth::token_type&) { return true; }
+                            )
+                        )
+                    );
+            }
+            /*!
+             * \brief Install a function to respond to a URI matched by a regular expression.
+             *
+             * \param function Method accepting the URI parameters and
+             * returning a string.
+             */
+            template<typename ...Arguments>
+            void install(
+                matcher m,
+                typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function,
+                auth_function_type auth_function
+                )
+            {
+                if(m_functions.count(m))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered"
+                        );
+                m_functions.insert(
+                    m,
+                    static_cast<detail::basic_function*>(
+                        new detail::unwrapped_function<Arguments...>(function, auth_function)
                         )
                     );
             }
@@ -259,7 +314,35 @@ namespace atlas
                 m_functions.insert(
                     m,
                     static_cast<detail::basic_function*>(
-                        new detail::json_function<Arguments...>(function)
+                        new detail::json_function<Arguments...>(
+                            function,
+                            [](const auth::token_type&) { return true; }
+                            )
+                        )
+                    );
+            }
+            /*!
+             * \brief Install a function to respond to a URI matched by a regular expression.
+             *
+             * \param function Method accepting the URI parameters and
+             * returning a string.
+             */
+            template<typename ...Arguments>
+            void install_json(
+                matcher m,
+                typename detail::json_function<Arguments...>::unwrapped_function_type function,
+                auth_function_type auth_function
+                )
+            {
+                if(m_functions.count(m))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered"
+                        );
+                m_functions.insert(
+                    m,
+                    static_cast<detail::basic_function*>(
+                        new detail::json_function<Arguments...>(function, auth_function)
                         )
                     );
             }

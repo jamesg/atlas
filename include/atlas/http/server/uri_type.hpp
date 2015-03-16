@@ -6,6 +6,7 @@
 
 #include "mongoose.h"
 
+#include "atlas/auth.hpp"
 #include "atlas/http/server/response.hpp"
 
 namespace atlas
@@ -40,6 +41,12 @@ namespace atlas
                     )
             >
             uri_type;
+        /*!
+         * \brief Function to allow/disallow access to a URL based on the
+         * current user's credentials.
+         */
+        typedef boost::function<bool(const auth::token_type&)>
+            auth_function_type;
     }
 }
 
