@@ -75,7 +75,7 @@ void atlas::api::detail::basic_method::serve(
     {
         jsonrpc::result result;
         result.error() = e.what();
-        log::error("api::detail::basic_method::serve") <<
+        log::error("atlas::api::detail::basic_method::serve") <<
             "api exception " << request.method() <<
             ": " << e.what();
         result.id() = request.id();
@@ -85,7 +85,7 @@ void atlas::api::detail::basic_method::serve(
     {
         jsonrpc::result result;
         result.error() = "Unknown error";
-        log::error("api::detail::basic_method::serve") <<
+        log::error("atlas::api::detail::basic_method::serve") <<
             "in api function " << request.method() <<
             ": " << e.what();
         result.id() = request.id();
@@ -139,7 +139,7 @@ void atlas::api::server::serve(
         boost::function<void(jsonrpc::result&)> callback
         ) const
 {
-    log::information("api::server::serve") << "request " <<
+    log::information("atlas::api::server::serve") << "request " <<
         "method: " << request.method() << " params: " <<
         std::string(styx::serialise_json(request.params())) <<
         "token: " << request.token();
@@ -149,7 +149,7 @@ void atlas::api::server::serve(
     {
         styx::element result_e;
         jsonrpc::result result(result_e);
-        log::warning("api::server::serve") <<
+        log::warning("atlas::api::server::serve") <<
             "jsonrpc request for unknown method: " << std::string(request.method());
         result.error() = "Method unknown";
         result.id() = request.id();
