@@ -33,5 +33,5 @@ target_link_libraries(
     atlas-http-server-test
     atlas-com-http-server
     )
-add_test(atlas-com-http-server-test atlas-com-http-server-test)
+add_test(atlas-http-server-test atlas-http-server-test)
 
