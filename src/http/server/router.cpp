@@ -87,7 +87,15 @@ void atlas::http::detail::basic_function::serve(
     const char *token = mg_get_header(conn, "Authorization");
     if(m_auth_function((token==nullptr)?"":token))
     {
-        m_serve(conn, match, success, failure);
+        try
+        {
+            m_serve(conn, match, success, failure);
+        }
+        catch(const std::exception& e)
+        {
+            log::error("atlas::http::detail::basic_function::serve") <<
+                "error in http handler: " << e.what();
+        }
     }
     else
     {
@@ -134,8 +142,9 @@ int atlas::http::router::operator()(
             )
     {
         boost::smatch match;
+        std::string uri(conn->uri);
         bool matched = i->first.matches(
-                std::string(conn->uri),
+                uri,
                 std::string(conn->request_method),
                 match
                 );
