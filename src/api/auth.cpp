@@ -19,7 +19,7 @@ void atlas::api::auth::install(
         )
 {
     server.install<styx::object, std::string, std::string>(
-            "user_signin",
+            "sign_in",
             [&conn](std::string username, std::string password) {
                 atlas::user user;
                 auto where = hades::where(
@@ -52,14 +52,19 @@ void atlas::api::auth::install(
                 atlas::user_session session =
                     db::user_session::start(conn, user.id());
 
-                styx::object user_o = (styx::object)user;
-                user_o.get_string("token") =
+                user.get_string("token") =
                     session.get_string<db::attr::user_session::token>();
-                return user_o;
+                return user;
+            }
+            );
+    server.install<bool, std::string>(
+            "sign_out",
+            [&conn](std::string token) {
+                return atlas::db::user_session::stop(token, conn);
             }
             );
     server.install<styx::list>(
-            "user_list",
+            "list",
             boost::bind(
                 &hades::equi_outer_join<
                     atlas::user,
@@ -71,7 +76,7 @@ void atlas::api::auth::install(
             boost::bind(jsonrpc::auth::is_superuser, boost::ref(conn), _1)
             );
     server.install<styx::element, styx::element>(
-            "user_get",
+            "get",
             [&conn](styx::element user_id_e) {
                 atlas::user::id_type user_id(user_id_e);
                 atlas::user out = hades::get_by_id<atlas::user>(conn, user_id);
@@ -79,7 +84,7 @@ void atlas::api::auth::install(
             }
             );
     server.install<styx::element, styx::element>(
-            "user_save",
+            "save",
             [&conn](styx::element e) {
                 atlas::user user(e);
                 if(user.exists(conn))
@@ -103,7 +108,7 @@ void atlas::api::auth::install(
             }
             );
     server.install<bool, styx::element>(
-            "user_destroy",
+            "destroy",
             [&conn](styx::element& e) {
                 atlas::user user(e);
                 if(user.get_string<db::attr::user::username>() == "root")
@@ -112,7 +117,7 @@ void atlas::api::auth::install(
             }
             );
     server.install<styx::list, int>(
-            "user_permissions",
+            "permissions",
             [&conn](int user_id) {
                 std::vector<atlas::user_permission> permissions =
                     atlas::db::user_permission::user_permissions(
@@ -126,7 +131,7 @@ void atlas::api::auth::install(
             }
             );
     server.install<bool, styx::object>(
-            "user_change_password",
+            "change_password",
             [&conn](styx::object change_password) {
                 atlas::user::id_type user_id{
                     change_password.get_int("user_id")
