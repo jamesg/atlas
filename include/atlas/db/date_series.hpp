@@ -32,7 +32,7 @@ namespace atlas
             typename Id,
             const char *const Relation,
             const char *const Attribute,
-            const char *const DateAttribute>
+            const char *const DateAttribute=atlas::db::attr::date_series::date>
         class date_series :
             public hades::crud<
                 date_series<Id, Relation, Attribute, DateAttribute>
