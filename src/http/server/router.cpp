@@ -61,6 +61,7 @@ atlas::http::uri_type atlas::http::detail::make_async_with_data(data_uri_functio
             )
     {
         response r = f(std::string(conn->content, conn->content_len), match);
+        mg_send_status(conn, r.status_code);
         for(std::pair<std::string, std::string> header : r.headers)
             mg_send_header(conn, header.first.c_str(), header.second.c_str());
         mg_send_data(conn, r.data.c_str(), r.data.length());
@@ -180,7 +181,8 @@ void atlas::http::router::install(
     // regular expressions.
     if(m_functions.count(m))
         throw std::runtime_error(
-            hades::mkstr() << "uri handler already registered"
+            hades::mkstr() << "uri handler already registered (" <<
+                m.regex() << ")"
             );
     m_functions.insert(
             m,
@@ -201,7 +203,8 @@ void atlas::http::router::install(
     // regular expressions.
     if(m_functions.count(m))
         throw std::runtime_error(
-            hades::mkstr() << "uri handler already registered"
+            hades::mkstr() << "uri handler already registered (" <<
+                m.regex() << ")"
             );
     m_functions.insert(
             m,

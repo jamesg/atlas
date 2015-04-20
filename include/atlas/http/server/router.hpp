@@ -256,7 +256,7 @@ namespace atlas
                 if(m_functions.count(m))
                     throw std::runtime_error(
                         hades::mkstr() <<
-                        "uri handler already registered"
+                        "uri handler already registered (" << m.regex() << ")"
                         );
                 m_functions.insert(
                     m,
@@ -284,7 +284,7 @@ namespace atlas
                 if(m_functions.count(m))
                     throw std::runtime_error(
                         hades::mkstr() <<
-                        "uri handler already registered"
+                        "uri handler already registered (" << m.regex() << ")"
                         );
                 m_functions.insert(
                     m,
@@ -309,7 +309,7 @@ namespace atlas
                 if(m_functions.count(m))
                     throw std::runtime_error(
                         hades::mkstr() <<
-                        "uri handler already registered"
+                        "uri handler already registered (" << m.regex() << ")"
                         );
                 m_functions.insert(
                     m,
@@ -337,7 +337,7 @@ namespace atlas
                 if(m_functions.count(m))
                     throw std::runtime_error(
                         hades::mkstr() <<
-                        "uri handler already registered"
+                        "uri handler already registered (" << m.regex() << ")"
                         );
                 m_functions.insert(
                     m,
