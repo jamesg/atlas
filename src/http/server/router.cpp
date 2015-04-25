@@ -119,10 +119,10 @@ int atlas::http::router::operator()(
         int status = ((http_connection*)(conn->connection_param))->status;
         delete (http_connection*)(conn->connection_param);
         conn->connection_param = nullptr;
-        return status;
-        //if(status != MG_TRUE)
-            //http::error(500, "fail", conn);
-        //return MG_TRUE;
+        //return status;
+        if(status != MG_TRUE)
+            http::error(500, "fail", conn);
+        return MG_TRUE;
     }
     if(ev == MG_POLL)
         return MG_MORE;
