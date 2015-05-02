@@ -172,6 +172,52 @@ int atlas::http::router::operator()(
     return MG_MORE;
 }
 
+void atlas::http::router::serve(
+        mg_connection *mg_conn,
+        boost::smatch match,
+        uri_callback_type success,
+        uri_callback_type failure
+        )
+{
+    const std::string uri(match[1]);
+    atlas::log::test("atlas::http::router::serve") << "uri " << uri;
+
+    for(
+            boost::ptr_map<matcher, detail::basic_function>::iterator i =
+                m_functions.begin(), e = m_functions.end();
+            i != e; ++i
+            )
+    {
+        boost::smatch match;
+        atlas::log::test("atlas::http::router::serve") << "test " << uri << " " << mg_conn->request_method;
+        atlas::log::test("atlas::http::router::serve") << "matcher " << i->first.regex() << " method " << i->first.method();
+        bool matched = i->first.matches(
+                uri,
+                std::string(mg_conn->request_method),
+                match
+                );
+        if(matched)
+        {
+            atlas::log::test("atlas::http::router::serve") << "match " << uri << " " << mg_conn->request_method;
+            auto f = *i->second;
+            f.serve(
+                    match,
+                    mg_conn,
+                    success,
+                    failure
+                    );
+            return;
+        }
+    }
+    http::error(
+            404,
+            hades::mkstr() << "uri handler not found for " << uri,
+            mg_conn,
+            success,
+            failure
+            );
+}
+
 void atlas::http::router::install(
     matcher m,
     uri_type uri_function

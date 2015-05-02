@@ -4,13 +4,13 @@
 
 atlas::http::matcher::matcher(const char *regex) :
     m_regex(regex),
-    m_method("get")
+    m_method("")
 {
 }
 
 atlas::http::matcher::matcher(const std::string& regex) :
     m_regex(regex),
-    m_method("get")
+    m_method("")
 {
 }
 
@@ -32,7 +32,7 @@ bool atlas::http::matcher::matches(
 {
     std::string m(method);
     boost::algorithm::to_lower(m);
-    if(m_method != m)
+    if(m_method != "" && m_method != m)
         return false;
     return boost::regex_match(uri, match, boost::regex(m_regex));
 }

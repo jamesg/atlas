@@ -15,13 +15,13 @@ namespace atlas
         {
         public:
             /*!
-             * \brief Match GET requests to a URI matching a regular expression.
+             * \brief Match all requests to a URI matching a regular expression.
              *
              * \todo Consider making this constructor explicit.
              */
             matcher(const char *regex);
             /*!
-             * \brief Match GET requests to a URI matching a regular expression.
+             * \brief Match all requests to a URI matching a regular expression.
              *
              * \todo Consider making this constructor explicit.
              */
@@ -49,6 +49,10 @@ namespace atlas
 
         private:
             const std::string m_regex;
+            /*!
+             * \brief HTTP method to match.  The empty string matches any
+             * method.
+             */
             std::string m_method;
         };
     }

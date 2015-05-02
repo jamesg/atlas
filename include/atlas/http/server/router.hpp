@@ -46,6 +46,8 @@ namespace atlas
                  * \brief Handle a request from the client for an API
                  * function.
                  *
+                 * \note Is a function of type atlas::http::uri_type.
+                 *
                  * \throws None.
                  */
                 void serve(
@@ -202,9 +204,19 @@ namespace atlas
         {
         public:
             /*!
-             * Route an HTTP request to a router function.
+             * \brief Route an HTTP request to a router function.
              */
             int operator()(mg_connection*, mg_event);
+            /*!
+             * \brief Handle an incoming connection, taking the first part of
+             * the match as a URL.
+             */
+            void serve(
+                    mg_connection*,
+                    boost::smatch,
+                    uri_callback_type success,
+                    uri_callback_type failure
+                    );
             /*!
              * \brief Install a function to respond to a specific URI.
              *
@@ -341,9 +353,9 @@ namespace atlas
                         );
                 m_functions.insert(
                     m,
-                    static_cast<detail::basic_function*>(
+                    //static_cast<detail::basic_function*>(
                         new detail::json_function<Arguments...>(function, auth_function)
-                        )
+                        //)
                     );
             }
         private:
