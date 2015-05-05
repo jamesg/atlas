@@ -5,6 +5,9 @@ project("Atlas Components")
 include("cmake/atlas_add_objcopy_target.cmake")
 
 include_directories("lib/catch/include")
+
+add_subdirectory(web)
+
 add_subdirectory(src)
 
 # Local copy of Mongoose

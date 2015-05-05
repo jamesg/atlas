@@ -4,22 +4,26 @@
 
 atlas::http::matcher::matcher(const char *regex) :
     m_regex(regex),
-    m_method("")
+    m_method(""),
+    m_priority(0)
 {
 }
 
-atlas::http::matcher::matcher(const std::string& regex) :
+atlas::http::matcher::matcher(const std::string& regex, int priority) :
     m_regex(regex),
-    m_method("")
+    m_method(""),
+    m_priority(priority)
 {
 }
 
 atlas::http::matcher::matcher(
         const std::string& regex,
-        const std::string& method
+        const std::string& method,
+        int priority
         ) :
     m_regex(regex),
-    m_method(method)
+    m_method(method),
+    m_priority(priority)
 {
     boost::algorithm::to_lower(m_method);
 }
@@ -49,8 +53,10 @@ const std::string& atlas::http::matcher::method() const
 
 bool atlas::http::matcher::operator<(const matcher& o) const
 {
-    return m_regex < o.m_regex ||
-        (m_regex == o.m_regex && m_method < o.m_method);
+    return m_priority < o.m_priority || (
+            m_priority == o.m_priority &&
+            (m_regex < o.m_regex || (m_regex == o.m_regex && m_method < o.m_method))
+        );
 }
 
 bool atlas::http::matcher::operator==(const matcher& o) const
