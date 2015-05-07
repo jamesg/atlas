@@ -9,6 +9,8 @@ atlas_add_objcopy_target(atlas open-iconic/font/fonts/open-iconic.ttf open_iconi
 atlas_add_objcopy_target(atlas open-iconic/font/fonts/open-iconic.woff open_iconic_font_fonts_open_iconic_woff.o)
 atlas_add_objcopy_target(atlas ShareTechMono-Regular.ttf ShareTechMono_Regular_ttf.o)
 atlas_add_objcopy_target(atlas ShareTech-Regular.ttf ShareTech_Regular_ttf.o)
+atlas_add_objcopy_target(atlas modal.js modal_js.o)
+atlas_add_objcopy_target(atlas modal.css modal_css.o)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/static.a
@@ -24,6 +26,8 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_fonts_open_iconic_woff.o
         ${CMAKE_CURRENT_BINARY_DIR}/ShareTechMono_Regular_ttf.o
         ${CMAKE_CURRENT_BINARY_DIR}/ShareTech_Regular_ttf.o
+        ${CMAKE_CURRENT_BINARY_DIR}/modal.js
+        ${CMAKE_CURRENT_BINARY_DIR}/modal.css
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Archiving static HTML libraries to ${CMAKE_CURRENT_BINARY_DIR}/static.a"
     DEPENDS
@@ -38,6 +42,8 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_fonts_open_iconic_woff.o
         ${CMAKE_CURRENT_BINARY_DIR}/ShareTechMono_Regular_ttf.o
         ${CMAKE_CURRENT_BINARY_DIR}/ShareTech_Regular_ttf.o
+        ${CMAKE_CURRENT_BINARY_DIR}/modal_js.o
+        ${CMAKE_CURRENT_BINARY_DIR}/modal_css.o
     )
 
 add_custom_target(atlas-web-text ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/static.a)
