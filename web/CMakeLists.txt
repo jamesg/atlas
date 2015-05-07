@@ -26,8 +26,8 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_fonts_open_iconic_woff.o
         ${CMAKE_CURRENT_BINARY_DIR}/ShareTechMono_Regular_ttf.o
         ${CMAKE_CURRENT_BINARY_DIR}/ShareTech_Regular_ttf.o
-        ${CMAKE_CURRENT_BINARY_DIR}/modal.js
-        ${CMAKE_CURRENT_BINARY_DIR}/modal.css
+        ${CMAKE_CURRENT_BINARY_DIR}/modal_js.o
+        ${CMAKE_CURRENT_BINARY_DIR}/modal_css.o
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Archiving static HTML libraries to ${CMAKE_CURRENT_BINARY_DIR}/static.a"
     DEPENDS
