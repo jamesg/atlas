@@ -27,6 +27,8 @@ ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_ttf)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_woff)
 ATLAS_DECLARE_STATIC_STRING(ShareTechMono_Regular_ttf)
 ATLAS_DECLARE_STATIC_STRING(ShareTech_Regular_ttf)
+ATLAS_DECLARE_STATIC_STRING(modal_js)
+ATLAS_DECLARE_STATIC_STRING(modal_css)
 
 boost::shared_ptr<atlas::http::router> atlas::http::static_files()
 {
@@ -70,6 +72,8 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
     install_static_text("/open-iconic/font/fonts/open-iconic.woff", ATLAS_STATIC_STD_STRING(open_iconic_font_fonts_open_iconic_woff));
     install_static_text("/ShareTechMono-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTechMono_Regular_ttf));
     install_static_text("/ShareTech-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTech_Regular_ttf));
+    install_static_text("/modal.js", ATLAS_STATIC_STD_STRING(modal_js));
+    install_static_text("/modal.css", ATLAS_STATIC_STD_STRING(modal_css));
 
     return out;
 }
