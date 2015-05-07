@@ -29,6 +29,7 @@ ATLAS_DECLARE_STATIC_STRING(ShareTechMono_Regular_ttf)
 ATLAS_DECLARE_STATIC_STRING(ShareTech_Regular_ttf)
 ATLAS_DECLARE_STATIC_STRING(modal_js)
 ATLAS_DECLARE_STATIC_STRING(modal_css)
+ATLAS_DECLARE_STATIC_STRING(pure_min_css)
 
 boost::shared_ptr<atlas::http::router> atlas::http::static_files()
 {
@@ -74,6 +75,7 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
     install_static_text("/ShareTech-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTech_Regular_ttf));
     install_static_text("/modal.js", ATLAS_STATIC_STD_STRING(modal_js));
     install_static_text("/modal.css", ATLAS_STATIC_STD_STRING(modal_css));
+    install_static_text("/pure-min.css", ATLAS_STATIC_STD_STRING(pure_min_css));
 
     return out;
 }
