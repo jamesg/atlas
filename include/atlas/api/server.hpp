@@ -4,6 +4,7 @@
 #include <map>
 #include <type_traits>
 
+#include <boost/asio.hpp>
 #include <boost/function.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/invoke.hpp>
@@ -11,6 +12,8 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+
+#include "mongoose.h"
 
 #include "hades/mkstr.hpp"
 #include "styx/cast.hpp"
@@ -20,6 +23,7 @@
 #include "atlas/api/auth_function_type.hpp"
 #include "atlas/api/exception.hpp"
 #include "atlas/api/method_type.hpp"
+#include "atlas/http/server/uri_type.hpp"
 #include "atlas/jsonrpc/request.hpp"
 #include "atlas/jsonrpc/result.hpp"
 #include "atlas/log/log.hpp"
@@ -194,7 +198,11 @@ namespace atlas
         class server
         {
             public:
-                server();
+                /*!
+                 * \param io IO service to use for servicing asynchronous API
+                 * requests.
+                 */
+                server(boost::shared_ptr<boost::asio::io_service> io);
 
                 /*!
                  * \brief Install an asynchronous JSONRPC method on the server.
@@ -269,8 +277,16 @@ namespace atlas
                         jsonrpc::request&,
                         boost::function<void(jsonrpc::result&)>
                         ) const;
+
+                void serve(
+                        mg_connection*,
+                        boost::smatch,
+                        http::uri_callback_type,
+                        http::uri_callback_type
+                        ) const;
             private:
                 boost::ptr_map<std::string, detail::basic_method> m_methods;
+                boost::shared_ptr<boost::asio::io_service> m_io;
         };
     }
 }
