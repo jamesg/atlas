@@ -2,13 +2,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-atlas::http::matcher::matcher(const char *regex) :
-    m_regex(regex),
-    m_method(""),
-    m_priority(0)
-{
-}
-
 atlas::http::matcher::matcher(const std::string& regex, int priority) :
     m_regex(regex),
     m_method(""),
@@ -61,6 +54,6 @@ bool atlas::http::matcher::operator<(const matcher& o) const
 
 bool atlas::http::matcher::operator==(const matcher& o) const
 {
-    return m_regex == o.m_regex && m_method == o.m_method;
+    return m_priority == o.m_priority && m_regex == o.m_regex && m_method == o.m_method;
 }
 

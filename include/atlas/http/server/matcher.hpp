@@ -15,12 +15,6 @@ namespace atlas
         {
         public:
             /*!
-             * \brief Match all requests to a URI matching a regular expression.
-             *
-             * \todo Consider making this constructor explicit.
-             */
-            matcher(const char *regex);
-            /*!
              * \brief Match all requests to a URI matching a regular
              * expression, regardless of method.
              *
