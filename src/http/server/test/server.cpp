@@ -13,13 +13,13 @@ SCENARIO("atlas::http::server") {
         atlas::http::server server(io, "localhost", "13337");
 
         server.router().install<>(
-                "/test",
+                atlas::http::matcher("/test", "GET"),
                 []() {
                     return atlas::http::text_response("test");
                 }
                 );
         server.router().install<std::string>(
-                "/message/(.+)",
+                atlas::http::matcher("/message/(.+)", "GET"),
                 [](std::string message) {
                     return atlas::http::text_response(message);
                 }

@@ -1,5 +1,7 @@
 #include "atlas/api/server.hpp"
 
+#include <boost/bind.hpp>
+
 #include "hades/mkstr.hpp"
 #include "styx/serialise_json.hpp"
 
@@ -93,7 +95,75 @@ void atlas::api::detail::basic_method::serve(
     }
 }
 
-atlas::api::server::server()
+void atlas::api::server::serve(
+        mg_connection *mg_conn,
+        boost::smatch,
+        http::uri_callback_type success,
+        http::uri_callback_type failure
+        ) const
+{
+    if(std::string(mg_conn->request_method) != "POST")
+    {
+        log::warning("atlas::api::server::serve") <<
+            "mg_conn->request_method != \"POST\"";
+        failure();
+        return;
+    }
+
+    if(mg_conn->content == nullptr)
+    {
+        log::warning("atlas::api::server::serve") << "mg_conn->content is null";
+        failure();
+        return;
+    }
+
+    std::string json(mg_conn->content, (mg_conn->content + mg_conn->content_len));
+    try
+    {
+        styx::element request_o = styx::parse_json(json);
+        jsonrpc::request request(request_o);
+        const char *token = mg_get_header(mg_conn, "Authorization");
+        if(token != nullptr)
+            request.token() = std::string(token);
+
+        m_io->post(
+            boost::bind(
+                &api::server::serve,
+                this,
+                request,
+                [mg_conn, success](jsonrpc::result jsonrpc_result)
+                {
+                    if(jsonrpc_result.has_key("error"))
+                        mg_send_status(mg_conn, 500);
+                    else
+                        mg_send_status(mg_conn, 200);
+
+                    log::information("atlas::api::server::serve") << "response: " <<
+                        styx::serialise_json(jsonrpc_result);
+
+                    // TODO: is Connection: close required?
+                    mg_send_header(mg_conn, "Connection", "close");
+                    mg_send_header(mg_conn, "Content-Type", "application/json");
+
+                    std::string result_str(
+                        styx::serialise_json(jsonrpc_result)
+                        );
+                    mg_send_data(mg_conn, result_str.c_str(), result_str.length());
+
+                    success();
+                }
+                )
+            );
+    }
+    catch(const std::exception&)
+    {
+        log::warning("atlas::api::server::serve") << "parsing json: " << json;
+        failure();
+    }
+}
+
+atlas::api::server::server(boost::shared_ptr<boost::asio::io_service> io) :
+    m_io(io)
 {
 }
 
