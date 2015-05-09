@@ -1,52 +1,21 @@
-atlas_add_objcopy_target(atlas backbone.js backbone_js.o)
-atlas_add_objcopy_target(atlas backbone-min.js backbone-min_js.o)
-atlas_add_objcopy_target(atlas underscore.js underscore_js.o)
-atlas_add_objcopy_target(atlas underscore-min.js underscore-min_js.o)
-atlas_add_objcopy_target(atlas jquery.js jquery_js.o)
-atlas_add_objcopy_target(atlas stacked_application.js stacked_application_js.o)
-atlas_add_objcopy_target(atlas open-iconic/font/css/open-iconic.css open_iconic_font_css_open_iconic_css.o)
-atlas_add_objcopy_target(atlas open-iconic/font/fonts/open-iconic.ttf open_iconic_font_fonts_open_iconic_ttf.o)
-atlas_add_objcopy_target(atlas open-iconic/font/fonts/open-iconic.woff open_iconic_font_fonts_open_iconic_woff.o)
-atlas_add_objcopy_target(atlas ShareTechMono-Regular.ttf ShareTechMono_Regular_ttf.o)
-atlas_add_objcopy_target(atlas ShareTech-Regular.ttf ShareTech_Regular_ttf.o)
-atlas_add_objcopy_target(atlas modal.js modal_js.o)
-atlas_add_objcopy_target(atlas modal.css modal_css.o)
-atlas_add_objcopy_target(atlas pure-min.css pure_min_css.o)
-
-add_custom_command(
+atlas_add_web_library(
+    PREFIX atlas
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/static.a
-    COMMAND ar -rc ${CMAKE_CURRENT_BINARY_DIR}/static.a
-        ${CMAKE_CURRENT_BINARY_DIR}/backbone_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/backbone-min_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/underscore_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/underscore-min_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/jquery_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/stacked_application_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_css_open_iconic_css.o
-        ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_fonts_open_iconic_ttf.o
-        ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_fonts_open_iconic_woff.o
-        ${CMAKE_CURRENT_BINARY_DIR}/ShareTechMono_Regular_ttf.o
-        ${CMAKE_CURRENT_BINARY_DIR}/ShareTech_Regular_ttf.o
-        ${CMAKE_CURRENT_BINARY_DIR}/modal_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/modal_css.o
-        ${CMAKE_CURRENT_BINARY_DIR}/pure_min_css.o
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Archiving static HTML libraries to ${CMAKE_CURRENT_BINARY_DIR}/static.a"
-    DEPENDS
-        ${CMAKE_CURRENT_BINARY_DIR}/backbone_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/backbone-min_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/underscore_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/underscore-min_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/jquery_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/stacked_application_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_css_open_iconic_css.o
-        ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_fonts_open_iconic_ttf.o
-        ${CMAKE_CURRENT_BINARY_DIR}/open_iconic_font_fonts_open_iconic_woff.o
-        ${CMAKE_CURRENT_BINARY_DIR}/ShareTechMono_Regular_ttf.o
-        ${CMAKE_CURRENT_BINARY_DIR}/ShareTech_Regular_ttf.o
-        ${CMAKE_CURRENT_BINARY_DIR}/modal_js.o
-        ${CMAKE_CURRENT_BINARY_DIR}/modal_css.o
-        ${CMAKE_CURRENT_BINARY_DIR}/pure_min_css.o
+    SOURCES
+        backbone.js
+        backbone-min.js
+        underscore.js
+        underscore-min.js
+        jquery.js
+        stacked_application.js
+        open-iconic/font/css/open-iconic.css
+        open-iconic/font/fonts/open-iconic.ttf
+        open-iconic/font/fonts/open-iconic.woff
+        ShareTechMono-Regular.ttf
+        ShareTech-Regular.ttf
+        modal.js
+        modal.css
+        pure-min.css
     )
 
 add_custom_target(atlas-web-text ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/static.a)

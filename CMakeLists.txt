@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 project("Atlas Components")
 
 include("cmake/atlas_add_objcopy_target.cmake")
+include("cmake/atlas_add_web_library.cmake")
 
 include_directories("lib/catch/include")
 
