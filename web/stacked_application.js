@@ -117,6 +117,7 @@ var coalesce = function() {
 var CollectionView = Backbone.View.extend(
     {
         initialize: function(options) {
+            console.log('initialize CollectionView');
             this.view = coalesce(
                 options['view'],
                 this['view'],
@@ -125,41 +126,106 @@ var CollectionView = Backbone.View.extend(
             this.emptyView = coalesce(options['emptyView'], this['emptyView']);
             this._offset = coalesce(options['offset'], 0);
             this._limit = coalesce(options['limit'], -1);
-            this.listenTo(this.model, 'add', this.render);
-            this.listenTo(this.model, 'remove', this.render);
-            this.listenTo(this.model, 'reset', this.render);
+            this._rendered = false;
+            this._views = [];
+            this.model.each(this.add);
+            this.listenTo(this.model, 'add', this.add);
+            this.listenTo(this.model, 'remove', this.remove);
+            this.listenTo(this.model, 'reset', this.reset);
+        },
+        add: function(model) {
+            if(this._limit > -1 && this._views.length >= this._limit)
+                return;
+            var view = this.constructView(model);
+            this._views.push(view);
+            view.render();
+            if(this._rendered) this.$el.append(view.el);
+            if(_.has(this, '_emptyView')) {
+                this._emptyView.$el.remove();
+                delete this._emptyView;
+            }
+            //this.render();
+        },
+        remove: function(model) {
+            var viewToRemove = this.get(model);
+            this._views = _(this._views).without(viewToRemove);
+            if(this._rendered) viewToRemove.$el.remove();
+            if(this._views.length < this._limit && this._views.length < this.model.length)
+                this.add(this.model.models[this._limit - 1]);
+            if(this._views.length == 0) {
+                if(!(_.has(this, '_emptyView'))) {
+                    this._emptyView = new this.emptyView;
+                    this._emptyView.render();
+                }
+                this.$el.append(this._emptyView.el);
+            }
+            //this.render();
+        },
+        get: function(model) {
+            return _(this._views).select(
+                function(cv) { return cv.model === model; }
+                )[0];
+        },
+        reset: function() {
+            this._views = [];
+            this._rendered = false;
+            this.model.each(
+                function(model) {
+                    var view = new this.view({
+                        model: model
+                    });
+                    this._views.push(view);
+                    this.initializeView(view);
+                    },
+                this
+                );
+            this.render();
         },
         constructView: function(model) {
             var view = new this.view({ model: model });
             this.initializeView(view);
+            //view.render();
             return view;
         },
         initializeView: function(view) {
         },
         emptyView: StaticView.extend({}),
+        each: function(f, context) {
+            if(_.isUndefined(context))
+                _(this._views).each(f);
+            else
+                _(this._views).each(f, context);
+        },
         render: function() {
+            console.log('render collection');
             // Replace the content of the element with a newly constructed view
             // for each model in the collection.
             //
             // TODO reuse old models, both for performance and to enable
             // editable views.
+            this._rendered = true;
             this.$el.empty();
-            var models;
 
+            var views;
             if(this._limit >= 0)
-                models = this.model.slice(this._offset, this._offset + this._limit);
+                views = this._views.slice(this._offset, this._offset + this._limit);
             else
-                models = this.model.slice(this._offset);
+                views = this._views.slice(this._offset);
 
-            if(models.length == 0) {
-                var dv = new this.emptyView;
-                dv.render();
-                this.$el.append(dv.el);
+            console.log('views', views)
+            if(views.length == 0) {
+                if(!(_.has(this, '_emptyView'))) {
+                    this._emptyView = new this.emptyView;
+                    this._emptyView.render();
+                }
+                this.$el.append(this._emptyView.el);
             } else {
-                _(models).each(
-                    function(model) {
-                        var dv = this.constructView(model);
-                        dv.render();
+                if(_.has(this, '_emptyView')) {
+                    this._emptyView.$el.remove();
+                    delete this._emptyView;
+                }
+                _(views).each(
+                    function(dv) {
                         this.$el.append(dv.el);
                     },
                     this
