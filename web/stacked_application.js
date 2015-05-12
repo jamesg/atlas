@@ -117,7 +117,6 @@ var coalesce = function() {
 var CollectionView = Backbone.View.extend(
     {
         initialize: function(options) {
-            console.log('initialize CollectionView');
             this.view = coalesce(
                 options['view'],
                 this['view'],
@@ -197,7 +196,6 @@ var CollectionView = Backbone.View.extend(
                 _(this._views).each(f, context);
         },
         render: function() {
-            console.log('render collection');
             // Replace the content of the element with a newly constructed view
             // for each model in the collection.
             //
@@ -212,7 +210,6 @@ var CollectionView = Backbone.View.extend(
             else
                 views = this._views.slice(this._offset);
 
-            console.log('views', views)
             if(views.length == 0) {
                 if(!(_.has(this, '_emptyView'))) {
                     this._emptyView = new this.emptyView;

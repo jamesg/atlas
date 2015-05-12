@@ -1,0 +1,17 @@
+.navigation {
+    background-color: white;
+    border-bottom: 1px solid black;
+    margin: 0;
+    padding: 0.5em;
+    list-style-type: none;
+    font-size: large;
+}
+
+.navigation a {
+    color: black;
+}
+
+.navigation li {
+    display: inline-block;
+}
+

@@ -2,20 +2,28 @@ atlas_add_web_library(
     PREFIX atlas
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/static.a
     SOURCES
-        backbone.js
-        backbone-min.js
-        underscore.js
-        underscore-min.js
-        jquery.js
-        stacked_application.js
-        open-iconic/font/css/open-iconic.css
-        open-iconic/font/fonts/open-iconic.ttf
-        open-iconic/font/fonts/open-iconic.woff
-        ShareTechMono-Regular.ttf
-        ShareTech-Regular.ttf
-        modal.js
-        modal.css
-        pure-min.css
+        "ShareTech-Regular.ttf"
+        "ShareTechMono-Regular.ttf"
+        "backbone-min.js"
+        "backbone.js"
+        "css/defaults.css"
+        "css/form.css"
+        "css/grid.css"
+        "css/list.css"
+        "css/messagebox.css"
+        "css/modal.css"
+        "css/navigation.css"
+        "css/teletype-theme.css"
+        "jquery.js"
+        "modal.css"
+        "modal.js"
+        "open-iconic/font/css/open-iconic.css"
+        "open-iconic/font/fonts/open-iconic.ttf"
+        "open-iconic/font/fonts/open-iconic.woff"
+        "pure-min.css"
+        "stacked_application.js"
+        "underscore-min.js"
+        "underscore.js"
     )
 
 add_custom_target(atlas-web-text ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/static.a)

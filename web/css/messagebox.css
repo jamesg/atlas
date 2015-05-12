@@ -1,0 +1,25 @@
+/*
+ * Message box styles.
+ */
+
+.messagebox {
+    border-bottom: 4px solid black;
+    padding: 1em;
+    transition: all 1s;
+}
+.messagebox-close {
+    float: right;
+}
+.messagebox-error {
+    background-color: #ffbaba;
+}
+.messagebox-information {
+    background-color: #bde5f8;
+}
+.messagebox-warning {
+    background-color: #feefb3;
+}
+.messagebox-success {
+    background-color: #dff2bf;
+}
+

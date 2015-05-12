@@ -15,21 +15,29 @@
 #define ATLAS_STATIC_STD_STRING(PREFIX) \
     std::string(&atlas_binary_##PREFIX##_start, &atlas_binary_##PREFIX##_end)
 
+ATLAS_DECLARE_STATIC_STRING(ShareTechMono_Regular_ttf)
+ATLAS_DECLARE_STATIC_STRING(ShareTech_Regular_ttf)
 ATLAS_DECLARE_STATIC_STRING(backbone_js)
-ATLAS_DECLARE_STATIC_STRING(underscore_js)
 ATLAS_DECLARE_STATIC_STRING(backbone_min_js)
-ATLAS_DECLARE_STATIC_STRING(underscore_js)
-ATLAS_DECLARE_STATIC_STRING(underscore_min_js)
+ATLAS_DECLARE_STATIC_STRING(css_defaults_css)
+ATLAS_DECLARE_STATIC_STRING(css_form_css)
+ATLAS_DECLARE_STATIC_STRING(css_grid_css)
+ATLAS_DECLARE_STATIC_STRING(css_list_css)
+ATLAS_DECLARE_STATIC_STRING(css_messagebox_css)
+ATLAS_DECLARE_STATIC_STRING(css_modal_css)
+ATLAS_DECLARE_STATIC_STRING(css_navigation_css)
+ATLAS_DECLARE_STATIC_STRING(css_teletype_theme_css)
 ATLAS_DECLARE_STATIC_STRING(jquery_js)
-ATLAS_DECLARE_STATIC_STRING(stacked_application_js)
+ATLAS_DECLARE_STATIC_STRING(modal_css)
+ATLAS_DECLARE_STATIC_STRING(modal_js)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_css_open_iconic_css)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_ttf)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_woff)
-ATLAS_DECLARE_STATIC_STRING(ShareTechMono_Regular_ttf)
-ATLAS_DECLARE_STATIC_STRING(ShareTech_Regular_ttf)
-ATLAS_DECLARE_STATIC_STRING(modal_js)
-ATLAS_DECLARE_STATIC_STRING(modal_css)
 ATLAS_DECLARE_STATIC_STRING(pure_min_css)
+ATLAS_DECLARE_STATIC_STRING(stacked_application_js)
+ATLAS_DECLARE_STATIC_STRING(underscore_js)
+ATLAS_DECLARE_STATIC_STRING(underscore_js)
+ATLAS_DECLARE_STATIC_STRING(underscore_min_js)
 
 boost::shared_ptr<atlas::http::router> atlas::http::static_files()
 {
@@ -62,20 +70,28 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
                 );
     };
 
-    install_static_text("/backbone.js", ATLAS_STATIC_STD_STRING(backbone_js));
+    install_static_text("/ShareTech-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTech_Regular_ttf));
+    install_static_text("/ShareTechMono-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTechMono_Regular_ttf));
     install_static_text("/backbone-min.js", ATLAS_STATIC_STD_STRING(backbone_min_js));
-    install_static_text("/underscore.js", ATLAS_STATIC_STD_STRING(underscore_js));
-    install_static_text("/underscore-min.js", ATLAS_STATIC_STD_STRING(underscore_min_js));
+    install_static_text("/backbone.js", ATLAS_STATIC_STD_STRING(backbone_js));
     install_static_text("/jquery.js", ATLAS_STATIC_STD_STRING(jquery_js));
-    install_static_text("/stacked_application.js", ATLAS_STATIC_STD_STRING(stacked_application_js));
+    install_static_text("/modal.css", ATLAS_STATIC_STD_STRING(modal_css));
+    install_static_text("/modal.js", ATLAS_STATIC_STD_STRING(modal_js));
     install_static_text("/open-iconic/font/css/open-iconic.css", ATLAS_STATIC_STD_STRING(open_iconic_font_css_open_iconic_css));
     install_static_text("/open-iconic/font/fonts/open-iconic.ttf", ATLAS_STATIC_STD_STRING(open_iconic_font_fonts_open_iconic_ttf));
     install_static_text("/open-iconic/font/fonts/open-iconic.woff", ATLAS_STATIC_STD_STRING(open_iconic_font_fonts_open_iconic_woff));
-    install_static_text("/ShareTechMono-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTechMono_Regular_ttf));
-    install_static_text("/ShareTech-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTech_Regular_ttf));
-    install_static_text("/modal.js", ATLAS_STATIC_STD_STRING(modal_js));
-    install_static_text("/modal.css", ATLAS_STATIC_STD_STRING(modal_css));
     install_static_text("/pure-min.css", ATLAS_STATIC_STD_STRING(pure_min_css));
+    install_static_text("/stacked_application.js", ATLAS_STATIC_STD_STRING(stacked_application_js));
+    install_static_text("/underscore-min.js", ATLAS_STATIC_STD_STRING(underscore_min_js));
+    install_static_text("/underscore.js", ATLAS_STATIC_STD_STRING(underscore_js));
+    install_static_text("/css/defaults.css", ATLAS_STATIC_STD_STRING(css_defaults_css));
+    install_static_text("/css/form.css", ATLAS_STATIC_STD_STRING(css_form_css));
+    install_static_text("/css/grid.css", ATLAS_STATIC_STD_STRING(css_grid_css));
+    install_static_text("/css/list.css", ATLAS_STATIC_STD_STRING(css_list_css));
+    install_static_text("/css/messagebox.css", ATLAS_STATIC_STD_STRING(css_messagebox_css));
+    install_static_text("/css/modal.css", ATLAS_STATIC_STD_STRING(css_modal_css));
+    install_static_text("/css/navigation.css", ATLAS_STATIC_STD_STRING(css_navigation_css));
+    install_static_text("/css/teletype-theme.css", ATLAS_STATIC_STD_STRING(css_teletype_theme_css));
 
     return out;
 }

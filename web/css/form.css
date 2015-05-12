@@ -1,0 +1,29 @@
+div.aligned div.group {
+    padding: 0.5em;
+}
+
+div.aligned div.group label {
+    text-align: right;
+    display: inline-block;
+    width: 10em;
+    padding-right: 0.5em;
+}
+
+div.aligned div.group input, div.aligned div.group textarea {
+    display: inline-block;
+}
+
+button, input, select, textarea {
+    padding: 0.5em;
+}
+
+button {
+}
+
+.button-box {
+    text-align: right;
+}
+
+span.disabled {
+}
+
