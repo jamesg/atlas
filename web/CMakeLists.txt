@@ -1,6 +1,7 @@
 atlas_add_web_library(
     PREFIX atlas
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/static.a
+    TARGET atlas-web-text
     SOURCES
         "ShareTech-Regular.ttf"
         "ShareTechMono-Regular.ttf"
@@ -25,8 +26,6 @@ atlas_add_web_library(
         "underscore-min.js"
         "underscore.js"
     )
-
-add_custom_target(atlas-web-text ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/static.a)
 
 file(GLOB atlas_web_sources src/*.cpp)
 add_library(atlas-web ${atlas_web_sources})
