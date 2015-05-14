@@ -7,6 +7,7 @@
 
 #include "hades/crud.ipp"
 #include "hades/devoid.hpp"
+#include "hades/exists.hpp"
 #include "hades/filter.hpp"
 #include "hades/get_collection.hpp"
 #include "hades/get_one.hpp"
@@ -18,12 +19,12 @@ const char atlas::db::attr::user_permission::permission[] = "permission";
 const char atlas::db::attr::user_session::token[] = "token";
 const char atlas::db::flag::user::enabled[] = "user_enabled";
 const char atlas::db::flag::user::super[] = "user_super";
-const char atlas::db::relvar::user[] = "user";
-const char atlas::db::relvar::user_created[] = "user_created";
-const char atlas::db::relvar::user_password[] = "user_password";
-const char atlas::db::relvar::user_permission[] = "user_permission";
-const char atlas::db::relvar::user_session[] = "user_session";
-const char atlas::db::relvar::user_session_updated[] = "user_session_updated";
+const char atlas::db::relvar::user[] = "atlas_user";
+const char atlas::db::relvar::user_created[] = "atlas_user_created";
+const char atlas::db::relvar::user_password[] = "atlas_user_password";
+const char atlas::db::relvar::user_permission[] = "atlas_user_permission";
+const char atlas::db::relvar::user_session[] = "atlas_user_session";
+const char atlas::db::relvar::user_session_updated[] = "atlas_user_session_updated";
 
 namespace
 {
@@ -80,7 +81,7 @@ bool atlas::db::user_session::stop(
         )
 {
     return hades::devoid(
-            "DELETE FROM user_session WHERE token = ?",
+            "DELETE FROM atlas_user_session WHERE token = ?",
             hades::row<std::string>(token),
             conn
             ) > 0;
@@ -104,8 +105,8 @@ void atlas::db::user_session::delete_old(hades::connection& conn)
             boost::posix_time::second_clock::universal_time() -
             boost::posix_time::hours(session_expiry_hours);
     hades::devoid(
-            "DELETE FROM user_session WHERE user_id IN ( "
-            " SELECT user_id FROM user_session_updated "
+            "DELETE FROM atlas_user_session WHERE user_id IN ( "
+            " SELECT user_id FROM atlas_user_session_updated "
             " WHERE date < ? "
             " )",
             hades::row<std::string>(
@@ -118,7 +119,7 @@ void atlas::db::user_session::delete_old(hades::connection& conn)
 void atlas::db::auth::create(hades::connection& conn)
 {
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user ( "
             " user_id INTEGER PRIMARY KEY AUTOINCREMENT, "
             " username VARCHAR, "
             " UNIQUE(username) "
@@ -126,71 +127,69 @@ void atlas::db::auth::create(hades::connection& conn)
             conn
             );
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user_enabled ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user_enabled ( "
             " user_id INTEGER PRIMARY KEY "
-            "  REFERENCES user(user_id) ON DELETE CASCADE "
+            "  REFERENCES atlas_user(user_id) ON DELETE CASCADE "
             " ) ",
             conn
             );
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user_super ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user_super ( "
             " user_id INTEGER PRIMARY KEY "
-            "  REFERENCES user(user_id) ON DELETE CASCADE "
+            "  REFERENCES atlas_user(user_id) ON DELETE CASCADE "
             " ) ",
             conn
             );
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user_created ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user_created ( "
             " user_id INTEGER, "
             " date VARCHAR, "
             " FOREIGN KEY(user_id) "
-            "  REFERENCES user(user_id) ON DELETE CASCADE "
+            "  REFERENCES atlas_user(user_id) ON DELETE CASCADE "
             " ) ",
             conn
             );
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user_password ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user_password ( "
             " user_id INTEGER, "
             " password VARCHAR, "
             " PRIMARY KEY(user_id), "
             " FOREIGN KEY(user_id) "
-            "  REFERENCES user(user_id) ON DELETE CASCADE "
+            "  REFERENCES atlas_user(user_id) ON DELETE CASCADE "
             " ) ",
             conn
             );
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user_password ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user_password ( "
             " user_id INTEGER, "
             " permission VARCHAR, "
             " PRIMARY KEY(user_id, permission), "
             " FOREIGN KEY(user_id) "
-            "  REFERENCES user(user_id) ON DELETE CASCADE "
+            "  REFERENCES atlas_user(user_id) ON DELETE CASCADE "
             " ) ",
             conn
             );
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user_session ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user_session ( "
             " user_id INTEGER, "
             " token VARCHAR, "
             " PRIMARY KEY(token), "
             " FOREIGN KEY(user_id) "
-            "  REFERENCES user(user_id) ON DELETE CASCADE "
+            "  REFERENCES atlas_user(user_id) ON DELETE CASCADE "
             " ) ",
             conn
             );
     hades::devoid(
-            "CREATE TABLE IF NOT EXISTS user_session_updated ( "
+            "CREATE TABLE IF NOT EXISTS atlas_user_session_updated ( "
             " token VARCHAR, "
             " date VARCHAR, "
             " PRIMARY KEY(token), "
             " FOREIGN KEY(token) "
-            "  REFERENCES user_session(token) ON DELETE CASCADE "
+            "  REFERENCES atlas_user_session(token) ON DELETE CASCADE "
             " ) ",
             conn
             );
-    auto where = hades::where("username = 'root'");
-    styx::list root_users = atlas::user::get_collection(conn, where);
-    if(root_users.empty())
+    if(!hades::exists<atlas::user>(conn, hades::where("username = 'root'")))
     {
         atlas::user root;
         root.get_string<db::attr::user::username>() = "root";
