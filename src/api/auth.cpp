@@ -26,17 +26,9 @@ void atlas::api::auth::install(
                     "atlas_user.username = ?",
                     hades::row<std::string>(username)
                     );
-                log::test("signin") << "username " << username;
                 try
                 {
-                    atlas::user user2 = hades::get_one<atlas::user>(conn, where);
-                    // This assignment doesn't work.  I don't know why.
                     user = hades::get_one<atlas::user>(conn, where);
-                    // prints ' 0'
-                    log::test("signin user 1") << user.get_string<db::attr::user::username>() << " " << user.get_int<db::attr::user::user_id>();
-                    // prints something like 'root 1'
-                    log::test("signin user 2") << user2.get_string<db::attr::user::username>() << " " << user2.get_int<db::attr::user::user_id>();
-                    user = user2;
                 }
                 catch(const std::exception&)
                 {
