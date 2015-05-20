@@ -28,9 +28,6 @@ atlas::http::mimetypes::mimetypes()
                 m_mimetypes[*iter] = mimetype;
         }
     }
-
-    log::information("http::mimetypes") << "installed " <<
-        m_mimetypes.size() << " mimetypes";
 }
 
 std::string atlas::http::mimetypes::content_type(
