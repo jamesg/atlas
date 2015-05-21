@@ -21,6 +21,70 @@ var StaticView = Backbone.View.extend(
     }
     );
 
+var ModalButton = Backbone.Model.extend(
+    {
+        defaults: {
+            action: function() {},
+            label: 'Button',
+            name: 'close',
+            icon: 'check'
+        }
+    }
+    );
+
+var ModalButtonView = StaticView.extend(
+    {
+        events: {
+            'click button': 'triggerClick'
+        },
+        tagName: 'span',
+        template: '\
+        <button type="button" name="<%-name%>">\
+            <span class="oi" data-glyph="<%-icon%>" aria-hidden="true"> </span>\
+            <%-label%>\
+        </button>\
+        ',
+        triggerClick: function() {
+            this.trigger('click');
+            var action = this.model.get('action');
+            if(_.isFunction(action))
+                action();
+        }
+    }
+    );
+
+var ModalButtonCollection = Backbone.Collection.extend(
+    {
+        model: ModalButton,
+        comparator: function(model) {
+            var index = ['yes', 'no', 'save', 'cancel', 'close']
+                .indexOf(model.get('name'));
+            return (index > -1) ? index : model.get('name');
+        }
+    }
+    );
+
+var ModalButton = {
+    close: function(action) {
+        return { name: 'close', icon: 'x', label: 'Close', action: action };
+    },
+    cancel: function(action) {
+        return { name: 'cancel', icon: 'x', label: 'Cancel', action: action };
+    },
+    no: function(action) {
+        return { name: 'no', icon: 'x', label: 'No', action: action };
+    },
+    yes: function(action) {
+        return { name: 'yes', icon: 'check', label: 'Yes', action: action };
+    },
+    create: function(action) {
+        return { name: 'create', icon: 'check', label: 'Create', action: action };
+    },
+    ok: function(action) {
+        return { name: 'Ok', icon: 'check', label: 'Ok', action: action };
+    }
+};
+
 var Modal = Backbone.View.extend(
     {
         /*
@@ -32,9 +96,22 @@ var Modal = Backbone.View.extend(
         initialize: function(options) {
             Backbone.View.prototype.initialize.apply(this, arguments);
 
-            this._buttons = coalesce(options['buttons'], this['buttons'], { close: true });
-
             this.$el.append(_.template(this.template)(this.templateParams()));
+
+            var buttons = coalesce(options['buttons'], this['buttons'], ModalButton.close());
+            this._buttons = new ModalButtonCollection(buttons);
+            this._buttons.each(
+                function(button) {
+                    this.listenTo(button, 'click', this._end.bind(this, button.get('name')));
+                },
+                this
+                );
+
+            (new CollectionView({
+                model: this._buttons,
+                view: ModalButtonView,
+                el: this.$('[name=buttons]')
+            })).render();
 
             var cons = coalesce(options['view'], this['view']);
             this._view = new cons({ el: this.contentEl(), model: this['model']});
@@ -42,7 +119,14 @@ var Modal = Backbone.View.extend(
             this.listenTo(this._view, 'finished', this.finish.bind(this));
         },
         className: 'modal',
-        template: $('#modal-template').html(),
+        template: '\
+<div class="modal-dialog">\
+    <form class="modal-content" name="modal-content">\
+    </form>\
+    <div class="modal-button-box" name="buttons">\
+    </div>\
+</div>\
+            ',
         templateParams: function() {
             return { buttons: this._buttons };
         },
@@ -64,8 +148,8 @@ var Modal = Backbone.View.extend(
             this.trigger('finished');
         },
         _end: function(act) {
-            if(_(this._buttons[act]).isFunction())
-                this._buttons[act]();
+            if(['cancel', 'close'].indexOf(act) > -1)
+                this.remove();
             this._view.trigger(act);
             return false;
         }
@@ -127,7 +211,7 @@ var CollectionView = Backbone.View.extend(
             this._limit = coalesce(options['limit'], -1);
             this._rendered = false;
             this._views = [];
-            this.model.each(this.add);
+            this.model.each(this.add, this);
             this.listenTo(this.model, 'add', this.add);
             this.listenTo(this.model, 'remove', this.remove);
             this.listenTo(this.model, 'reset', this.reset);
@@ -317,6 +401,7 @@ StackedApplication.prototype._createBreadcrumb = function(view) {
 };
 
 StackedApplication.prototype._setPage = function(view) {
+    view.render();
     this._setElement(view.el);
 };
 
