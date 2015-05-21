@@ -6,6 +6,7 @@ add_subdirectory(api)
 add_subdirectory(db)
 add_subdirectory(http)
 add_subdirectory(jsonrpc)
+add_subdirectory(task)
 
 file(GLOB atlas_common_sources log/*.cpp *.cpp)
 add_library(atlas-com-common ${atlas_common_sources})
