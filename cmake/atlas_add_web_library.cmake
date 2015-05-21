@@ -1,3 +1,5 @@
+include(CMakeParseArguments)
+
 # Generate a library of plain files to be embedded into an executable.
 #
 # Parameters:
