@@ -14,6 +14,7 @@ atlas_add_web_library(
         "css/messagebox.css"
         "css/modal.css"
         "css/navigation.css"
+        "css/plant-theme.css"
         "css/teletype-theme.css"
         "jquery.js"
         "modal.css"

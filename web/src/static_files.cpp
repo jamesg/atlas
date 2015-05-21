@@ -26,6 +26,7 @@ ATLAS_DECLARE_STATIC_STRING(css_list_css)
 ATLAS_DECLARE_STATIC_STRING(css_messagebox_css)
 ATLAS_DECLARE_STATIC_STRING(css_modal_css)
 ATLAS_DECLARE_STATIC_STRING(css_navigation_css)
+ATLAS_DECLARE_STATIC_STRING(css_plant_theme_css)
 ATLAS_DECLARE_STATIC_STRING(css_teletype_theme_css)
 ATLAS_DECLARE_STATIC_STRING(jquery_js)
 ATLAS_DECLARE_STATIC_STRING(modal_css)
@@ -91,6 +92,7 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
     install_static_text("/css/messagebox.css", ATLAS_STATIC_STD_STRING(css_messagebox_css));
     install_static_text("/css/modal.css", ATLAS_STATIC_STD_STRING(css_modal_css));
     install_static_text("/css/navigation.css", ATLAS_STATIC_STD_STRING(css_navigation_css));
+    install_static_text("/css/plant-theme.css", ATLAS_STATIC_STD_STRING(css_plant_theme_css));
     install_static_text("/css/teletype-theme.css", ATLAS_STATIC_STD_STRING(css_teletype_theme_css));
 
     return out;
