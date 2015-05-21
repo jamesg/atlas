@@ -161,11 +161,11 @@ namespace atlas
              * \brief A function accepting POST or PUT data in addition to URI
              * parameters.
              */
-            template<typename ...Arguments>
+            template<typename Json, typename ...Arguments>
             class json_function : public basic_function
             {
             public:
-                typedef boost::function<http::response(styx::element, Arguments...)>
+                typedef boost::function<http::response(Json, Arguments...)>
                     unwrapped_function_type;
 
                 json_function(
@@ -176,19 +176,39 @@ namespace atlas
                         detail::make_async_with_data(
                             [function](std::string data, boost::smatch match)
                             {
-                                typedef boost::fusion::vector<styx::element, Arguments...>
-                                    arg_values_type;
-                                arg_values_type arg_values;
-                                boost::fusion::at_c<0>(arg_values) =
-                                    styx::parse_json(data);
-                                copy_to_vector<0, sizeof...(Arguments), 1, sizeof...(Arguments)+1>()
-                                    .copy(match, arg_values);
+                                styx::element element(styx::parse_json(data));
 
-                                // Invoke the API function with the argument
-                                // list.
-                                http::response out =
-                                    boost::fusion::invoke(function, arg_values);
-                                return out;
+                                try
+                                {
+                                    // Convert the incoming data to the type
+                                    // required for the handler function.
+                                    Json json_data(boost::get<Json>(element));
+
+                                    typedef boost::fusion::vector<Json, Arguments...>
+                                        arg_values_type;
+                                    arg_values_type arg_values;
+                                    boost::fusion::at_c<0>(arg_values) = json_data;
+                                    // Copy remaining arguments (URI placeholders).
+                                    copy_to_vector<
+                                        0, sizeof...(Arguments),
+                                        1, sizeof...(Arguments) + 1>()
+                                        .copy(match, arg_values);
+
+                                    // Invoke the API function with the argument
+                                    // list.
+                                    http::response out =
+                                        boost::fusion::invoke(function, arg_values);
+                                    return out;
+                                }
+                                catch(const boost::bad_get&)
+                                {
+                                    // The JSON input was the wrong type of
+                                    // element (e.g. a list was expected but an
+                                    // object received).
+                                    http::response out =
+                                        json_error_response("bad get");
+                                    return out;
+                                }
                             }
                             ),
                             auth_function
@@ -339,10 +359,11 @@ namespace atlas
              * \param function Method accepting the URI parameters and
              * returning a string.
              */
-            template<typename ...Arguments>
+            template<typename Json, typename ...Arguments>
             void install_json(
                 matcher m,
-                typename detail::json_function<Arguments...>::unwrapped_function_type function,
+                typename detail::json_function<Json, Arguments...>
+                    ::unwrapped_function_type function,
                 auth_function_type auth_function
                 )
             {
@@ -353,9 +374,7 @@ namespace atlas
                         );
                 m_functions.insert(
                     m,
-                    //static_cast<detail::basic_function*>(
-                        new detail::json_function<Arguments...>(function, auth_function)
-                        //)
+                    new detail::json_function<Json, Arguments...>(function, auth_function)
                     );
             }
         private:
