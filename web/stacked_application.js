@@ -57,19 +57,22 @@ var ModalButtonCollection = Backbone.Collection.extend(
     {
         model: ModalButton,
         comparator: function(model) {
-            var index = ['yes', 'no', 'save', 'cancel', 'close']
+            var index = ['no', 'cancel', 'close', 'save', 'yes']
                 .indexOf(model.get('name'));
             return (index > -1) ? index : model.get('name');
         }
     }
     );
 
-var ModalButton = {
+var StandardButton = {
     close: function(action) {
         return { name: 'close', icon: 'x', label: 'Close', action: action };
     },
     cancel: function(action) {
         return { name: 'cancel', icon: 'x', label: 'Cancel', action: action };
+    },
+    destroy: function(action) {
+        return { name: 'destroy', icon: 'trash', label: 'Delete', action: action };
     },
     no: function(action) {
         return { name: 'no', icon: 'x', label: 'No', action: action };
@@ -78,10 +81,13 @@ var ModalButton = {
         return { name: 'yes', icon: 'check', label: 'Yes', action: action };
     },
     create: function(action) {
-        return { name: 'create', icon: 'check', label: 'Create', action: action };
+        return { name: 'create', icon: 'file', label: 'Create', action: action };
     },
     ok: function(action) {
-        return { name: 'Ok', icon: 'check', label: 'Ok', action: action };
+        return { name: 'ok', icon: 'check', label: 'Ok', action: action };
+    },
+    save: function(action) {
+        return { name: 'save', icon: 'data-transfer-download', label: 'Save', action: action };
     }
 };
 
@@ -98,7 +104,11 @@ var Modal = Backbone.View.extend(
 
             this.$el.append(_.template(this.template)(this.templateParams()));
 
-            var buttons = coalesce(options['buttons'], this['buttons'], ModalButton.close());
+            var buttons = coalesce(
+                options['buttons'],
+                this['buttons'],
+                [ StandardButton.close() ]
+                );
             this._buttons = new ModalButtonCollection(buttons);
             this._buttons.each(
                 function(button) {
