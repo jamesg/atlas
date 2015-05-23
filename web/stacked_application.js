@@ -89,7 +89,7 @@ $(document).ajaxError(
  * params: Parameters to the method.
  */
 var jsonRpc = function(options) {
-    var url = _.has(options, 'url')?options.url:'/api_call';
+    var url = _.has(options, 'url')?options.url:'api_call';
     var req = _.has(options, 'xhr')?options.xhr:new XMLHttpRequest;
     var reqListener = function() {
         switch(this.status) {
