@@ -13,6 +13,11 @@ div.aligned div.group input, div.aligned div.group textarea {
     display: inline-block;
 }
 
+div.aligned div.controls {
+    padding: 0.5em;
+    text-align: right;
+}
+
 button, input, select, textarea {
     padding: 0.5em;
 }
