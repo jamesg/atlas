@@ -10,6 +10,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include "hades/mkstr.hpp"
+#include "styx/cast.hpp"
 #include "styx/styx.hpp"
 
 #include "atlas/log/log.hpp"
@@ -182,7 +183,7 @@ namespace atlas
                                 {
                                     // Convert the incoming data to the type
                                     // required for the handler function.
-                                    Json json_data(boost::get<Json>(element));
+                                    Json json_data(styx::cast<Json>(element));
 
                                     typedef boost::fusion::vector<Json, Arguments...>
                                         arg_values_type;
