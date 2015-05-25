@@ -226,33 +226,17 @@ var CollectionView = Backbone.View.extend(
             this.listenTo(this.model, 'remove', this.remove);
             this.listenTo(this.model, 'reset', this.reset);
         },
-        add: function(model) {
-            if(this._limit > -1 && this._views.length >= this._limit)
-                return;
+        add: function(model, options) {
+            // Index to place the new view (may not be at the end of this div).
+            var index = this.model.indexOf(model);
             var view = this.constructView(model);
-            this._views.push(view);
-            view.render();
-            if(this._rendered) this.$el.append(view.el);
-            if(_.has(this, '_emptyView')) {
-                this._emptyView.$el.remove();
-                delete this._emptyView;
-            }
-            //this.render();
+            this._views.splice(index, 0, view);
+            this.render();
         },
         remove: function(model) {
             var viewToRemove = this.get(model);
             this._views = _(this._views).without(viewToRemove);
-            if(this._rendered) viewToRemove.$el.remove();
-            if(this._views.length < this._limit && this._views.length < this.model.length)
-                this.add(this.model.models[this._limit - 1]);
-            if(this._views.length == 0) {
-                if(!(_.has(this, '_emptyView'))) {
-                    this._emptyView = new this.emptyView;
-                    this._emptyView.render();
-                }
-                this.$el.append(this._emptyView.el);
-            }
-            //this.render();
+            this.render();
         },
         get: function(model) {
             return _(this._views).select(
@@ -264,11 +248,8 @@ var CollectionView = Backbone.View.extend(
             this._rendered = false;
             this.model.each(
                 function(model) {
-                    var view = new this.view({
-                        model: model
-                    });
+                    var view = this.constructView(model);
                     this._views.push(view);
-                    this.initializeView(view);
                     },
                 this
                 );
@@ -277,7 +258,7 @@ var CollectionView = Backbone.View.extend(
         constructView: function(model) {
             var view = new this.view({ model: model });
             this.initializeView(view);
-            //view.render();
+            view.render();
             return view;
         },
         initializeView: function(view) {
@@ -318,6 +299,10 @@ var CollectionView = Backbone.View.extend(
                 _(views).each(
                     function(dv) {
                         this.$el.append(dv.el);
+                        // Rendering the CollectionView in this way removes
+                        // every element from the DOM and reinserts it
+                        // somewhere else.  Event bindings are lost.
+                        dv.delegateEvents();
                     },
                     this
                     );
