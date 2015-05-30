@@ -29,3 +29,11 @@ a {
     padding: 1em;
 }
 
+.visible-on-hover {
+    visibility: hidden;
+}
+
+li:hover .visible-on-hover {
+    visibility: visible;
+}
+

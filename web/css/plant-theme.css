@@ -80,3 +80,17 @@ span.disabled {
     color: lightgrey;
 }
 
+.tag {
+    margin-right: 0.5em;
+    padding: 2px;
+    border: 1px solid black;
+    border-radius: 3px;
+}
+
+.advice {
+    padding: 2px;
+    background-color: #95dca2;
+    border: 1px solid black;
+    border-radius: 3px;
+}
+

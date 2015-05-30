@@ -1,16 +1,19 @@
 div.aligned div.group {
     padding: 0.5em;
+    width: auto;
 }
 
 div.aligned div.group label {
     text-align: right;
     display: inline-block;
-    width: 10em;
+    /*width: 10em;*/
     padding-right: 0.5em;
 }
 
 div.aligned div.group input, div.aligned div.group textarea {
     display: inline-block;
+    width: 50%;
+    margin-right: 0;
 }
 
 div.aligned div.controls {
