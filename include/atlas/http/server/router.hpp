@@ -11,6 +11,7 @@
 
 #include "hades/mkstr.hpp"
 #include "styx/cast.hpp"
+#include "styx/is_json_type.hpp"
 #include "styx/styx.hpp"
 
 #include "atlas/log/log.hpp"
@@ -23,6 +24,41 @@ namespace atlas
     {
         namespace detail
         {
+            /*!
+             * \brief Remove the first const, volatile and reference from
+             * 'Type'.
+             */
+            template<typename Type>
+            struct base_type
+            {
+                typedef typename std::remove_cv<typename std::remove_reference<Type>::type>::type type;
+            };
+            /*!
+             * \brief Convert incoming JSON data to another JSON data type
+             * using a styx::cast, or to any other type that has a
+             * styx::element constructor.
+             */
+            template<typename Json>
+            typename std::enable_if<
+                styx::is_json_type<typename base_type<Json>::type>::value,
+                Json>::type
+                    convert_json(const styx::element& e)
+            {
+                return styx::cast<Json>(e);
+            }
+            /*!
+             * \brief Convert incoming JSON data to another JSON data type
+             * using a styx::cast, or to any other type that has a
+             * styx::element constructor.
+             */
+            template<typename Json>
+            typename std::enable_if<
+                !styx::is_json_type<typename base_type<Json>::type>::value,
+                Json>::type
+                    convert_json(const styx::element& e)
+            {
+                return (typename base_type<Json>::type)(e);
+            }
             /*!
              * \brief Turn a synchronous URI router function into an
              * asynchronous one in order to make it compatible with the lower
@@ -183,7 +219,7 @@ namespace atlas
                                 {
                                     // Convert the incoming data to the type
                                     // required for the handler function.
-                                    Json json_data(styx::cast<Json>(element));
+                                    Json json_data(detail::convert_json<Json>(element));
 
                                     typedef boost::fusion::vector<Json, Arguments...>
                                         arg_values_type;

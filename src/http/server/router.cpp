@@ -189,8 +189,6 @@ void atlas::http::router::serve(
             )
     {
         boost::smatch match;
-        atlas::log::test("atlas::http::router::serve") << "test " << uri << " " << mg_conn->request_method;
-        atlas::log::test("atlas::http::router::serve") << "matcher " << i->first.regex() << " method " << i->first.method();
         bool matched = i->first.matches(
                 uri,
                 std::string(mg_conn->request_method),
