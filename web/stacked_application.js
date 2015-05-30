@@ -163,10 +163,7 @@ var ModalButtonView = StaticView.extend(
         </button>\
         ',
         triggerClick: function() {
-            this.trigger('click');
-            var action = this.model.get('action');
-            if(_.isFunction(action))
-                action();
+            this.model.trigger('click');
         }
     }
     );
@@ -175,7 +172,7 @@ var ModalButtonCollection = Backbone.Collection.extend(
     {
         model: ModalButton,
         comparator: function(model) {
-            var index = ['no', 'cancel', 'close', 'destroy', 'save', 'yes']
+            var index = ['no', 'cancel', 'close', 'destroy', 'save', 'yes', 'prev', 'next']
                 .indexOf(model.get('name'));
             return (index > -1) ? index : model.get('name');
         }
@@ -206,6 +203,12 @@ var StandardButton = {
     },
     save: function(action) {
         return { name: 'save', icon: 'data-transfer-download', label: 'Save', action: action };
+    },
+    prev: function(action) {
+        return { name: 'prev', icon: 'chevron-left', label: 'Prev', action: action };
+    },
+    next: function(action) {
+        return { name: 'next', icon: 'chevron-right', label: 'Next', action: action };
     }
 };
 
@@ -230,7 +233,7 @@ var Modal = Backbone.View.extend(
             this._buttons = new ModalButtonCollection(buttons);
             this._buttons.each(
                 function(button) {
-                    this.listenTo(button, 'click', this._end.bind(this, button.get('name')));
+                    this.listenTo(button, 'click', this._end.bind(this, button));
                 },
                 this
                 );
@@ -275,10 +278,16 @@ var Modal = Backbone.View.extend(
             this.remove();
             this.trigger('finished');
         },
-        _end: function(act) {
-            if(['cancel', 'close'].indexOf(act) > -1)
+        _end: function(button) {
+            console.log('_end');
+            var action = button.get('action');
+            if(_.isFunction(action))
+                action.apply(this);
+            if(['cancel', 'close'].indexOf(button.get('name')) > -1)
                 this.remove();
-            this._view.trigger(act);
+            this._view.trigger(button.get('name'));
+            this._view.trigger('finished');
+            this.trigger(button.get('name'));
             return false;
         }
     }
@@ -350,11 +359,13 @@ var CollectionView = Backbone.View.extend(
             var view = this.constructView(model);
             this._views.splice(index, 0, view);
             this.render();
+            this.trigger('add');
         },
         remove: function(model) {
             var viewToRemove = this.get(model);
             this._views = _(this._views).without(viewToRemove);
             this.render();
+            this.trigger('remove');
         },
         get: function(model) {
             return _(this._views).select(
@@ -372,6 +383,7 @@ var CollectionView = Backbone.View.extend(
                 this
                 );
             this.render();
+            this.trigger('reset');
         },
         constructView: function(model) {
             var view = new this.view({ model: model });
