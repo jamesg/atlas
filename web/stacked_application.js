@@ -354,10 +354,19 @@ var CollectionView = Backbone.View.extend(
             this.listenTo(this.model, 'reset', this.reset);
         },
         add: function(model, options) {
-            // Index to place the new view (may not be at the end of this div).
-            var index = this.model.indexOf(model);
             var view = this.constructView(model);
-            this._views.splice(index, 0, view);
+
+            var pos = 0;
+            // Increment pos until the next view in this._views has a greater
+            // model index than the new view.
+            while(
+                pos < this._views.length &&
+                this.model.indexOf(this._views[pos].model) < this.model.indexOf(model)
+                )
+                pos++;
+
+            this._views.splice(pos, 0, view);
+
             this.render();
             this.trigger('add');
         },
