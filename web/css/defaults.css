@@ -4,7 +4,6 @@
  */
 
 a {
-    color: black;
     cursor: pointer;
     text-decoration: underline;
 }
@@ -24,7 +23,7 @@ a {
 
 .content {
     background-color: white;
-    border: 1px solid black;
+    /*border: 1px solid black;*/
     margin: 1em;
     padding: 1em;
 }

@@ -9,8 +9,8 @@
 /*}*/
 
 body {
-    background-color: #95dca2;
-    font-family: 'Times';
+    /*background-color: #95dca2;*/
+    font-family: 'Sans';
     margin: 0;
     padding: 0;
 }
@@ -89,8 +89,42 @@ span.disabled {
 
 .advice {
     padding: 2px;
-    background-color: #95dca2;
-    border: 1px solid black;
-    border-radius: 3px;
+    background-color: #c1e8c9;
+    border-radius: 8px;
+}
+
+.header {
+    margin: 0;
+}
+
+.navigation {
+    margin: 0;
+    padding: 0.5em;
+}
+
+.navigation-pages {
+    color: white;
+    background-color: #1abc9c;
+}
+
+.navigation-pages a {
+    color: white;
+}
+
+.navigation-breadcrumbs {
+    background-color: #e0e0e0;
+    color: darkgrey;
+}
+
+.navigation-breadcrumbs a {
+    color: darkgrey;
+}
+
+.navigation-breadcrumbs > :last-child {
+    color: black;
+}
+
+.navigation-breadcrumbs > :last-child a {
+    color: black;
 }
 
