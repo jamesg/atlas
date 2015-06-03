@@ -29,8 +29,10 @@ ATLAS_DECLARE_STATIC_STRING(css_navigation_css)
 ATLAS_DECLARE_STATIC_STRING(css_plant_theme_css)
 ATLAS_DECLARE_STATIC_STRING(css_teletype_theme_css)
 ATLAS_DECLARE_STATIC_STRING(jquery_js)
+ATLAS_DECLARE_STATIC_STRING(jquery_min_js)
 ATLAS_DECLARE_STATIC_STRING(modal_css)
 ATLAS_DECLARE_STATIC_STRING(modal_js)
+ATLAS_DECLARE_STATIC_STRING(moment_min_js)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_css_open_iconic_css)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_ttf)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_woff)
@@ -76,8 +78,10 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
     install_static_text("/backbone-min.js", ATLAS_STATIC_STD_STRING(backbone_min_js));
     install_static_text("/backbone.js", ATLAS_STATIC_STD_STRING(backbone_js));
     install_static_text("/jquery.js", ATLAS_STATIC_STD_STRING(jquery_js));
+    install_static_text("/jquery.min.js", ATLAS_STATIC_STD_STRING(jquery_min_js));
     install_static_text("/modal.css", ATLAS_STATIC_STD_STRING(modal_css));
     install_static_text("/modal.js", ATLAS_STATIC_STD_STRING(modal_js));
+    install_static_text("/moment.min.js", ATLAS_STATIC_STD_STRING(moment_min_js));
     install_static_text("/open-iconic/font/css/open-iconic.css", ATLAS_STATIC_STD_STRING(open_iconic_font_css_open_iconic_css));
     install_static_text("/open-iconic/font/fonts/open-iconic.ttf", ATLAS_STATIC_STD_STRING(open_iconic_font_fonts_open_iconic_ttf));
     install_static_text("/open-iconic/font/fonts/open-iconic.woff", ATLAS_STATIC_STD_STRING(open_iconic_font_fonts_open_iconic_woff));
