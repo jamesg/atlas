@@ -267,14 +267,17 @@ var Modal = Backbone.View.extend(
         events: {
             'click button[name=cancel]': 'remove',
             'click button[name=close]': 'remove',
-            'submit form': function() { return this._end('save'); }
+            'submit form': function() {
+                this._view.trigger('save');
+                this.trigger('save');
+                return false;
+            }
         },
         finish: function() {
             this.remove();
             this.trigger('finished');
         },
         _end: function(button) {
-            console.log('_end');
             var action = button.get('action');
             if(_.isFunction(action))
                 action.apply(this);
