@@ -11,7 +11,7 @@ div.aligned div.group label {
 }
 
 div.aligned div.group label > input, div.aligned div.group label > textarea {
-    width: 30%;
+    width: 40%;
     margin-right: 0;
 }
 

@@ -73,3 +73,25 @@ span.disabled {
     color: lightgrey;
 }
 
+.navigation-pages {
+    background-color: white;
+    color: black;
+}
+
+.navigation-breadcrumbs {
+    background-color: white;
+    color: darkgrey;
+}
+
+.navigation-breadcrumbs a {
+    color: darkgrey;
+}
+
+.navigation-breadcrumbs > :last-child {
+    color: black;
+}
+
+.navigation-breadcrumbs > :last-child a {
+    color: black;
+}
+
