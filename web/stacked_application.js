@@ -343,6 +343,11 @@ var CollectionView = Backbone.View.extend(
                 this['view'],
                 function() { console.log('warning: view not defined'); }
                 );
+            this.filter = coalesce(
+                options['filter'],
+                this['filter'],
+                function(model) { return true; }
+                );
             this.emptyView = coalesce(options['emptyView'], this['emptyView']);
             this._offset = coalesce(options['offset'], 0);
             this._limit = coalesce(options['limit'], -1);
@@ -418,11 +423,19 @@ var CollectionView = Backbone.View.extend(
             this._rendered = true;
             this.$el.empty();
 
+            var filtered = _.filter(
+                    this._views,
+                    function(view) {
+                        return this.filter(view.model);
+                    },
+                    this
+                    );
+
             var views;
             if(this._limit >= 0)
-                views = this._views.slice(this._offset, this._offset + this._limit);
+                views = filtered.slice(this._offset, this._offset + this._limit);
             else
-                views = this._views.slice(this._offset);
+                views = filtered.slice(this._offset);
 
             if(views.length == 0) {
                 if(!(_.has(this, '_emptyView'))) {
