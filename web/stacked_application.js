@@ -267,11 +267,6 @@ var Modal = Backbone.View.extend(
         events: {
             'click button[name=cancel]': 'remove',
             'click button[name=close]': 'remove',
-            'click button[name=destroy]': function() { return this._end('destroy'); },
-            'click button[name=no]': function() { return this._end('no') },
-            'click button[name=create]': function() { return this._end('create'); },
-            'click button[name=save]': function() { return this._end('save'); },
-            'click button[name=yes]': function() { return this._end('yes'); },
             'submit form': function() { return this._end('save'); }
         },
         finish: function() {
@@ -301,10 +296,8 @@ var ConfirmModal = Modal.extend(
                 coalesce(options['callback'], this['callback'], function() {});
             this._view.message = options['message'];
             this._view.render();
-        },
-        events: {
-            'click button[name=no]': 'no',
-            'click button[name=yes]': 'yes'
+            this.on('yes', this.yes.bind(this));
+            this.on('no', this.no.bind(this));
         },
         yes: function() {
             this._callback();
