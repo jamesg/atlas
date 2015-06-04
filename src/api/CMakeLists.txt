@@ -6,7 +6,6 @@ file(GLOB atlas_api_sources *.cpp)
 add_library(atlas-com-api ${atlas_api_sources})
 target_link_libraries(
     atlas-com-api
-    atlas-com-api-client
     atlas-com-http-server
     hades
     styx
