@@ -123,3 +123,7 @@ span.disabled {
     color: black;
 }
 
+h1 small {
+    color: darkgray;
+}
+
