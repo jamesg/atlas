@@ -285,7 +285,6 @@ var Modal = Backbone.View.extend(
             if(['cancel', 'close'].indexOf(button.get('name')) > -1)
                 this.remove();
             this._view.trigger(button.get('name'));
-            this._view.trigger('finished');
             this.trigger(button.get('name'));
             return false;
         }
