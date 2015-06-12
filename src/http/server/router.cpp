@@ -8,6 +8,7 @@
 #include "hades/mkstr.hpp"
 
 #include "atlas/http/server/error.hpp"
+#include "atlas/http/server/exception.hpp"
 #include "atlas/log/log.hpp"
 
 namespace
@@ -42,12 +43,29 @@ atlas::http::uri_type atlas::http::detail::make_async(uri_function_type f)
             uri_callback_type failure
             )
     {
-        response r = f(match);
-        mg_send_status(conn, r.status_code);
-        for(std::pair<std::string, std::string> header : r.headers)
-            mg_send_header(conn, header.first.c_str(), header.second.c_str());
-        mg_send_data(conn, r.data.c_str(), r.data.length());
-        success();
+        try
+        {
+            response r = f(match);
+            mg_send_status(conn, r.status_code);
+            for(std::pair<std::string, std::string> header : r.headers)
+                mg_send_header(conn, header.first.c_str(), header.second.c_str());
+            mg_send_data(conn, r.data.c_str(), r.data.length());
+            success();
+        }
+        catch(const http::exception& e)
+        {
+            log::error("atlas::http::detail::make_async") <<
+                "exception returned to client: " << e.what();
+            error(e.code(), e.what(), conn, success, failure);
+        }
+        catch(const std::exception& e)
+        {
+            log::error("atlas::http::detail::make_async") <<
+                "exception not returned to client: " << e.what();
+            // There was an exception while processing the request; we don't
+            // want to provide further information to the client.
+            error(500, "unknown error", conn, success, failure);
+        }
     };
 }
 
