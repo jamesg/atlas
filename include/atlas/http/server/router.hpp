@@ -204,6 +204,75 @@ namespace atlas
             public:
                 typedef boost::function<http::response(Json, Arguments...)>
                     unwrapped_function_type;
+                typedef boost::function<
+                    void(Json, uri_success_callback_type, uri_callback_type, Arguments...)
+                    > unwrapped_async_function_type;
+
+                json_function(
+                        unwrapped_async_function_type function,
+                        auth_function_type auth_function
+                        ) :
+                    basic_function(
+                            [function](
+                                mg_connection *mg_conn,
+                                boost::smatch match,
+                                uri_callback_type success,
+                                uri_callback_type error
+                                )
+                            {
+                                std::string data(mg_conn->content, mg_conn->content_len);
+                                styx::element element(styx::parse_json(data));
+
+                                try
+                                {
+                                    // Convert the incoming data to the type
+                                    // required for the handler function.
+                                    Json json_data(detail::convert_json<Json>(element));
+
+                                    typedef boost::fusion::vector<
+                                        Json,
+                                        uri_success_callback_type,
+                                        uri_callback_type,
+                                        Arguments...
+                                        > arg_values_type;
+                                    arg_values_type arg_values;
+                                    // Copy the first value (JSON data).
+                                    boost::fusion::at_c<0>(arg_values) = json_data;
+                                    // Copy the second and third values
+                                    // (success and error callbacks).
+                                    boost::fusion::at_c<1>(arg_values) =
+                                        [mg_conn, success](atlas::http::response r) {
+                                            // TODO send response
+                                            // move this - possibly to http/server/response.hpp
+                                            mg_send_status(mg_conn, r.status_code);
+                                            for(std::pair<std::string, std::string> header : r.headers)
+                                                mg_send_header(mg_conn, header.first.c_str(), header.second.c_str());
+                                            mg_send_data(mg_conn, r.data.c_str(), r.data.length());
+                                            success();
+                                        };
+                                    boost::fusion::at_c<2>(arg_values) = error;
+                                    // Copy remaining arguments (URI placeholders).
+                                    copy_to_vector<
+                                        0, sizeof...(Arguments),
+                                        3, sizeof...(Arguments) + 3>()
+                                        .copy(match, arg_values);
+
+                                    // Invoke the API function with the argument
+                                    // list.
+                                    boost::fusion::invoke(function, arg_values);
+                                }
+                                catch(const boost::bad_get&)
+                                {
+                                    // The JSON input was the wrong type of
+                                    // element (e.g. a list was expected but an
+                                    // object received).
+                                    error();
+                                }
+                            },
+                            auth_function
+                            )
+                {
+                }
 
                 json_function(
                         unwrapped_function_type function,
@@ -401,6 +470,58 @@ namespace atlas
                 matcher m,
                 typename detail::json_function<Json, Arguments...>
                     ::unwrapped_function_type function,
+                auth_function_type auth_function
+                )
+            {
+                if(m_functions.count(m))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered (" << m.regex() << ")"
+                        );
+                m_functions.insert(
+                    m,
+                    new detail::json_function<Json, Arguments...>(function, auth_function)
+                    );
+            }
+            /*!
+             * \brief Install an asynchronous function accepting JSON-formatted
+             * POST data.
+             *
+             * \param function Method accepting JSON data, success and failure
+             * callbacks and URI parameters.
+             */
+            template<typename Json, typename ...Arguments>
+            void install_json_async(
+                matcher m,
+                typename detail::json_function<Json, Arguments...>
+                    ::unwrapped_async_function_type function
+                )
+            {
+                if(m_functions.count(m))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered (" << m.regex() << ")"
+                        );
+                m_functions.insert(
+                    m,
+                    new detail::json_function<Json, Arguments...>(
+                        function,
+                        [](const auth::token_type&) { return true; }
+                        )
+                    );
+            }
+            /*!
+             * \brief Install an asynchronous function accepting JSON-formatted
+             * POST data.
+             *
+             * \param function Method accepting JSON data, success and failure
+             * callbacks and URI parameters.
+             */
+            template<typename Json, typename ...Arguments>
+            void install_json_async(
+                matcher m,
+                typename detail::json_function<Json, Arguments...>
+                    ::unwrapped_async_function_type function,
                 auth_function_type auth_function
                 )
             {

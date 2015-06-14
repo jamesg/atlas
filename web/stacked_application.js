@@ -252,10 +252,11 @@ var Modal = Backbone.View.extend(
         className: 'modal',
         template: '\
 <div class="modal-dialog">\
-    <form class="modal-content" name="modal-content">\
+    <form class="modal-content">\
+        <div name="modal-content"></div>\
+        <input type="submit" style="display: none;"></input>\
+        <div class="modal-button-box" name="buttons"></div>\
     </form>\
-    <div class="modal-button-box" name="buttons">\
-    </div>\
 </div>\
             ',
         templateParams: function() {

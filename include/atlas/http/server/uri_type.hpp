@@ -18,6 +18,10 @@ namespace atlas
          */
         typedef boost::function<void()> uri_callback_type;
         /*!
+         * \brief Success callback with a result.
+         */
+        typedef boost::function<void(const response&)> uri_success_callback_type;
+        /*!
          * \brief Synchronous URI function type.
          */
         typedef boost::function<response(boost::smatch)> uri_function_type;

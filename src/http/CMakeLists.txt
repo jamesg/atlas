@@ -14,7 +14,6 @@ add_library(atlas-com-http-server ${atlas_http_server_sources})
 target_link_libraries(
     atlas-com-http-server
     atlas-com-common
-    atlas-com-http
     mongoose
     styx
     ${CMAKE_THREAD_LIBS_INIT}
@@ -28,6 +27,7 @@ add_executable(
 target_link_libraries(
     atlas-http-server-test
     atlas-com-http-server
+    atlas-com-http
     )
 add_test(atlas-http-server-test atlas-http-server-test)
 
