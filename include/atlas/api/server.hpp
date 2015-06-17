@@ -171,24 +171,24 @@ namespace atlas
                                 result.data() = out;
                             }
                             ),
-                            [check_auth](
-                                jsonrpc::request& request
-                                ) -> bool
-                            {
-                                styx::list& l = request.params();
-                                typedef boost::fusion::vector<Arguments...> arg_values_type;
-                                arg_values_type arg_values;
-                                copy_list_to_vector<0, sizeof...(Arguments)>()
-                                    .copy(l, arg_values);
+                        [check_auth](
+                            jsonrpc::request& request
+                            ) -> bool
+                        {
+                            styx::list& l = request.params();
+                            typedef boost::fusion::vector<Arguments...> arg_values_type;
+                            arg_values_type arg_values;
+                            copy_list_to_vector<0, sizeof...(Arguments)>()
+                                .copy(l, arg_values);
 
-                                // Append the JSONRPC request to the argument list.
-                                auto args = boost::fusion::push_front(arg_values, request);
-                                // Invoke the check_auth function with the argument list.
-                                return boost::fusion::invoke(
-                                    check_auth,
-                                    args
-                                    );
-                            }
+                            // Append the JSONRPC request to the argument list.
+                            auto args = boost::fusion::push_front(arg_values, request);
+                            // Invoke the check_auth function with the argument list.
+                            return boost::fusion::invoke(
+                                check_auth,
+                                args
+                                );
+                        }
                         )
                 {
                 }
@@ -258,7 +258,7 @@ namespace atlas
                     typename detail::unwrapped_method<Return, Arguments...>::unwrapped_auth_type auth_function
                     )
                 {
-                    log::information("api::server::install") << "installing " << name;
+                    log::information("atlas::api::server::install") << "installing " << name;
                     m_methods.insert(
                         name,
                         static_cast<detail::basic_method*>(
