@@ -447,14 +447,63 @@ var CollectionView = Backbone.View.extend(
                 _(views).each(
                     function(dv) {
                         this.$el.append(dv.el);
-                        // Rendering the CollectionView in this way removes
-                        // every element from the DOM and reinserts it
-                        // somewhere else.  Event bindings are lost.
-                        dv.delegateEvents();
                     },
                     this
                     );
             }
+            // Rendering the CollectionView in this way removes
+            // every element from the DOM and reinserts it
+            // somewhere else.  Event bindings are lost.
+            this.delegateEvents();
+        },
+        delegateEvents: function() {
+            Backbone.View.prototype.delegateEvents.apply(this, arguments);
+            _(this._views).each(function(dv) { dv.delegateEvents(); });
+        }
+    }
+    );
+
+/*
+ * A generic table view that can be adapted to any kind of table with a header.
+ * Provide a view constructor for the table header (thead) as the theadView
+ * option and a view constructor for the table rows (tr) as the trView option.
+ *
+ * model: An instance of Backbone.Collection.
+ * emptyView: View to use if the table is empty (defaults to displaying no
+ * rows).
+ * theadView: Header view constructor.
+ * trView: Row view constructor.
+ */
+var TableView = StaticView.extend(
+    {
+        tagName: 'table',
+        initialize: function(options) {
+            StaticView.prototype.initialize.apply(this, arguments);
+
+            this._thead = new options.theadView;
+            this._thead.render();
+            this._tbody = new CollectionView({
+                tagName: 'tbody',
+                view: options.trView,
+                model: this.model
+            });
+            this._tbody.render();
+
+            this.emptyView = coalesce(options['emptyView'], this['emptyView']);
+
+            this.listenTo(this.model, 'all', this.render);
+
+            this.render();
+        },
+        render: function() {
+            this.$el.empty();
+            this.$el.append(this._thead.$el);
+            if(this.model.length == 0 && _.has(this, 'emptyView'))
+                this.$el.append((new this.emptyView).$el);
+            else if(this.model.length > 0)
+                this.$el.append(this._tbody.$el);
+            this._tbody.delegateEvents();
+            this.delegateEvents();
         }
     }
     );
