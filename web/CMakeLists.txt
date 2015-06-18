@@ -16,6 +16,8 @@ atlas_add_web_library(
         "css/navigation.css"
         "css/plant-theme.css"
         "css/teletype-theme.css"
+        "d3/d3.js"
+        "d3/d3.min.js"
         "jquery.js"
         "jquery.min.js"
         "modal.css"
@@ -28,6 +30,10 @@ atlas_add_web_library(
         "stacked_application.js"
         "underscore-min.js"
         "underscore.js"
+        "xcharts/xcharts.css"
+        "xcharts/xcharts.js"
+        "xcharts/xcharts.min.css"
+        "xcharts/xcharts.min.js"
     )
 
 file(GLOB atlas_web_sources src/*.cpp)

@@ -28,6 +28,8 @@ ATLAS_DECLARE_STATIC_STRING(css_modal_css)
 ATLAS_DECLARE_STATIC_STRING(css_navigation_css)
 ATLAS_DECLARE_STATIC_STRING(css_plant_theme_css)
 ATLAS_DECLARE_STATIC_STRING(css_teletype_theme_css)
+ATLAS_DECLARE_STATIC_STRING(d3_d3_js)
+ATLAS_DECLARE_STATIC_STRING(d3_d3_min_js)
 ATLAS_DECLARE_STATIC_STRING(jquery_js)
 ATLAS_DECLARE_STATIC_STRING(jquery_min_js)
 ATLAS_DECLARE_STATIC_STRING(modal_css)
@@ -41,6 +43,10 @@ ATLAS_DECLARE_STATIC_STRING(stacked_application_js)
 ATLAS_DECLARE_STATIC_STRING(underscore_js)
 ATLAS_DECLARE_STATIC_STRING(underscore_js)
 ATLAS_DECLARE_STATIC_STRING(underscore_min_js)
+ATLAS_DECLARE_STATIC_STRING(xcharts_xcharts_css)
+ATLAS_DECLARE_STATIC_STRING(xcharts_xcharts_js)
+ATLAS_DECLARE_STATIC_STRING(xcharts_xcharts_min_css)
+ATLAS_DECLARE_STATIC_STRING(xcharts_xcharts_min_js)
 
 boost::shared_ptr<atlas::http::router> atlas::http::static_files()
 {
@@ -77,6 +83,8 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
     install_static_text("/ShareTechMono-Regular.ttf", ATLAS_STATIC_STD_STRING(ShareTechMono_Regular_ttf));
     install_static_text("/backbone-min.js", ATLAS_STATIC_STD_STRING(backbone_min_js));
     install_static_text("/backbone.js", ATLAS_STATIC_STD_STRING(backbone_js));
+    install_static_text("/d3/d3.js", ATLAS_STATIC_STD_STRING(d3_d3_js));
+    install_static_text("/d3/d3.min.js", ATLAS_STATIC_STD_STRING(d3_d3_min_js));
     install_static_text("/jquery.js", ATLAS_STATIC_STD_STRING(jquery_js));
     install_static_text("/jquery.min.js", ATLAS_STATIC_STD_STRING(jquery_min_js));
     install_static_text("/modal.css", ATLAS_STATIC_STD_STRING(modal_css));
@@ -98,6 +106,10 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
     install_static_text("/css/navigation.css", ATLAS_STATIC_STD_STRING(css_navigation_css));
     install_static_text("/css/plant-theme.css", ATLAS_STATIC_STD_STRING(css_plant_theme_css));
     install_static_text("/css/teletype-theme.css", ATLAS_STATIC_STD_STRING(css_teletype_theme_css));
+    install_static_text("/xcharts/xcharts.css", ATLAS_STATIC_STD_STRING(xcharts_xcharts_css));
+    install_static_text("/xcharts/xcharts.js", ATLAS_STATIC_STD_STRING(xcharts_xcharts_js));
+    install_static_text("/xcharts/xcharts.min.css", ATLAS_STATIC_STD_STRING(xcharts_xcharts_min_css));
+    install_static_text("/xcharts/xcharts.min.js", ATLAS_STATIC_STD_STRING(xcharts_xcharts_min_js));
 
     return out;
 }
