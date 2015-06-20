@@ -31,6 +31,12 @@ namespace atlas
         typedef boost::function<response(std::string, boost::smatch)>
             data_uri_function_type;
         /*!
+         * \brief Synchronous URI function type with access to the original
+         * mg_connection structure.
+         */
+        typedef boost::function<response(mg_connection*, boost::smatch)>
+            conn_uri_function_type;
+        /*!
          * \brief Function to handle URI requests.
          *
          * The function will be called with the incoming connection and success
