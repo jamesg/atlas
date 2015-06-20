@@ -8,18 +8,34 @@
 #include "atlas/jsonrpc/request.hpp"
 #include "atlas/jsonrpc/result.hpp"
 
-atlas::api::async_method_type atlas::api::detail::make_async(method_type method)
+namespace
 {
-    return [method](
-            jsonrpc::request& request,
-            boost::function<void(jsonrpc::result&)> callback
+    void async_template(
+            atlas::api::method_type method,
+            atlas::jsonrpc::request& request,
+            boost::function<void(atlas::jsonrpc::result&)> callback
             )
     {
-        jsonrpc::result result;
+        atlas::jsonrpc::result result;
         method(request, result);
         result.id() = request.id();
         callback(result);
-    };
+    }
+}
+
+atlas::api::async_method_type atlas::api::detail::make_async(method_type method)
+{
+    return boost::bind(async_template, method, _1, _2);
+    //return [method](
+            //jsonrpc::request& request,
+            //boost::function<void(jsonrpc::result&)> callback
+            //)
+    //{
+        //jsonrpc::result result;
+        //method(request, result);
+        //result.id() = request.id();
+        //callback(result);
+    //};
 }
 
 atlas::api::detail::basic_method::basic_method(
