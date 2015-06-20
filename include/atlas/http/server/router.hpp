@@ -72,6 +72,12 @@ namespace atlas
              */
             uri_type make_async_with_data(data_uri_function_type function);
             /*!
+             * \brief Turn a synchronous URI router function into an
+             * asynchronous one in order to make it compatible with the lower
+             * level basic_function interface.
+             */
+            uri_type make_async_with_conn(conn_uri_function_type function);
+            /*!
              * \brief Wrapper for a router function as stored by the router.
              */
             class basic_function
@@ -179,6 +185,110 @@ namespace atlas
                                     arg_values_type;
                                 arg_values_type arg_values;
                                 copy_to_vector<0, sizeof...(Arguments), 0, sizeof...(Arguments)>()
+                                    .copy(match, arg_values);
+
+                                // Invoke the API function with the argument
+                                // list.
+                                http::response out =
+                                    boost::fusion::invoke(function, arg_values);
+                                return out;
+                            }
+                            ),
+                            auth_function
+                        )
+                {
+                }
+            };
+
+            std::map<std::string, std::string> parse_get_parameters(mg_connection *);
+
+            /*!
+             * \brief A function accepting GET parameters.
+             */
+            template<typename ...Arguments>
+            class get_function : public basic_function
+            {
+            public:
+                typedef std::map<std::string, std::string> get_parameters_type;
+                typedef boost::function<http::response(get_parameters_type, Arguments...)>
+                    unwrapped_function_type;
+                typedef boost::function<
+                    void(get_parameters_type, uri_success_callback_type, uri_callback_type, Arguments...)
+                    > unwrapped_async_function_type;
+
+                get_function(
+                        unwrapped_async_function_type function,
+                        auth_function_type auth_function
+                        ) :
+                    basic_function(
+                            [function](
+                                mg_connection *mg_conn,
+                                boost::smatch match,
+                                uri_callback_type success,
+                                uri_callback_type error
+                                )
+                            {
+                                get_parameters_type params(
+                                    detail::parse_get_parameters(mg_conn)
+                                    );
+
+                                typedef boost::fusion::vector<
+                                    get_parameters_type,
+                                    uri_success_callback_type,
+                                    uri_callback_type,
+                                    Arguments...
+                                    > arg_values_type;
+                                arg_values_type arg_values;
+                                // Copy the first value (JSON data).
+                                boost::fusion::at_c<0>(arg_values) = params;
+                                // Copy the second and third values
+                                // (success and error callbacks).
+                                boost::fusion::at_c<1>(arg_values) =
+                                    [mg_conn, success](atlas::http::response r) {
+                                        // TODO send response
+                                        // move this - possibly to http/server/response.hpp
+                                        mg_send_status(mg_conn, r.status_code);
+                                        for(std::pair<std::string, std::string> header : r.headers)
+                                            mg_send_header(mg_conn, header.first.c_str(), header.second.c_str());
+                                        mg_send_data(mg_conn, r.data.c_str(), r.data.length());
+                                        success();
+                                    };
+                                boost::fusion::at_c<2>(arg_values) = error;
+                                // Copy remaining arguments (URI placeholders).
+                                copy_to_vector<
+                                    0, sizeof...(Arguments),
+                                    3, sizeof...(Arguments) + 3>()
+                                    .copy(match, arg_values);
+
+                                // Invoke the API function with the argument
+                                // list.
+                                boost::fusion::invoke(function, arg_values);
+                            },
+                            auth_function
+                            )
+                {
+                }
+
+                get_function(
+                        unwrapped_function_type function,
+                        auth_function_type auth_function
+                        ) :
+                    basic_function(
+                        detail::make_async_with_conn(
+                            [function](mg_connection *mg_conn, boost::smatch match)
+                            {
+                                get_parameters_type params(
+                                    detail::parse_get_parameters(mg_conn)
+                                    );
+
+                                typedef boost::fusion::vector<get_parameters_type, Arguments...>
+                                    arg_values_type;
+                                arg_values_type arg_values;
+                                boost::fusion::at_c<0>(arg_values) = params;
+                                // Copy remaining arguments (URI placeholders).
+                                copy_to_vector<
+                                    0, sizeof...(Arguments),
+                                    1, sizeof...(Arguments) + 1>()
                                     .copy(match, arg_values);
 
                                 // Invoke the API function with the argument
@@ -432,6 +542,60 @@ namespace atlas
                     );
             }
 
+            /*!
+             * \brief Install a function to respond to a URI matched by a
+             * regular expression.
+             *
+             * \param function Method accepting the URI parameters and
+             * returning a string.
+             */
+            template<typename ...Arguments>
+            void install_get(
+                matcher m,
+                typename detail::get_function<Arguments...>
+                    ::unwrapped_function_type function
+                )
+            {
+                if(m_functions.count(m))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered (" << m.regex() << ")"
+                        );
+                m_functions.insert(
+                    m,
+                    static_cast<detail::basic_function*>(
+                        new detail::get_function<Arguments...>(
+                            function,
+                            [](const auth::token_type&) { return true; }
+                            )
+                        )
+                    );
+            }
+            /*!
+             * \brief Install a function to respond to a URI matched by a
+             * regular expression.
+             *
+             * \param function Method accepting the URI parameters and
+             * returning a string.
+             */
+            template<typename ...Arguments>
+            void install_get(
+                matcher m,
+                typename detail::get_function<Arguments...>
+                    ::unwrapped_function_type function,
+                auth_function_type auth_function
+                )
+            {
+                if(m_functions.count(m))
+                    throw std::runtime_error(
+                        hades::mkstr() <<
+                        "uri handler already registered (" << m.regex() << ")"
+                        );
+                m_functions.insert(
+                    m,
+                    new detail::get_function<Arguments...>(function, auth_function)
+                    );
+            }
             /*!
              * \brief Install a function to respond to a URI matched by a regular expression.
              *
