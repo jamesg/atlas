@@ -70,12 +70,6 @@ namespace atlas
              * asynchronous one in order to make it compatible with the lower
              * level basic_function interface.
              */
-            uri_type make_async_with_data(data_uri_function_type function);
-            /*!
-             * \brief Turn a synchronous URI router function into an
-             * asynchronous one in order to make it compatible with the lower
-             * level basic_function interface.
-             */
             uri_type make_async_with_conn(conn_uri_function_type function);
             /*!
              * \brief Wrapper for a router function as stored by the router.
@@ -200,7 +194,7 @@ namespace atlas
                 }
             };
 
-            std::map<std::string, std::string> parse_get_parameters(mg_connection *);
+            get_parameters_type parse_get_parameters(mg_connection *);
 
             /*!
              * \brief A function accepting GET parameters.
@@ -209,11 +203,15 @@ namespace atlas
             class get_function : public basic_function
             {
             public:
-                typedef std::map<std::string, std::string> get_parameters_type;
                 typedef boost::function<http::response(get_parameters_type, Arguments...)>
                     unwrapped_function_type;
                 typedef boost::function<
-                    void(get_parameters_type, uri_success_callback_type, uri_callback_type, Arguments...)
+                    void(
+                            get_parameters_type,
+                            uri_success_callback_type,
+                            uri_callback_type,
+                            Arguments...
+                            )
                     > unwrapped_async_function_type;
 
                 get_function(
@@ -389,10 +387,16 @@ namespace atlas
                         auth_function_type auth_function
                         ) :
                     basic_function(
-                        detail::make_async_with_data(
-                            [function](std::string data, boost::smatch match)
+                        detail::make_async_with_conn(
+                            [function](mg_connection *conn, boost::smatch match)
                             {
-                                styx::element element(styx::parse_json(data));
+                                const std::string content(
+                                    conn->content,
+                                    conn->content_len
+                                    );
+                                styx::element element(
+                                    styx::parse_json(content)
+                                    );
 
                                 try
                                 {

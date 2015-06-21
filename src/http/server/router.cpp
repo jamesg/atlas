@@ -70,24 +70,6 @@ atlas::http::uri_type atlas::http::detail::make_async(uri_function_type f)
     };
 }
 
-atlas::http::uri_type atlas::http::detail::make_async_with_data(data_uri_function_type f)
-{
-    return [f](
-            mg_connection *conn,
-            boost::smatch match,
-            uri_callback_type success,
-            uri_callback_type failure
-            )
-    {
-        response r = f(std::string(conn->content, conn->content_len), match);
-        mg_send_status(conn, r.status_code);
-        for(std::pair<std::string, std::string> header : r.headers)
-            mg_send_header(conn, header.first.c_str(), header.second.c_str());
-        mg_send_data(conn, r.data.c_str(), r.data.length());
-        success();
-    };
-}
-
 atlas::http::uri_type atlas::http::detail::make_async_with_conn(conn_uri_function_type f)
 {
     return [f](
@@ -214,6 +196,8 @@ std::map<std::string, std::string> atlas::http::detail::parse_get_parameters(
         )
 {
     std::map<std::string, std::string> params;
+    if(mg_conn->query_string == nullptr)
+        return params;
     std::string query_string(mg_conn->query_string);
     typedef boost::tokenizer<boost::escaped_list_separator<char>> tokenizer;
     tokenizer t(query_string, boost::escaped_list_separator<char>("\\", "&", "\""));

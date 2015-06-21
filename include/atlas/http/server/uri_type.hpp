@@ -14,6 +14,10 @@ namespace atlas
     namespace http
     {
         /*!
+         * \brief Collection of query string arguments.
+         */
+        typedef std::map<std::string, std::string> get_parameters_type;
+        /*!
          * \brief Success or error callback for URI handlers.
          */
         typedef boost::function<void()> uri_callback_type;
@@ -25,11 +29,6 @@ namespace atlas
          * \brief Synchronous URI function type.
          */
         typedef boost::function<response(boost::smatch)> uri_function_type;
-        /*!
-         * \brief Synchronous URI function type accepting POST or PUT data.
-         */
-        typedef boost::function<response(std::string, boost::smatch)>
-            data_uri_function_type;
         /*!
          * \brief Synchronous URI function type with access to the original
          * mg_connection structure.
