@@ -23,9 +23,13 @@ namespace atlas
         };
 
         /*!
-         * \brief Generate a plain text response.
+         * \brief Generate a plain text response with a success status code.
          */
         response text_response(const std::string&);
+        /*!
+         * \brief Generate a plain text response with a custom status code.
+         */
+        response text_response(const int code, const std::string& message);
         /*!
          * \brief Generate a raw JSON response.
          *

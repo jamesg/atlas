@@ -111,6 +111,10 @@ void atlas::http::detail::basic_function::serve(
         {
             m_serve(conn, match, success, failure);
         }
+        catch(const http::exception& e)
+        {
+            http::error(e.code(), e.what(), conn);
+        }
         catch(const std::exception& e)
         {
             log::error("atlas::http::detail::basic_function::serve") <<
@@ -294,4 +298,3 @@ void atlas::http::router::install(
             new detail::basic_function(uri_function, auth_function)
             );
 }
-

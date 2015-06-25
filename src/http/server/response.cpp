@@ -23,6 +23,16 @@ atlas::http::response atlas::http::text_response(const std::string& str)
     return out;
 }
 
+atlas::http::response atlas::http::text_response(
+        const int code,
+        const std::string& str
+        )
+{
+    atlas::http::response out(str);
+    out.status_code = code;
+    return out;
+}
+
 atlas::http::response atlas::http::raw_json_response(
         const styx::element& element
         )
