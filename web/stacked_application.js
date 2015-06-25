@@ -124,6 +124,8 @@ var StaticView = Backbone.View.extend(
                 this.listenTo(this.model, 'change', this.render.bind(this));
             if(!_.isUndefined(options) && _(options).has('template'))
                 this.template = options.template;
+            if(!_.isUndefined(options) && _(options).has('templateParams'))
+                this.templateParams = options.templateParams;
         },
         template: '',
         templateParams: function() {
