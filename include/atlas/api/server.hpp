@@ -261,12 +261,12 @@ namespace atlas
                     log::information("atlas::api::server::install") << "installing " << name;
                     m_methods.insert(
                         name,
-                        static_cast<detail::basic_method*>(
+                        //static_cast<detail::basic_method*>(
                             new detail::unwrapped_method<Return, Arguments...>(
                                 method,
                                 auth_function
                                 )
-                            )
+                            //)
                         );
                 }
                 /*!
