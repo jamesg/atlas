@@ -7,7 +7,7 @@ namespace atlas
 {
     namespace auth
     {
-        /*
+        /*!
          * \brief REST API for managing tokens and users.
          */
         class router : public http::router

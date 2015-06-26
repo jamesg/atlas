@@ -159,6 +159,11 @@ namespace atlas
             };
 
             /*!
+             * \brief URI handler called with arguments specified as a template
+             * list.
+             *
+             * This class is used to transfer arguments from a URI regex match
+             * to the URI handler.
              */
             template<typename ...Arguments>
             class unwrapped_function : public basic_function
@@ -166,10 +171,36 @@ namespace atlas
             public:
                 typedef boost::function<http::response(Arguments...)>
                     unwrapped_function_type;
+                typedef boost::function<bool(std::string, Arguments...)>
+                    unwrapped_auth_function_type;
 
+                unwrapped_function(unwrapped_function_type function) :
+                    basic_function(
+                        detail::make_async(
+                            [function](boost::smatch match)
+                            {
+                                typedef boost::fusion::vector<Arguments...>
+                                    arg_values_type;
+                                arg_values_type arg_values;
+                                copy_to_vector<0, sizeof...(Arguments), 0, sizeof...(Arguments)>()
+                                    .copy(match, arg_values);
+
+                                // Invoke the API function with the argument
+                                // list.
+                                http::response out =
+                                    boost::fusion::invoke(function, arg_values);
+                                return out;
+                            }
+                            ),
+                        [](const std::string&, boost::smatch) {
+                            return true;
+                        }
+                        )
+                {
+                }
                 unwrapped_function(
                         unwrapped_function_type function,
-                        auth_function_type auth_function
+                        unwrapped_auth_function_type auth_function
                         ) :
                     basic_function(
                         detail::make_async(
@@ -188,7 +219,15 @@ namespace atlas
                                 return out;
                             }
                             ),
-                            auth_function
+                        [auth_function](const std::string& token, boost::smatch match) {
+                            typedef boost::fusion::vector<std::string, Arguments...>
+                                arg_values_type;
+                            arg_values_type arg_values;
+                            boost::fusion::at_c<0>(arg_values) = token;
+                            copy_to_vector<0, sizeof...(Arguments), 1, sizeof...(Arguments) + 1>()
+                                .copy(match, arg_values);
+                            return boost::fusion::invoke(auth_function, arg_values);
+                        }
                         )
                 {
                 }
@@ -458,6 +497,14 @@ namespace atlas
                     uri_callback_type failure
                     );
             /*!
+             * \brief Install any type of URI handler.
+             *
+             * \param handler A pointer to the URI handler.  The router takes
+             * ownership of this pointer.  The handler will be deleted when the
+             * router is deleted.
+             */
+            void install(matcher, detail::basic_function*);
+            /*!
              * \brief Install a function to respond to a specific URI.
              *
              * \param uri_function Function to execute when the URI is
@@ -470,10 +517,7 @@ namespace atlas
              * \throws std::runtime_error if a function has already been
              * installed for this URI.
              */
-            void install(
-                matcher m,
-                uri_type uri_function
-                );
+            void install(matcher m, uri_type uri_function);
             /*!
              * \brief Install a function to respond to a specific URI.
              *
@@ -505,20 +549,10 @@ namespace atlas
                 typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
+                install(
+                        m,
+                        new detail::unwrapped_function<Arguments...>(function)
                         );
-                m_functions.insert(
-                    m,
-                    static_cast<detail::basic_function*>(
-                        new detail::unwrapped_function<Arguments...>(
-                            function,
-                            [](const auth::token_type&) { return true; }
-                            )
-                        )
-                    );
             }
             /*!
              * \brief Install a function to respond to a URI matched by a regular expression.
@@ -530,19 +564,12 @@ namespace atlas
             void install(
                 matcher m,
                 typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function,
-                auth_function_type auth_function
+                typename detail::unwrapped_function<Arguments...>::unwrapped_auth_function_type auth_function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
-                        );
-                m_functions.insert(
+                install(
                     m,
-                    static_cast<detail::basic_function*>(
-                        new detail::unwrapped_function<Arguments...>(function, auth_function)
-                        )
+                    new detail::unwrapped_function<Arguments...>(function, auth_function)
                     );
             }
 
@@ -560,20 +587,10 @@ namespace atlas
                     ::unwrapped_function_type function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
-                        );
-                m_functions.insert(
+                install(
                     m,
-                    static_cast<detail::basic_function*>(
-                        new detail::get_function<Arguments...>(
-                            function,
-                            [](const auth::token_type&) { return true; }
-                            )
-                        )
-                    );
+                    new detail::get_function<Arguments...>(function, [](const std::string&, boost::smatch) { return true; })
+                   );
             }
             /*!
              * \brief Install a function to respond to a URI matched by a
@@ -622,7 +639,7 @@ namespace atlas
                     static_cast<detail::basic_function*>(
                         new detail::json_function<Arguments...>(
                             function,
-                            [](const auth::token_type&) { return true; }
+                            [](const auth::token_type&, boost::smatch) { return true; }
                             )
                         )
                     );
@@ -674,7 +691,7 @@ namespace atlas
                     m,
                     new detail::json_function<Json, Arguments...>(
                         function,
-                        [](const auth::token_type&) { return true; }
+                        [](const auth::token_type&, boost::smatch) { return true; }
                         )
                     );
             }

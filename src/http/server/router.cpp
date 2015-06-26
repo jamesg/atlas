@@ -105,7 +105,7 @@ void atlas::http::detail::basic_function::serve(
         ) const
 {
     const char *token = mg_get_header(conn, "Authorization");
-    if(m_auth_function((token==nullptr)?"":token))
+    if(m_auth_function((token == nullptr) ? "" : token, match))
     {
         try
         {
@@ -259,23 +259,31 @@ void atlas::http::router::serve(
             );
 }
 
+void atlas::http::router::install(matcher m, detail::basic_function *f)
+{
+    // This won't catch all conflicting handlers because they are based on
+    // regular expressions.
+    if(m_functions.count(m))
+    {
+        delete f;
+        throw std::runtime_error(
+            hades::mkstr() << "uri handler already registered (" <<
+                m.regex() << ")"
+            );
+    }
+    m_functions.insert(m, f);
+}
+
 void atlas::http::router::install(
     matcher m,
     uri_type uri_function
     )
 {
-    // This won't catch all conflicting handlers because they are based on
-    // regular expressions.
-    if(m_functions.count(m))
-        throw std::runtime_error(
-            hades::mkstr() << "uri handler already registered (" <<
-                m.regex() << ")"
-            );
-    m_functions.insert(
+    install(
             m,
             new detail::basic_function(
                 uri_function,
-                [](const auth::token_type&) { return true; }
+                [](const auth::token_type&, boost::smatch) { return true; }
                 )
             );
 }
@@ -286,14 +294,7 @@ void atlas::http::router::install(
     auth_function_type auth_function
     )
 {
-    // This won't catch all conflicting handlers because they are based on
-    // regular expressions.
-    if(m_functions.count(m))
-        throw std::runtime_error(
-            hades::mkstr() << "uri handler already registered (" <<
-                m.regex() << ")"
-            );
-    m_functions.insert(
+    install(
             m,
             new detail::basic_function(uri_function, auth_function)
             );

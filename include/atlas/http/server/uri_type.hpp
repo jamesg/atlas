@@ -54,7 +54,7 @@ namespace atlas
          * \brief Function to allow/disallow access to a URL based on the
          * current user's credentials.
          */
-        typedef boost::function<bool(const auth::token_type&)>
+        typedef boost::function<bool(const auth::token_type&, boost::smatch)>
             auth_function_type;
     }
 }

@@ -9,7 +9,7 @@
 atlas::auth::router::router(hades::connection& conn)
 {
     install_get<>(
-            http::matcher("/token", "GET"),
+            http::matcher("/session", "GET"),
             [&conn](http::get_parameters_type params) {
                 if(params.find("username") == params.end())
                     return atlas::http::text_response(
@@ -56,22 +56,23 @@ atlas::auth::router::router(hades::connection& conn)
                 atlas::user_session session =
                     db::user_session::start(conn, user.id());
 
-                return http::json_response(
-                        session.get_string<db::attr::user_session::token>()
-                        );
+                return http::json_response(session);
             }
             );
     install<std::string>(
-            http::matcher("/token/([^/]+)", "DELETE"),
+            http::matcher("/session/([^/]+)", "DELETE"),
             [&conn](std::string token) {
                 return http::text_response(
                     db::user_session::stop(token, conn) ? 200 : 500,
                     "sign out"
                     );
+            },
+            [](const std::string& token, std::string url_token) {
+                return (token == url_token);
             }
             );
     install<>(
-            http::matcher("/token", "DELETE"),
+            http::matcher("/session", "DELETE"),
             [&conn]() {
                 return http::text_response(500, "not yet implemented");
             }
