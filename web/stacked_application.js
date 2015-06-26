@@ -68,16 +68,6 @@ var setHeader = function(xhr) {
 }
 
 /*
- * Push a sign in page to the application whenever a jQuery request receives a
- * 403 error.
- */
-$(document).ajaxError(
-        function (e, xhr, options) {
-            gApplication.pushPage(SignInPage);
-        }
-        );
-
-/*
  * Make a JSONRPC request.
  *
  * 'options' is a map of:
@@ -800,4 +790,3 @@ var RestCollection = Backbone.Collection.extend(
             }
         }
         );
-
