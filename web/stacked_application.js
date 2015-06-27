@@ -52,14 +52,14 @@ if(
     };
 }
 
-/*
- * Set the 'Authorization' header on an outgoing XMLHttpRequest.
- */
-var setHeader = function(xhr) {
-    xhr.setRequestHeader('Authorization', storage.get('token'));
-};
-
 {
+    /*
+     * Set the 'Authorization' header on an outgoing XMLHttpRequest.
+     */
+    var setHeader = function(xhr) {
+        xhr.setRequestHeader('Authorization', storage.get('token'));
+    };
+
     var oldSync = Backbone.sync;
     Backbone.sync = function(method, model, options) {
         options.beforeSend = setHeader;
