@@ -5,6 +5,7 @@
 #include "atlas/http/server/response.hpp"
 #include "hades/crud.ipp"
 #include "hades/get_one.hpp"
+#include "hades/join.hpp"
 
 atlas::auth::router::router(hades::connection& conn)
 {
@@ -68,6 +69,8 @@ atlas::auth::router::router(hades::connection& conn)
                     );
             },
             [](const std::string& token, std::string url_token) {
+                // Check that the session token is the one the client is trying
+                // to delete.
                 return (token == url_token);
             }
             );
@@ -80,7 +83,9 @@ atlas::auth::router::router(hades::connection& conn)
     install<>(
             http::matcher("/user", "GET"),
             [&conn]() {
-                return http::json_response(user::get_collection(conn));
+                return http::json_response(
+                        hades::equi_outer_join<user, user_enabled>(conn)
+                        );
             }
             );
 }
