@@ -2,3 +2,11 @@
     width: 100%;
 }
 
+.action-table tr {
+    cursor: pointer;
+}
+
+.action-table tr:hover {
+    background-color: lightgrey;
+}
+
