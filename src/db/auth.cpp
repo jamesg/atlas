@@ -5,6 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_int.hpp>
 
+#include "atlas/log/log.hpp"
 #include "hades/crud.ipp"
 #include "hades/devoid.hpp"
 #include "hades/exists.hpp"
@@ -197,5 +198,21 @@ void atlas::db::auth::create(hades::connection& conn)
         root.get_bool<db::flag::user::super>() = true;
         root.save(conn);
     }
+}
+
+bool atlas::db::user_session::validate(hades::connection& conn, const std::string& token)
+{
+    // TODO check that the session time is valid.
+    // TODO update the session valid time.
+    log::test("atlas::db::user_session::validate") << "validating " << token;
+    bool valid = hades::exists<atlas::user_session>(
+            conn,
+            hades::where(
+                "token = ?",
+                hades::row<std::string>(token)
+                )
+            );
+    log::test("atlas::db::user_session::validate") << (valid ? "valid" : "invalid");
+    return valid;
 }
 
