@@ -15,6 +15,7 @@ atlas_add_web_library(
         "css/modal.css"
         "css/navigation.css"
         "css/plant-theme.css"
+        "css/table.css"
         "css/teletype-theme.css"
         "d3/d3.js"
         "d3/d3.min.js"
