@@ -84,8 +84,33 @@ atlas::auth::router::router(hades::connection& conn)
             http::matcher("/user", "GET"),
             [&conn]() {
                 return http::json_response(
-                        hades::equi_outer_join<user, user_enabled>(conn)
+                        hades::equi_outer_join<user, user_enabled, user_super>(conn)
                         );
+            }
+            );
+    install<int>(
+            http::matcher("/user/([0-9]+)", "GET"),
+            [&conn](const int user_id) {
+                styx::list users(
+                        hades::equi_outer_join<user, user_enabled, user_super>(conn)
+                        );
+                if(users.size() == 0)
+                    return atlas::http::text_response(404, "user not found");
+                return atlas::http::json_response(users.at(0));
+            }
+            );
+    install_json<user, int>(
+            http::matcher("/user/([0-9]+)", "PUT"),
+            [&conn](user u, const int) {
+                u.update(conn);
+                return atlas::http::json_response(u);
+            }
+            );
+    install_json<user>(
+            http::matcher("/user", "POST"),
+            [&conn](user u) {
+                u.insert(conn);
+                return atlas::http::json_response(u);
             }
             );
 }
