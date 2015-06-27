@@ -487,6 +487,7 @@ var TableView = StaticView.extend(
 
             this.render();
         },
+        emptyView: StaticView,
         render: function() {
             this.$el.empty();
             this.$el.append(this._thead.$el);
