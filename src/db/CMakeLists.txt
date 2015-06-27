@@ -7,6 +7,7 @@ file(GLOB atlas_com_db_sources *.cpp)
 add_library(atlas-com-db ${atlas_com_db_sources})
 target_link_libraries(
     atlas-com-db
+    atlas-com-common
     hades
     styx
     ${Boost_LIBRARIES}
