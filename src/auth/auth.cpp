@@ -17,7 +17,7 @@ bool atlas::auth::has_permission(
         return true;
 
     auto where = hades::where(
-            "permission = ? AND user.user_id = ?",
+            "permission = ? AND atlas_user.user_id = ?",
             hades::row<std::string>(permission)
             );
     styx::list user_permissions =
@@ -50,9 +50,9 @@ bool atlas::auth::is_superuser(
             token
             );
     auto where = hades::where(
-            "user.user_id = ? AND "
-            "user_enabled.user_id IS NOT NULL AND "
-            "user_super.user_id IS NOT NULL ",
+            "atlas_user.user_id = ? AND "
+            "atlas_user_enabled.user_id IS NOT NULL AND "
+            "atlas_user_super.user_id IS NOT NULL ",
             hades::row<int>(session.get_int<atlas::db::attr::user::user_id>())
             );
     styx::list users = hades::equi_outer_join<
@@ -65,4 +65,3 @@ bool atlas::auth::is_superuser(
                 );
     return (users.size() == 1);
 }
-
