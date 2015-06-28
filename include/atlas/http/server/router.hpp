@@ -159,6 +159,37 @@ namespace atlas
             };
 
             /*!
+             * \brief Traits type for the type of an unwrapped auth function
+             * (returns bool, accepts a reference to the session token and a
+             * list of arguments).
+             */
+            template<typename ...Arguments>
+            struct unwrapped_auth_function
+            {
+                typedef boost::function<bool(const auth::token_type&, Arguments...)> type;
+
+                static bool allow(const auth::token_type&, Arguments...) {
+                    return true;
+                }
+            };
+
+            template<typename ...Arguments>
+            auth_function_type wrap_auth_function(
+                    typename unwrapped_auth_function<Arguments...>::type auth_function
+                    )
+            {
+                return [auth_function](const auth::token_type& token, boost::smatch match) {
+                    typedef boost::fusion::vector<auth::token_type, Arguments...>
+                        arg_values_type;
+                    arg_values_type arg_values;
+                    boost::fusion::at_c<0>(arg_values) = token;
+                    copy_to_vector<0, sizeof...(Arguments), 1, sizeof...(Arguments) + 1>()
+                        .copy(match, arg_values);
+                    return boost::fusion::invoke(auth_function, arg_values);
+                };
+            }
+
+            /*!
              * \brief URI handler called with arguments specified as a template
              * list.
              *
@@ -171,8 +202,6 @@ namespace atlas
             public:
                 typedef boost::function<http::response(Arguments...)>
                     unwrapped_function_type;
-                typedef boost::function<bool(std::string, Arguments...)>
-                    unwrapped_auth_function_type;
 
                 unwrapped_function(unwrapped_function_type function) :
                     basic_function(
@@ -200,7 +229,7 @@ namespace atlas
                 }
                 unwrapped_function(
                         unwrapped_function_type function,
-                        unwrapped_auth_function_type auth_function
+                        typename unwrapped_auth_function<Arguments...>::type auth_function
                         ) :
                     basic_function(
                         detail::make_async(
@@ -219,15 +248,7 @@ namespace atlas
                                 return out;
                             }
                             ),
-                        [auth_function](const std::string& token, boost::smatch match) {
-                            typedef boost::fusion::vector<std::string, Arguments...>
-                                arg_values_type;
-                            arg_values_type arg_values;
-                            boost::fusion::at_c<0>(arg_values) = token;
-                            copy_to_vector<0, sizeof...(Arguments), 1, sizeof...(Arguments) + 1>()
-                                .copy(match, arg_values);
-                            return boost::fusion::invoke(auth_function, arg_values);
-                        }
+                        wrap_auth_function<Arguments...>(auth_function)
                         )
                 {
                 }
@@ -345,19 +366,19 @@ namespace atlas
              * \brief A function accepting POST or PUT data in addition to URI
              * parameters.
              */
-            template<typename Json, typename ...Arguments>
+            template<typename Json, typename ...UriPlaceholders>
             class json_function : public basic_function
             {
             public:
-                typedef boost::function<http::response(Json, Arguments...)>
+                typedef boost::function<http::response(Json, UriPlaceholders...)>
                     unwrapped_function_type;
                 typedef boost::function<
-                    void(Json, uri_success_callback_type, uri_callback_type, Arguments...)
+                    void(Json, uri_success_callback_type, uri_callback_type, UriPlaceholders...)
                     > unwrapped_async_function_type;
 
                 json_function(
                         unwrapped_async_function_type function,
-                        auth_function_type auth_function
+                        typename unwrapped_auth_function<UriPlaceholders...>::type auth_function
                         ) :
                     basic_function(
                             [function](
@@ -380,7 +401,7 @@ namespace atlas
                                         Json,
                                         uri_success_callback_type,
                                         uri_callback_type,
-                                        Arguments...
+                                        UriPlaceholders...
                                         > arg_values_type;
                                     arg_values_type arg_values;
                                     // Copy the first value (JSON data).
@@ -400,8 +421,8 @@ namespace atlas
                                     boost::fusion::at_c<2>(arg_values) = error;
                                     // Copy remaining arguments (URI placeholders).
                                     copy_to_vector<
-                                        0, sizeof...(Arguments),
-                                        3, sizeof...(Arguments) + 3>()
+                                        0, sizeof...(UriPlaceholders),
+                                        3, sizeof...(UriPlaceholders) + 3>()
                                         .copy(match, arg_values);
 
                                     // Invoke the API function with the argument
@@ -416,14 +437,14 @@ namespace atlas
                                     error();
                                 }
                             },
-                            auth_function
+                            wrap_auth_function<UriPlaceholders...>(auth_function)
                             )
                 {
                 }
 
                 json_function(
                         unwrapped_function_type function,
-                        auth_function_type auth_function
+                        typename detail::unwrapped_auth_function<UriPlaceholders...>::type auth_function
                         ) :
                     basic_function(
                         detail::make_async_with_conn(
@@ -443,14 +464,14 @@ namespace atlas
                                     // required for the handler function.
                                     Json json_data(detail::convert_json<Json>(element));
 
-                                    typedef boost::fusion::vector<Json, Arguments...>
+                                    typedef boost::fusion::vector<Json, UriPlaceholders...>
                                         arg_values_type;
                                     arg_values_type arg_values;
                                     boost::fusion::at_c<0>(arg_values) = json_data;
                                     // Copy remaining arguments (URI placeholders).
                                     copy_to_vector<
-                                        0, sizeof...(Arguments),
-                                        1, sizeof...(Arguments) + 1>()
+                                        0, sizeof...(UriPlaceholders),
+                                        1, sizeof...(UriPlaceholders) + 1>()
                                         .copy(match, arg_values);
 
                                     // Invoke the API function with the argument
@@ -470,7 +491,7 @@ namespace atlas
                                 }
                             }
                             ),
-                            auth_function
+                            wrap_auth_function<UriPlaceholders...>(auth_function)
                         )
                 {
                 }
@@ -564,7 +585,7 @@ namespace atlas
             void install(
                 matcher m,
                 typename detail::unwrapped_function<Arguments...>::unwrapped_function_type function,
-                typename detail::unwrapped_function<Arguments...>::unwrapped_auth_function_type auth_function
+                typename detail::unwrapped_auth_function<Arguments...>::type auth_function
                 )
             {
                 install(
@@ -589,7 +610,10 @@ namespace atlas
             {
                 install(
                     m,
-                    new detail::get_function<Arguments...>(function, [](const std::string&, boost::smatch) { return true; })
+                    new detail::get_function<Arguments...>(
+                        function,
+                        [](const auth::token_type&, boost::smatch) { return true; }
+                        )
                    );
             }
             /*!
@@ -607,12 +631,7 @@ namespace atlas
                 auth_function_type auth_function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
-                        );
-                m_functions.insert(
+                install(
                     m,
                     new detail::get_function<Arguments...>(function, auth_function)
                     );
@@ -623,24 +642,17 @@ namespace atlas
              * \param function Method accepting the URI parameters and
              * returning a string.
              */
-            template<typename ...Arguments>
+            template<typename Json, typename ...UriPlaceholders>
             void install_json(
                 matcher m,
-                typename detail::json_function<Arguments...>::unwrapped_function_type function
+                typename detail::json_function<Json, UriPlaceholders...>::unwrapped_function_type function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
-                        );
-                m_functions.insert(
+                install(
                     m,
-                    static_cast<detail::basic_function*>(
-                        new detail::json_function<Arguments...>(
-                            function,
-                            [](const auth::token_type&, boost::smatch) { return true; }
-                            )
+                    new detail::json_function<Json, UriPlaceholders...>(
+                        function,
+                        &detail::unwrapped_auth_function<UriPlaceholders...>::allow
                         )
                     );
             }
@@ -650,22 +662,17 @@ namespace atlas
              * \param function Method accepting the URI parameters and
              * returning a string.
              */
-            template<typename Json, typename ...Arguments>
+            template<typename Json, typename ...UriPlaceholders>
             void install_json(
                 matcher m,
-                typename detail::json_function<Json, Arguments...>
+                typename detail::json_function<Json, UriPlaceholders...>
                     ::unwrapped_function_type function,
-                auth_function_type auth_function
+                typename detail::unwrapped_auth_function<UriPlaceholders...>::type auth_function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
-                        );
-                m_functions.insert(
+                install(
                     m,
-                    new detail::json_function<Json, Arguments...>(function, auth_function)
+                    new detail::json_function<Json, UriPlaceholders...>(function, auth_function)
                     );
             }
             /*!
@@ -675,23 +682,18 @@ namespace atlas
              * \param function Method accepting JSON data, success and failure
              * callbacks and URI parameters.
              */
-            template<typename Json, typename ...Arguments>
+            template<typename Json, typename ...UriPlaceholders>
             void install_json_async(
                 matcher m,
-                typename detail::json_function<Json, Arguments...>
+                typename detail::json_function<Json, UriPlaceholders...>
                     ::unwrapped_async_function_type function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
-                        );
-                m_functions.insert(
+                install(
                     m,
-                    new detail::json_function<Json, Arguments...>(
+                    new detail::json_function<Json, UriPlaceholders...>(
                         function,
-                        [](const auth::token_type&, boost::smatch) { return true; }
+                        &detail::unwrapped_auth_function<UriPlaceholders...>::allow
                         )
                     );
             }
@@ -702,24 +704,26 @@ namespace atlas
              * \param function Method accepting JSON data, success and failure
              * callbacks and URI parameters.
              */
-            template<typename Json, typename ...Arguments>
+            template<typename Json, typename ...UriPlaceholders>
             void install_json_async(
                 matcher m,
-                typename detail::json_function<Json, Arguments...>
+                typename detail::json_function<Json, UriPlaceholders...>
                     ::unwrapped_async_function_type function,
-                auth_function_type auth_function
+                typename detail::unwrapped_auth_function<UriPlaceholders...>::type auth_function
                 )
             {
-                if(m_functions.count(m))
-                    throw std::runtime_error(
-                        hades::mkstr() <<
-                        "uri handler already registered (" << m.regex() << ")"
-                        );
-                m_functions.insert(
+                install(
                     m,
-                    new detail::json_function<Json, Arguments...>(function, auth_function)
+                    new detail::json_function<Json, UriPlaceholders...>(function, auth_function)
                     );
             }
+            /*!
+             * \brief Install a router.
+             *
+             * The first matched string provided by the URI matcher will be
+             * passed to the installed router as the request URI.
+             */
+            void install(matcher, boost::shared_ptr<router>);
         private:
             boost::ptr_map<matcher, detail::basic_function> m_functions;
         };

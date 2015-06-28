@@ -6,7 +6,7 @@
 
 #include "mongoose.h"
 
-#include "atlas/auth.hpp"
+#include "atlas/auth/auth.hpp"
 #include "atlas/http/server/response.hpp"
 
 namespace atlas

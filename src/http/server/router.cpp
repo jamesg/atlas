@@ -299,3 +299,9 @@ void atlas::http::router::install(
             new detail::basic_function(uri_function, auth_function)
             );
 }
+
+void atlas::http::router::install(matcher m, boost::shared_ptr<router> r)
+{
+    install(m, boost::bind(&router::serve, r, _1, _2, _3, _4));
+}
+

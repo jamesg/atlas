@@ -1,4 +1,4 @@
-#include "atlas/auth.hpp"
+#include "atlas/auth/auth.hpp"
 
 #include "hades/crud.ipp"
 #include "hades/filter.hpp"

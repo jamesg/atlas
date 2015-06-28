@@ -1,6 +1,8 @@
 #include "atlas/auth/router.hpp"
 
-#include "atlas/auth.hpp"
+#include <boost/bind.hpp>
+
+#include "atlas/auth/auth.hpp"
 #include "atlas/db/auth.hpp"
 #include "atlas/http/server/response.hpp"
 #include "hades/crud.ipp"
@@ -62,7 +64,7 @@ atlas::auth::router::router(hades::connection& conn)
             );
     install<std::string>(
             http::matcher("/session/([^/]+)", "DELETE"),
-            [&conn](std::string token) {
+            [&conn](const std::string& token) {
                 return http::text_response(
                     db::user_session::stop(token, conn) ? 200 : 500,
                     "sign out"
@@ -80,13 +82,50 @@ atlas::auth::router::router(hades::connection& conn)
                 return http::text_response(500, "not yet implemented");
             }
             );
+    // Get the user associated with a session token.
+    install<std::string>(
+            http::matcher("/session/([^/]+)/user", "GET"),
+            [&conn](const std::string& token) {
+                styx::list users(
+                        hades::outer_join<user, user_session, user_enabled, user_super>(
+                            conn,
+                            "atlas_user.user_id = atlas_user_session.user_id AND "
+                            "atlas_user.user_id = atlas_user_enabled.user_id AND "
+                            "atlas_user.user_id = atlas_user_super.user_id ",
+                            hades::where(
+                                "atlas_user_session.token == ? ",
+                                hades::row<std::string>(token)
+                                )
+                            )
+                        );
+                if(users.size() == 0)
+                    return atlas::http::text_response(404, "user not found");
+                return atlas::http::json_response(users.at(0));
+            },
+            [](const atlas::auth::token_type& token, std::string url_token) {
+                // Check that the session token is the one the client is trying
+                // to delete.
+                return (token == url_token);
+            }
+            );
+    // Get the user associated with the current session.
+    install<>(
+            http::matcher("/session/user", "GET"),
+            [&conn]() {
+                return atlas::http::text_response(500, "not yet implemented");
+            },
+            [](const atlas::auth::token_type&) {
+                return true;
+            }
+            );
     install<>(
             http::matcher("/user", "GET"),
             [&conn]() {
                 return http::json_response(
                         hades::equi_outer_join<user, user_enabled, user_super>(conn)
                         );
-            }
+            },
+            boost::bind(&atlas::db::user_session::validate, boost::ref(conn), _1)
             );
     install<int>(
             http::matcher("/user/([0-9]+)", "GET"),
