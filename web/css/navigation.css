@@ -1,12 +1,26 @@
 .navigation {
-    margin: 0;
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 0;
     padding: 0.5em;
     list-style-type: none;
     font-size: large;
 }
 
+.navigation ul {
+    display: inline-block;
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+}
+
 .navigation li {
     display: inline-block;
     padding-right: 1em;
+}
+
+.current-user {
+    float: right;
 }
 
