@@ -214,6 +214,7 @@ var Modal = Backbone.View.extend(
          */
         initialize: function(options) {
             Backbone.View.prototype.initialize.apply(this, arguments);
+            options = coalesce(options, {});
 
             this.$el.append(_.template(this.template)(this.templateParams()));
 
@@ -661,11 +662,9 @@ var StackedApplication = function(homeView) {
                 view: BreadcrumbView
             }
             );
-
-    //this.goHome();
 };
 
-//_.extend(StackedApplication, Backbone.Events);
+_.extend(StackedApplication.prototype, Backbone.Events);
 
 StackedApplication.prototype._setElement = function(el) {
     document.getElementById('template-content').innerHTML = '';
@@ -748,18 +747,23 @@ StackedApplication.prototype.revisit = function(breadcrumb) {
  */
 StackedApplication.prototype.modal = function(modal) {
     $('#modal-container').append(modal.el);
+    this._currentModal = modal;
+    this.listenTo(
+        modal,
+        'finished',
+        (function() {
+            if(this._currentModal == modal)
+                this._currentModal = null;
+        }).bind(this)
+    );
 };
 
-/*!
- * \brief Handle an authentication error by displaying a sign in page over the
- * current page.  Will only display a sign in page if none is currently
- * displayed.
+/*
+ * Get the current (topmost) modal.
  */
-StackedApplication.prototype.authenticationError = function() {
-    if(!(this.currentPage() instanceof AuthenticationRequiredPage)) {
-        this.pushPage(AuthenticationRequiredPage);
-    }
-};
+StackedApplication.prototype.currentModal = function() {
+    return this['_currentModal'];
+}
 
 var PageView = StaticView.extend(
     {
