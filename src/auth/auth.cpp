@@ -1,6 +1,7 @@
 #include "atlas/auth/auth.hpp"
 
 #include "hades/crud.ipp"
+#include "hades/exists.hpp"
 #include "hades/filter.hpp"
 #include "hades/join.hpp"
 
@@ -16,14 +17,18 @@ bool atlas::auth::has_permission(
     if(is_superuser(conn, token))
         return true;
 
-    auto where = hades::where(
+    user_session u(db::user_session::token_session(conn, token));
+
+    return hades::exists<user_permission>(
+        conn,
+        hades::where(
             "permission = ? AND atlas_user.user_id = ?",
-            hades::row<std::string>(permission)
-            );
-    styx::list user_permissions =
-            atlas::user_permission::get_collection(conn, where);
-    //atlas::user_permission::id_type user_permission{}
-    return (user_permissions.size() > 0);
+            hades::row<std::string, int>(
+                permission,
+                u.get_int<db::attr::user::user_id>()
+                )
+            )
+        );
 }
 
 bool atlas::auth::is_signed_in(
@@ -31,12 +36,13 @@ bool atlas::auth::is_signed_in(
         const std::string& token
         )
 {
-    auto where = hades::where(
+    return hades::exists<user_session>(
+        conn,
+        hades::where(
             "token = ?",
             hades::row<std::string>(token)
-            );
-    styx::list sessions = atlas::user_session::get_collection(conn, where);
-    return (sessions.size() == 1);
+            )
+        );
 }
 
 bool atlas::auth::is_superuser(

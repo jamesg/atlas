@@ -105,7 +105,21 @@ void atlas::http::detail::basic_function::serve(
         ) const
 {
     const char *token = mg_get_header(conn, "Authorization");
-    if(m_auth_function((token == nullptr) ? "" : token, match))
+
+    bool authorised = false;
+    try
+    {
+        authorised = m_auth_function((token == nullptr) ? "" : token, match);
+    }
+    catch(const std::exception& e)
+    {
+        log::error("atlas::http::detail::basic_function::serve") <<
+            "error checking authentication token: " << e.what();
+        http::error(403, "checking authentication", conn);
+        success();
+    }
+
+    if(authorised)
     {
         try
         {
@@ -113,6 +127,8 @@ void atlas::http::detail::basic_function::serve(
         }
         catch(const http::exception& e)
         {
+            log::error("atlas::http::detail::basic_function::serve") <<
+                "error in http handler returned to client: " << e.what();
             http::error(e.code(), e.what(), conn);
         }
         catch(const std::exception& e)
@@ -304,4 +320,3 @@ void atlas::http::router::install(matcher m, boost::shared_ptr<router> r)
 {
     install(m, boost::bind(&router::serve, r, _1, _2, _3, _4));
 }
-

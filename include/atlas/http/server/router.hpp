@@ -173,6 +173,10 @@ namespace atlas
                 }
             };
 
+            /*!
+            \brief Turn an authentication function of the form bool(token,
+            arguments) into a function of the form bool(token, boost::smatch).
+             */
             template<typename ...Arguments>
             auth_function_type wrap_auth_function(
                     typename unwrapped_auth_function<Arguments...>::type auth_function
@@ -731,4 +735,3 @@ namespace atlas
 }
 
 #endif
-
