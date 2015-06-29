@@ -130,11 +130,14 @@ void atlas::http::detail::basic_function::serve(
             log::error("atlas::http::detail::basic_function::serve") <<
                 "error in http handler returned to client: " << e.what();
             http::error(e.code(), e.what(), conn);
+            success();
         }
         catch(const std::exception& e)
         {
             log::error("atlas::http::detail::basic_function::serve") <<
                 "error in http handler: " << e.what();
+            http::error(500, "unknown error", conn);
+            success();
         }
     }
     else

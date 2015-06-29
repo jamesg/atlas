@@ -146,21 +146,25 @@ void atlas::http::get_json(
                 close_brace == std::string::npos
                 )
             {
-                failure("error parsing json - object not found");
+                failure("parsing json - object not found");
                 return;
             }
 
+            styx::element e;
+            
             try
             {
-                styx::element e = styx::parse_json(
+                e = styx::parse_json(
                     std::string(body, open_brace, close_brace-open_brace + 1)
                 );
-                success(e);
             }
             catch(const std::exception&)
             {
-                failure("error parsing json");
+                failure("parsing json");
+                return;
             }
+
+            success(e);
         },
         failure
     );
