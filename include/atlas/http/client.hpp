@@ -10,6 +10,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <curl/curl.h>
 
+#include "styx/element.hpp"
+
 namespace atlas
 {
     namespace http
@@ -130,6 +132,26 @@ namespace atlas
                 const callback_type& failure
                 );
         /*!
+         * \brief Make an HTTP GET request and parse the resulting data as JSON.
+         *
+         * \param callback_io io_service which should be used to call the
+         * success and failure callbacks and destroy the request object.  This
+         * must not be the io_service that the cpp-netlib request is operating
+         * in.  The io_service will not complete until the HTTP request has
+         * completed.
+         * \param uri URI to query, including protocol, domain, path and port
+         * (if not the default).
+         * \param success Function to call with the decoded JSON data upon
+         * success.
+         * \param failure Function to call with an error message upon failure.
+         */
+        void get_json(
+                io_type callback_io,
+                const std::string& url,
+                const boost::function<void(styx::element)>& success,
+                const callback_type& failure
+                );
+        /*!
          * \brief Start making a POST request.  The success or failure callback
          * will be called when the request is complete.
          *
@@ -156,4 +178,3 @@ namespace atlas
 }
 
 #endif
-

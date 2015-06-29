@@ -5,6 +5,7 @@
 #include "hades/mkstr.hpp"
 
 #include "atlas/log/log.hpp"
+#include "styx/styx.hpp"
 
 namespace
 {
@@ -127,6 +128,44 @@ void atlas::http::get(
         );
 }
 
+void atlas::http::get_json(
+    io_type io,
+    const std::string& url,
+    const boost::function<void(styx::element)>& success,
+    const callback_type& failure
+)
+{
+    get(
+        io,
+        url,
+        [success, failure](const std::string& body) {
+            std::string::size_type open_brace = body.find('{');
+            std::string::size_type close_brace = body.find_last_of('}');
+            if(
+                open_brace == std::string::npos ||
+                close_brace == std::string::npos
+                )
+            {
+                failure("error parsing json - object not found");
+                return;
+            }
+
+            try
+            {
+                styx::element e = styx::parse_json(
+                    std::string(body, open_brace, close_brace-open_brace + 1)
+                );
+                success(e);
+            }
+            catch(const std::exception&)
+            {
+                failure("error parsing json");
+            }
+        },
+        failure
+    );
+}
+
 void atlas::http::post(
         io_type callback_io,
         const std::string& uri,
@@ -142,4 +181,3 @@ void atlas::http::post(
         }
         );
 }
-
