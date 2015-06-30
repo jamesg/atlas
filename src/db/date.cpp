@@ -23,3 +23,10 @@ boost::posix_time::ptime atlas::db::date::to_ptime(const std::string& str)
             );
 }
 
+time_t atlas::db::date::to_unix_time(boost::posix_time::ptime t)
+{
+    return (
+        t -
+        boost::posix_time::ptime(boost::gregorian::date(1970, 1, 1))
+    ).total_seconds();
+}

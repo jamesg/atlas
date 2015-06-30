@@ -3,7 +3,7 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include "hades/crud.hpp"
+#include "hades/crud.ipp"
 #include "hades/filter.hpp"
 #include "hades/get_one.hpp"
 #include "hades/mkstr.hpp"
@@ -69,10 +69,10 @@ namespace atlas
 
                 // Accessor functions.
 
-                std::string& date()
+                time_t& date()
                 {
                     tuple_type& t = static_cast<tuple_type&>(*this);
-                    return t.template get_string<DateAttribute>();
+                    return t.template get_int<DateAttribute>();
                 }
 
                 double& attribute()
@@ -97,14 +97,14 @@ namespace atlas
                  */
                 static styx::list newer_than(
                         hades::connection& conn,
-                        const std::string& date,
+                        const time_t date,
                         const base_id_type id,
                         const int limit=-1
                         )
                 {
                     auto date_newer = hades::where(
                             hades::mkstr() << DateAttribute << " > ?",
-                            hades::row<std::string>(date)
+                            hades::row<time_t>(date)
                             );
                     auto order_by = hades::order_by(
                             hades::mkstr() << DateAttribute << " ASC",
@@ -125,13 +125,13 @@ namespace atlas
                  */
                 static styx::list newer_than(
                         hades::connection& conn,
-                        const std::string& date,
+                        const time_t date,
                         const int limit=-1
                         )
                 {
                     auto where = hades::where(
                             hades::mkstr() << DateAttribute << " > ?",
-                            hades::row<std::string>(date)
+                            hades::row<time_t>(date)
                             );
                     auto order_by = hades::order_by(
                             hades::mkstr() << DateAttribute << " ASC",
@@ -191,13 +191,13 @@ namespace atlas
                  * \brief Record a value for the date series.
                  */
                 void record(
-                        const std::string& date,
+                        const time_t date,
                         double attr,
                         hades::connection& conn
                         )
                 {
                     tuple_type& t = static_cast<tuple_type&>(*this);
-                    t.template get_string<DateAttribute>() = date;
+                    t.template get_int<DateAttribute>() = date;
                     t.template get_double<Attribute>() = attr;
                     hades::crud<
                         date_series<Id, Relation, Attribute, DateAttribute>
@@ -210,7 +210,7 @@ namespace atlas
                 void record(double attr, hades::connection& conn)
                 {
                     return record(
-                        db::date::to_string(
+                        db::date::to_unix_time(
                             boost::posix_time::second_clock::universal_time()
                             ),
                         attr,
@@ -237,7 +237,7 @@ namespace atlas
                     id.where(),
                     hades::where(
                         hades::mkstr() << DateSeries::date_attribute() << " > ?",
-                        hades::row<std::string>(db::date::to_string(date))
+                        hades::row<time_t>(db::date::to_unix_time(date))
                         )
                     ),
                 hades::order_by(
@@ -266,7 +266,7 @@ namespace atlas
                     id.where(),
                     hades::where(
                         hades::mkstr() << DateSeries::date_attribute() << " < ?",
-                        hades::row<std::string>(db::date::to_string(date))
+                        hades::row<time_t>(db::date::to_unix_time(date))
                         )
                     ),
                 hades::order_by(
@@ -305,12 +305,12 @@ namespace atlas
             if(!before.id_set() && after.id_set())
                 return after;
             boost::posix_time::time_duration duration_before(
-                date - db::date::to_ptime(before.date())
+                date - boost::posix_time::from_time_t(before.date())
                 );
             boost::posix_time::time_duration duration_after(
-                db::date::to_ptime(after.date()) - date
+                boost::posix_time::from_time_t(after.date()) - date
                 );
-            return (duration_before < duration_after)?before:after;
+            return (duration_before < duration_after) ? before : after;
         }
 
         /*!
@@ -325,7 +325,7 @@ namespace atlas
                 )
         {
             DateSeries near = nearest<DateSeries>(conn, id, date);
-            return db::date::to_ptime(near.date()) - date;
+            return boost::posix_time::from_time_t(near.date()) - date;
         }
 
         /*!
@@ -344,7 +344,7 @@ namespace atlas
             if(
                 abs(
                     (
-                        db::date::to_ptime(
+                        boost::posix_time::from_time_t(
                             nearest<DateSeries>(conn, id, date).date()
                             ) -
                         date
@@ -379,10 +379,10 @@ namespace atlas
             }
 
             boost::posix_time::ptime before_time(
-                    db::date::to_ptime(before.date())
+                    boost::posix_time::from_time_t(before.date())
                     );
             boost::posix_time::ptime after_time(
-                    db::date::to_ptime(after.date())
+                    boost::posix_time::from_time_t(after.date())
                     );
             // before and after are both set, choose an average
             boost::posix_time::time_duration duration =
@@ -397,4 +397,3 @@ namespace atlas
 }
 
 #endif
-

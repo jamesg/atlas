@@ -1,6 +1,8 @@
 #ifndef ATLAS_DB_DATE_HPP
 #define ATLAS_DB_DATE_HPP
 
+#include <ctime>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace atlas
@@ -46,9 +48,17 @@ namespace atlas
              * boost::posix_time::ptime.
              */
             boost::posix_time::ptime to_ptime(const std::string&);
+
+            /*!
+             * \brief Convert a UTC boost::posix_time::ptime to a Unix
+             * timestamp.
+             *
+             * \note Boost has a function boost::posix_time::from_time_t to do
+             * the opposite conversion.
+             */
+            time_t to_unix_time(boost::posix_time::ptime t);
         }
     }
 }
 
 #endif
-
