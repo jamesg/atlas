@@ -69,7 +69,7 @@ namespace atlas
 
                 // Accessor functions.
 
-                time_t& date()
+                styx::int_type& date()
                 {
                     tuple_type& t = static_cast<tuple_type&>(*this);
                     return t.template get_int<DateAttribute>();
@@ -261,20 +261,46 @@ namespace atlas
                 boost::posix_time::ptime date
                 )
         {
-            hades::filter filter(
-                hades::and_(
-                    id.where(),
-                    hades::where(
-                        hades::mkstr() << DateSeries::date_attribute() << " < ?",
-                        hades::row<time_t>(db::date::to_unix_time(date))
+            return hades::get_one<DateSeries>(
+                conn,
+                hades::filter(
+                    hades::and_(
+                        id.where(),
+                        hades::where(
+                            hades::mkstr() << DateSeries::date_attribute() <<
+                                " < ?",
+                            hades::row<time_t>(db::date::to_unix_time(date))
                         )
                     ),
-                hades::order_by(
-                    hades::mkstr() << DateSeries::date_attribute() << " DESC",
-                    1
+                    hades::order_by(
+                        hades::mkstr() << DateSeries::date_attribute() <<
+                            " DESC",
+                        1
                     )
-                );
-            return hades::get_one<DateSeries>(conn, filter);
+                )
+            );
+        }
+
+        /*!
+         * \brief Get the most recent value in the series.
+         */
+        template<typename DateSeries>
+        DateSeries most_recent(
+                hades::connection& conn,
+                typename DateSeries::base_id_type id
+                )
+        {
+            return hades::get_one<DateSeries>(
+                conn,
+                hades::filter(
+                    id.where(),
+                    hades::order_by(
+                        hades::mkstr() << DateSeries::date_attribute() <<
+                            " DESC",
+                        1
+                    )
+                )
+            );
         }
 
         template<typename DateSeries>

@@ -9,6 +9,7 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/invoke.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/ptr_container/ptr_map.hpp>

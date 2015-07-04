@@ -58,7 +58,7 @@ std::vector<atlas::user_permission> atlas::db::user_permission::user_permissions
     auto where =
         hades::where(
             "user_id = ?",
-            hades::row<int>(id.get_int<db::attr::user::user_id>())
+            hades::row<styx::int_type>(id.get_int<db::attr::user::user_id>())
             );
     return hades::get_collection_vector<atlas::user_permission>(conn, where);
 }

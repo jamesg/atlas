@@ -56,7 +56,7 @@ bool atlas::jsonrpc::auth::is_superuser(
             "user.user_id = ? AND "
             "user_enabled.user_id IS NOT NULL AND "
             "user_super.user_id IS NOT NULL ",
-            hades::row<int>(session.get_int<db::attr::user::user_id>())
+            hades::row<styx::int_type>(session.get_int<db::attr::user::user_id>())
             );
     styx::list users = hades::equi_outer_join<
         atlas::user,
