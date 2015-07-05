@@ -39,8 +39,11 @@ ATLAS_DECLARE_STATIC_STRING(moment_min_js)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_css_open_iconic_css)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_ttf)
 ATLAS_DECLARE_STATIC_STRING(open_iconic_font_fonts_open_iconic_woff)
+ATLAS_DECLARE_STATIC_STRING(open_iconic_sprite_open_iconic_svg)
 ATLAS_DECLARE_STATIC_STRING(pure_min_css)
 ATLAS_DECLARE_STATIC_STRING(stacked_application_js)
+ATLAS_DECLARE_STATIC_STRING(svg_injector_js)
+ATLAS_DECLARE_STATIC_STRING(svg_injector_min_js)
 ATLAS_DECLARE_STATIC_STRING(underscore_js)
 ATLAS_DECLARE_STATIC_STRING(underscore_js)
 ATLAS_DECLARE_STATIC_STRING(underscore_min_js)
@@ -94,8 +97,11 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
     install_static_text("/open-iconic/font/css/open-iconic.css", ATLAS_STATIC_STD_STRING(open_iconic_font_css_open_iconic_css));
     install_static_text("/open-iconic/font/fonts/open-iconic.ttf", ATLAS_STATIC_STD_STRING(open_iconic_font_fonts_open_iconic_ttf));
     install_static_text("/open-iconic/font/fonts/open-iconic.woff", ATLAS_STATIC_STD_STRING(open_iconic_font_fonts_open_iconic_woff));
+    install_static_text("/open-iconic/sprite/open-iconic.svg", ATLAS_STATIC_STD_STRING(open_iconic_sprite_open_iconic_svg));
     install_static_text("/pure-min.css", ATLAS_STATIC_STD_STRING(pure_min_css));
     install_static_text("/stacked_application.js", ATLAS_STATIC_STD_STRING(stacked_application_js));
+    install_static_text("/svg-injector.js", ATLAS_STATIC_STD_STRING(svg_injector_js));
+    install_static_text("/svg-injector.min.js", ATLAS_STATIC_STD_STRING(svg_injector_min_js));
     install_static_text("/underscore-min.js", ATLAS_STATIC_STD_STRING(underscore_min_js));
     install_static_text("/underscore.js", ATLAS_STATIC_STD_STRING(underscore_js));
     install_static_text("/css/defaults.css", ATLAS_STATIC_STD_STRING(css_defaults_css));
