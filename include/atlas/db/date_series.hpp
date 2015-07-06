@@ -32,7 +32,7 @@ namespace atlas
             typename Id,
             const char *const Relation,
             const char *const Attribute,
-            const char *const DateAttribute=atlas::db::attr::date_series::date>
+            const char *const DateAttribute>
         class date_series :
             public hades::crud<
                 date_series<Id, Relation, Attribute, DateAttribute>
@@ -50,7 +50,8 @@ namespace atlas
                     tuple_type tuple_type;
                 typedef Id base_id_type;
 
-                static const char * const date_attribute()
+                static constexpr const char * const date_attribute = DateAttribute;
+                static const char * get_date_attribute()
                 {
                     return DateAttribute;
                 }
@@ -236,12 +237,12 @@ namespace atlas
                 hades::and_(
                     id.where(),
                     hades::where(
-                        hades::mkstr() << DateSeries::date_attribute() << " > ?",
+                        hades::mkstr() << DateSeries::get_date_attribute() << " > ?",
                         hades::row<time_t>(db::date::to_unix_time(date))
                         )
                     ),
                 hades::order_by(
-                    hades::mkstr() << DateSeries::date_attribute() << " ASC",
+                    hades::mkstr() << DateSeries::get_date_attribute()<< " ASC",
                     1
                     )
                 );
@@ -267,13 +268,13 @@ namespace atlas
                     hades::and_(
                         id.where(),
                         hades::where(
-                            hades::mkstr() << DateSeries::date_attribute() <<
+                            hades::mkstr() << DateSeries::get_date_attribute() <<
                                 " < ?",
                             hades::row<time_t>(db::date::to_unix_time(date))
                         )
                     ),
                     hades::order_by(
-                        hades::mkstr() << DateSeries::date_attribute() <<
+                        hades::mkstr() << DateSeries::get_date_attribute() <<
                             " DESC",
                         1
                     )
@@ -295,7 +296,7 @@ namespace atlas
                 hades::filter(
                     id.where(),
                     hades::order_by(
-                        hades::mkstr() << DateSeries::date_attribute() <<
+                        hades::mkstr() << DateSeries::get_date_attribute() <<
                             " DESC",
                         1
                     )
