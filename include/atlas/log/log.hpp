@@ -1,15 +1,11 @@
-#ifndef ATLAS_LOG_HPP
-#define ATLAS_LOG_HPP
+#ifndef ATLAS_LOG_LOG_HPP
+#define ATLAS_LOG_LOG_HPP
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 namespace atlas
 {
-    /*!
-     * \brief Format an save logged information.
-     */
     namespace log
     {
         namespace detail
@@ -29,10 +25,7 @@ namespace atlas
             class cerr_sink : public basic_sink
             {
                 public:
-                    void log(const std::string& s) override
-                    {
-                        std::cerr << s << std::endl;
-                    }
+                    void log(const std::string& s) override;
             };
 
             /*!
@@ -41,14 +34,8 @@ namespace atlas
             class file_sink : public basic_sink
             {
                 public:
-                    explicit file_sink(const char *filename) :
-                        m_fstream(filename, std::ios::app)
-                    {
-                    }
-                    void log(const std::string& s) override
-                    {
-                        m_fstream << s << std::endl;
-                    }
+                    explicit file_sink(const char *filename);
+                    void log(const std::string& s) override;
                 private:
                     std::ofstream m_fstream;
             };
@@ -61,19 +48,12 @@ namespace atlas
             {
                 public:
                     basic_log(
-                            const char *source,
-                            const char *severity,
-                            basic_sink& sink = get_default_sink()
-                            ) :
-                        m_sink(sink)
-                    {
-                        m_oss << severity << " " << source << " ";
-                    }
+                        const char *source,
+                        const char *severity,
+                        basic_sink& sink = get_default_sink()
+                    );
 
-                    ~basic_log()
-                    {
-                        m_sink.log(m_oss.str());
-                    }
+                    ~basic_log();
 
                     template<typename Output>
                     basic_log& operator<<(const Output& output)
@@ -83,10 +63,7 @@ namespace atlas
                     }
 
                 protected:
-                    basic_sink& sink()
-                    {
-                        return m_sink;
-                    }
+                    basic_sink& sink();
 
                 private:
                     basic_sink& m_sink;
@@ -97,40 +74,27 @@ namespace atlas
         class error : public detail::basic_log
         {
             public:
-                error(const char *source) :
-                    basic_log(source, "ERR ")
-                {
-                }
+                explicit error(const char *source);
         };
 
         class information : public detail::basic_log
         {
             public:
-                information(const char *source) :
-                    basic_log(source, "INFO")
-                {
-                }
+                explicit information(const char *source);
         };
 
         class test : public detail::basic_log
         {
             public:
-                test(const char *source) :
-                    basic_log(source, "TEST")
-                {
-                }
+                explicit test(const char *source);
         };
 
         class warning : public detail::basic_log
         {
             public:
-                warning(const char *source) :
-                    basic_log(source, "WARN")
-                {
-                }
+                explicit warning(const char *source);
         };
     }
 }
 
 #endif
-
