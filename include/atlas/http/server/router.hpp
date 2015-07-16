@@ -520,6 +520,8 @@ namespace atlas
             /*!
              * \brief Handle an incoming connection, taking the first part of
              * the match as a URL.
+             * \note This function allows the router to act as a handler
+             * function.
              */
             void serve(
                     mg_connection*,

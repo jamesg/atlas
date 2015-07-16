@@ -3,6 +3,7 @@
 #include <atomic>
 
 #include <boost/bind.hpp>
+#include <boost/bind/protect.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tokenizer.hpp>
 
@@ -199,12 +200,23 @@ int atlas::http::router::operator()(
         if(matched)
         {
             auto f = *i->second;
-            f.serve(
+            // Post the handler function to the io_service supplied by the
+            // creator of the router to guarantee that the callback is triggered
+            // in the correct thread.
+            m_io->post(
+                boost::bind(
+                    &detail::basic_function::serve,
+                    f,
                     match,
                     conn,
-                    boost::bind(&http_connection::report_success, http_conn),
-                    boost::bind(&http_connection::report_failure, http_conn)
-                    );
+                    boost::protect(
+                        boost::bind(&http_connection::report_success, http_conn)
+                    ),
+                    boost::protect(
+                        boost::bind(&http_connection::report_failure, http_conn)
+                    )
+                )
+            );
             return MG_MORE;
         }
     }
