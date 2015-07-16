@@ -181,7 +181,7 @@ int atlas::http::router::operator()(
         return MG_TRUE;
     }
     if(ev == MG_POLL)
-        return MG_MORE;
+        return MG_FALSE;
 
     if(ev == MG_AUTH)
         return MG_TRUE;
