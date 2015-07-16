@@ -9,7 +9,11 @@
 #include "hades/get_one.hpp"
 #include "hades/join.hpp"
 
-atlas::auth::router::router(hades::connection& conn)
+atlas::auth::router::router(
+    boost::shared_ptr<boost::asio::io_service> io,
+    hades::connection& conn
+) :
+    atlas::http::router(io)
 {
     install_get<>(
             http::matcher("/session", "GET"),
@@ -153,4 +157,3 @@ atlas::auth::router::router(hades::connection& conn)
             }
             );
 }
-

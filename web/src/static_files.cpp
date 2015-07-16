@@ -52,9 +52,11 @@ ATLAS_DECLARE_STATIC_STRING(xcharts_xcharts_js)
 ATLAS_DECLARE_STATIC_STRING(xcharts_xcharts_min_css)
 ATLAS_DECLARE_STATIC_STRING(xcharts_xcharts_min_js)
 
-boost::shared_ptr<atlas::http::router> atlas::http::static_files()
+boost::shared_ptr<atlas::http::router> atlas::http::static_files(
+    boost::shared_ptr<boost::asio::io_service> io
+)
 {
-    boost::shared_ptr<router> out(new router);
+    boost::shared_ptr<router> out(new router(io));
 
     mimetypes mime_information;
 
@@ -121,4 +123,3 @@ boost::shared_ptr<atlas::http::router> atlas::http::static_files()
 
     return out;
 }
-

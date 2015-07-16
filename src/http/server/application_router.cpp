@@ -4,6 +4,13 @@
 
 #include "atlas/http/server/static_text.hpp"
 
+atlas::http::application_router::application_router(
+    boost::shared_ptr<boost::asio::io_service> io
+) :
+    router(io)
+{
+}
+
 const atlas::http::mimetypes&
 atlas::http::application_router::mime_information() const
 {
@@ -36,4 +43,3 @@ void atlas::http::application_router::install_static_text(
         boost::bind(&atlas::http::static_text, mimetype, text, _1, _2, _3, _4)
         );
 }
-

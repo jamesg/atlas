@@ -13,7 +13,10 @@ namespace atlas
         class router : public http::router
         {
         public:
-            router(hades::connection&);
+            router(
+                boost::shared_ptr<boost::asio::io_service>,
+                hades::connection&
+            );
         };
     }
 }

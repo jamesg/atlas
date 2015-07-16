@@ -147,6 +147,11 @@ void atlas::http::detail::basic_function::serve(
     }
 }
 
+atlas::http::router::router(boost::shared_ptr<boost::asio::io_service> io) :
+    m_io(io)
+{
+}
+
 int atlas::http::router::operator()(
         mg_connection *conn,
         mg_event ev
@@ -260,22 +265,29 @@ void atlas::http::router::serve(
         {
             atlas::log::test("atlas::http::router::serve") << "match " << uri << " " << mg_conn->request_method;
             auto f = *i->second;
-            f.serve(
+            // Post the handler function to the io_service supplied by the
+            // creator of the router to guarantee that the callback is triggered
+            // in the correct thread.
+            m_io->post(
+                boost::bind(
+                    &detail::basic_function::serve,
+                    f,
                     match,
                     mg_conn,
                     success,
                     failure
-                    );
+                )
+            );
             return;
         }
     }
     http::error(
-            404,
-            hades::mkstr() << "uri handler not found for " << uri,
-            mg_conn,
-            success,
-            failure
-            );
+        404,
+        hades::mkstr() << "uri handler not found for " << uri,
+        mg_conn,
+        success,
+        failure
+    );
 }
 
 void atlas::http::router::install(matcher m, detail::basic_function *f)

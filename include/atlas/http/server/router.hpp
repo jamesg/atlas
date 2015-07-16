@@ -3,11 +3,13 @@
 
 #include <map>
 
+#include <boost/asio.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/invoke.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "hades/mkstr.hpp"
 #include "styx/cast.hpp"
@@ -508,6 +510,10 @@ namespace atlas
         {
         public:
             /*!
+             * \param io IO service to use for callbacks.
+             */
+            explicit router(boost::shared_ptr<boost::asio::io_service> io);
+            /*!
              * \brief Route an HTTP request to a router function.
              */
             int operator()(mg_connection*, mg_event);
@@ -729,6 +735,7 @@ namespace atlas
              */
             void install(matcher, boost::shared_ptr<router>);
         private:
+            boost::shared_ptr<boost::asio::io_service> m_io;
             boost::ptr_map<matcher, detail::basic_function> m_functions;
         };
     }

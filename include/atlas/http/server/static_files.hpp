@@ -13,9 +13,10 @@ namespace atlas
          * \brief Construct a router to serve useful static files such as
          * common Javascript and CSS libraries.
          */
-        boost::shared_ptr<router> static_files();
+        boost::shared_ptr<router> static_files(
+            boost::shared_ptr<boost::asio::io_service>
+        );
     }
 }
 
 #endif
-

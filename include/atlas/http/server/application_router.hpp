@@ -15,7 +15,11 @@ namespace atlas
         class application_router : public router
         {
         public:
-            const atlas::http::mimetypes& mime_information() const;
+            explicit application_router(
+                boost::shared_ptr<boost::asio::io_service> io
+            );
+
+            const mimetypes& mime_information() const;
             /*!
              * \brief Install a static string at a URI.
              *
@@ -45,4 +49,3 @@ namespace atlas
 }
 
 #endif
-

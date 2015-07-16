@@ -20,7 +20,7 @@ atlas::http::server::server(
         const char *address,
         const char *port
         ) :
-    m_router(new http::router)
+    m_router(new http::router(callback_io))
 {
     m_mg_server = mg_create_server((void*)this, &accept);
     if(m_mg_server == nullptr)
@@ -57,4 +57,3 @@ void atlas::http::server::run()
         mg_poll_server(m_mg_server, 50);
     }
 }
-
