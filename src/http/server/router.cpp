@@ -34,13 +34,21 @@ namespace
             status = MG_FALSE;
         }
     };
+
+    std::vector<std::string> smatch_to_vector(boost::smatch match)
+    {
+        std::vector<std::string> out;
+        for(auto it : match)
+            out.push_back(std::string(it));
+        return out;
+    }
 }
 
 atlas::http::uri_type atlas::http::detail::make_async(uri_function_type f)
 {
     return [f](
             mg_connection *conn,
-            boost::smatch match,
+            uri_parameters_type match,
             uri_callback_type success,
             uri_callback_type failure
             )
@@ -75,7 +83,7 @@ atlas::http::uri_type atlas::http::detail::make_async_with_conn(conn_uri_functio
 {
     return [f](
             mg_connection *conn,
-            boost::smatch match,
+            uri_parameters_type match,
             uri_callback_type success,
             uri_callback_type failure
             )
@@ -99,7 +107,7 @@ atlas::http::detail::basic_function::basic_function(
 }
 
 void atlas::http::detail::basic_function::serve(
-        boost::smatch match,
+        uri_parameters_type match,
         mg_connection *conn,
         uri_callback_type success,
         uri_callback_type failure
@@ -154,9 +162,9 @@ atlas::http::router::router(boost::shared_ptr<boost::asio::io_service> io) :
 }
 
 int atlas::http::router::operator()(
-        mg_connection *conn,
-        mg_event ev
-        )
+    mg_connection *conn,
+    mg_event ev
+)
 {
     if(
             ev == MG_POLL &&
@@ -193,21 +201,20 @@ int atlas::http::router::operator()(
         boost::smatch match;
         std::string uri(conn->uri);
         bool matched = i->first.matches(
-                uri,
-                std::string(conn->request_method),
-                match
-                );
+            uri,
+            std::string(conn->request_method),
+            match
+        );
         if(matched)
         {
-            auto f = *i->second;
             // Post the handler function to the io_service supplied by the
             // creator of the router to guarantee that the callback is triggered
             // in the correct thread.
             m_io->post(
                 boost::bind(
                     &detail::basic_function::serve,
-                    f,
-                    match,
+                    *i->second,
+                    smatch_to_vector(match),
                     conn,
                     boost::protect(
                         boost::bind(&http_connection::report_success, http_conn)
@@ -253,7 +260,7 @@ std::map<std::string, std::string> atlas::http::detail::parse_get_parameters(
 
 void atlas::http::router::serve(
         mg_connection *mg_conn,
-        boost::smatch match,
+        uri_parameters_type match,
         uri_callback_type success,
         uri_callback_type failure
         )
@@ -275,16 +282,16 @@ void atlas::http::router::serve(
                 );
         if(matched)
         {
-            atlas::log::test("atlas::http::router::serve") << "match " << uri << " " << mg_conn->request_method;
-            auto f = *i->second;
+            atlas::log::test("atlas::http::router::serve") << "match " << uri
+                << " " << mg_conn->request_method;
             // Post the handler function to the io_service supplied by the
             // creator of the router to guarantee that the callback is triggered
             // in the correct thread.
             m_io->post(
                 boost::bind(
                     &detail::basic_function::serve,
-                    f,
-                    match,
+                    *i->second,
+                    smatch_to_vector(match),
                     mg_conn,
                     success,
                     failure
@@ -326,7 +333,7 @@ void atlas::http::router::install(
             m,
             new detail::basic_function(
                 uri_function,
-                [](const auth::token_type&, boost::smatch) { return true; }
+                [](const auth::token_type&, uri_parameters_type) { return true; }
                 )
             );
 }

@@ -113,7 +113,7 @@ void atlas::api::detail::basic_method::serve(
 
 void atlas::api::server::serve(
         mg_connection *mg_conn,
-        boost::smatch,
+        atlas::http::uri_parameters_type,
         http::uri_callback_type success,
         http::uri_callback_type failure
         ) const
@@ -245,4 +245,3 @@ void atlas::api::server::serve(
 
     method_it->second->serve(request, callback);
 }
-

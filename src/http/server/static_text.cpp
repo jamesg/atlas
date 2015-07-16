@@ -8,7 +8,7 @@ void atlas::http::static_text(
         const std::string& mimetype,
         const std::string& content,
         mg_connection *conn,
-        boost::smatch,
+        uri_parameters_type,
         http::uri_callback_type success,
         http::uri_callback_type error
         )
@@ -22,4 +22,3 @@ void atlas::http::static_text(
 
     success();
 }
-

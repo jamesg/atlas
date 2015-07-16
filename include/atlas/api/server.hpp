@@ -281,7 +281,7 @@ namespace atlas
 
                 void serve(
                         mg_connection*,
-                        boost::smatch,
+                        atlas::http::uri_parameters_type,
                         http::uri_callback_type,
                         http::uri_callback_type
                         ) const;
@@ -293,4 +293,3 @@ namespace atlas
 }
 
 #endif
-

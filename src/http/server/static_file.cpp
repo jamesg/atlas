@@ -11,7 +11,7 @@ void atlas::http::static_file(
         const mimetypes& mime_information,
         const std::string& filename,
         mg_connection *conn,
-        boost::smatch,
+        uri_parameters_type,
         http::uri_callback_type success,
         http::uri_callback_type error
         )
@@ -61,4 +61,3 @@ void atlas::http::static_file(
 
     success();
 }
-

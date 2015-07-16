@@ -90,7 +90,7 @@ namespace atlas
                  * \throws None.
                  */
                 void serve(
-                        boost::smatch,
+                        uri_parameters_type,
                         mg_connection*,
                         uri_callback_type sucess,
                         uri_callback_type failure
@@ -106,7 +106,7 @@ namespace atlas
              */
             template<int Src, int Dest, typename Container>
             void copy_string_to_vector(
-                    const boost::smatch& match,
+                    const uri_parameters_type& match,
                     Container& container
                     )
             {
@@ -144,7 +144,7 @@ namespace atlas
             struct copy_to_vector
             {
                 template<typename Container>
-                void copy(const boost::smatch& list, Container& container)
+                void copy(const uri_parameters_type& list, Container& container)
                 {
                     copy_string_to_vector<SrcFrom, DestFrom, Container>(list, container);
                     copy_to_vector<SrcFrom+1, SrcTo, DestFrom+1, DestTo>()
@@ -155,7 +155,7 @@ namespace atlas
             struct copy_to_vector<SrcFrom, SrcTo, Dest, Dest>
             {
                 template<typename Container>
-                void copy(const boost::smatch&, Container&)
+                void copy(const uri_parameters_type&, Container&)
                 {
                 };
             };
@@ -177,14 +177,14 @@ namespace atlas
 
             /*!
             \brief Turn an authentication function of the form bool(token,
-            arguments) into a function of the form bool(token, boost::smatch).
+            arguments) into a function of the form bool(token, uri_parameters_type).
              */
             template<typename ...Arguments>
             auth_function_type wrap_auth_function(
                     typename unwrapped_auth_function<Arguments...>::type auth_function
                     )
             {
-                return [auth_function](const auth::token_type& token, boost::smatch match) {
+                return [auth_function](const auth::token_type& token, uri_parameters_type match) {
                     typedef boost::fusion::vector<auth::token_type, Arguments...>
                         arg_values_type;
                     arg_values_type arg_values;
@@ -212,7 +212,7 @@ namespace atlas
                 unwrapped_function(unwrapped_function_type function) :
                     basic_function(
                         detail::make_async(
-                            [function](boost::smatch match)
+                            [function](uri_parameters_type match)
                             {
                                 typedef boost::fusion::vector<Arguments...>
                                     arg_values_type;
@@ -227,7 +227,7 @@ namespace atlas
                                 return out;
                             }
                             ),
-                        [](const std::string&, boost::smatch) {
+                        [](const std::string&, uri_parameters_type) {
                             return true;
                         }
                         )
@@ -239,7 +239,7 @@ namespace atlas
                         ) :
                     basic_function(
                         detail::make_async(
-                            [function](boost::smatch match)
+                            [function](uri_parameters_type match)
                             {
                                 typedef boost::fusion::vector<Arguments...>
                                     arg_values_type;
@@ -287,7 +287,7 @@ namespace atlas
                     basic_function(
                             [function](
                                 mg_connection *mg_conn,
-                                boost::smatch match,
+                                uri_parameters_type match,
                                 uri_callback_type success,
                                 uri_callback_type error
                                 )
@@ -339,7 +339,7 @@ namespace atlas
                         ) :
                     basic_function(
                         detail::make_async_with_conn(
-                            [function](mg_connection *mg_conn, boost::smatch match)
+                            [function](mg_connection *mg_conn, uri_parameters_type match)
                             {
                                 get_parameters_type params(
                                     detail::parse_get_parameters(mg_conn)
@@ -389,7 +389,7 @@ namespace atlas
                     basic_function(
                             [function](
                                 mg_connection *mg_conn,
-                                boost::smatch match,
+                                uri_parameters_type match,
                                 uri_callback_type success,
                                 uri_callback_type error
                                 )
@@ -454,7 +454,7 @@ namespace atlas
                         ) :
                     basic_function(
                         detail::make_async_with_conn(
-                            [function](mg_connection *conn, boost::smatch match)
+                            [function](mg_connection *conn, uri_parameters_type match)
                             {
                                 const std::string content(
                                     conn->content,
@@ -525,7 +525,7 @@ namespace atlas
              */
             void serve(
                     mg_connection*,
-                    boost::smatch,
+                    uri_parameters_type,
                     uri_callback_type success,
                     uri_callback_type failure
                     );
@@ -624,7 +624,7 @@ namespace atlas
                     m,
                     new detail::get_function<Arguments...>(
                         function,
-                        [](const auth::token_type&, boost::smatch) { return true; }
+                        [](const auth::token_type&, uri_parameters_type) { return true; }
                         )
                    );
             }

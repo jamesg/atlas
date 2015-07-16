@@ -24,7 +24,7 @@ namespace atlas
                 const std::string& mimetype,
                 const std::string& content,
                 mg_connection*,
-                boost::smatch,
+                uri_parameters_type,
                 http::uri_callback_type success,
                 http::uri_callback_type error
                 );
@@ -32,4 +32,3 @@ namespace atlas
 }
 
 #endif
-
