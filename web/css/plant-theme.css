@@ -91,6 +91,7 @@ span.disabled {
     padding: 2px;
     background-color: #c1e8c9;
     border-radius: 8px;
+    color: black;
 }
 
 .header {
@@ -126,4 +127,3 @@ span.disabled {
 h1 small {
     color: darkgray;
 }
-

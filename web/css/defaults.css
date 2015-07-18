@@ -22,8 +22,6 @@ a {
 }
 
 .content {
-    background-color: white;
-    /*border: 1px solid black;*/
     margin: 1em;
     padding: 1em;
 }
@@ -35,4 +33,3 @@ a {
 li:hover .visible-on-hover {
     visibility: visible;
 }
-
