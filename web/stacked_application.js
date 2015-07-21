@@ -238,9 +238,9 @@ var Modal = Backbone.View.extend(
             })).render();
 
             var cons = coalesce(options['view'], this['view']);
-            this._view = new cons({ el: this.contentEl(), model: this['model']});
-            this._view.render();
-            this.listenTo(this._view, 'finished', this.finish.bind(this));
+            this.view = new cons({ el: this.contentEl(), model: this['model']});
+            this.view.render();
+            this.listenTo(this.view, 'finished', this.finish.bind(this));
         },
         className: 'modal',
         template: '\
@@ -262,7 +262,7 @@ var Modal = Backbone.View.extend(
             'click button[name=cancel]': 'remove',
             'click button[name=close]': 'remove',
             'submit form': function() {
-                this._view.trigger('save');
+                this.view.trigger('save');
                 this.trigger('save');
                 return false;
             }
@@ -277,7 +277,7 @@ var Modal = Backbone.View.extend(
                 action.apply(this);
             if(['cancel', 'close'].indexOf(button.get('name')) > -1)
                 this.remove();
-            this._view.trigger(button.get('name'));
+            this.view.trigger(button.get('name'));
             this.trigger(button.get('name'));
             return false;
         }
@@ -290,8 +290,8 @@ var ConfirmModal = Modal.extend(
             Modal.prototype.initialize.apply(this, arguments);
             this._callback =
                 coalesce(options['callback'], this['callback'], function() {});
-            this._view.message = options['message'];
-            this._view.render();
+            this.view.message = options['message'];
+            this.view.render();
             this.on('yes', this.yes.bind(this));
             this.on('no', this.no.bind(this));
         },
