@@ -8,6 +8,7 @@
 #include "hades/relation.hpp"
 #include "hades/tuple.hpp"
 
+#include "atlas/db/date.hpp"
 #include "atlas/db/detail.hpp"
 
 namespace atlas
@@ -59,13 +60,22 @@ namespace atlas
                 {
                 }
 
-                semi_temporal(const Id& id, const std::string& date)
+                explicit semi_temporal(const Id& id)
                 {
-                    styx::object::m_map = id.m_map;//semi_temporal<Id, Relation, Attribute>(id);
-                    tuple_type::template get_string<Attribute>() = date;
+                    Id::candidate_key_type::set_id(id);
+                    tuple_type::template get_int<Attribute>() =
+                        db::date::to_unix_time(
+                            boost::posix_time::second_clock::universal_time()
+                        );
                 }
 
-                std::string& date()
+                semi_temporal(const Id& id, const styx::int_type date)
+                {
+                    set_id(id);
+                    tuple_type::template get_int<Attribute>() = date;
+                }
+
+                styx::int_type& date()
                 {
                     return tuple_type::template get_string<Attribute>();
                 }
@@ -75,7 +85,7 @@ namespace atlas
                  *
                  * \post The date attribute of this tuple has been updated.
                  */
-                void update(const std::string& date_, hades::connection& conn)
+                void update(const styx::int_type date_, hades::connection& conn)
                 {
                     date() = date_;
                     crud_type::save(conn);
@@ -91,9 +101,7 @@ namespace atlas
                         hades::connection& conn
                         )
                 {
-                    date() = boost::posix_time::to_iso_extended_string(
-                            date_
-                            );
+                    date() = db::date::to_unix_time(date_);
                     crud_type::save(conn);
                 }
 
@@ -104,7 +112,10 @@ namespace atlas
                  */
                 void update(hades::connection& conn)
                 {
-                    update(detail::utc_date_iso_extended(), conn);
+                    update(
+                        boost::posix_time::second_clock::universal_time(),
+                        conn
+                    );
                 }
         };
 
@@ -172,4 +183,3 @@ namespace atlas
 }
 
 #endif
-
