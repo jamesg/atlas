@@ -15,7 +15,7 @@
     overflow: auto;
     position: fixed;
     top: 10%;
-    height: 70%;
+    max-height: 70%;
     /*left: 50%;*/
     left: 20%;
     right: 20%;
@@ -28,8 +28,8 @@
 
 .modal-button-box {
     text-align: right;
-    position: fixed;
-    top: 80%;
+    /*position: fixed;
+    top: 80%;*/
     left: 20%;
     right: 20%;
     width: auto;
@@ -38,3 +38,8 @@
     /*margin-left: -280px;*/
 }
 
+.modal-help-button {
+    border: none;
+    float: right;
+    margin: 2px;
+}

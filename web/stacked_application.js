@@ -129,7 +129,22 @@ var StaticView = Backbone.View.extend(
                 this.$el.html(_.template(this.template)(this.templateParams()));
         }
     }
-    );
+);
+
+var HelpView = StaticView.extend(
+    {
+        initialize: function(options) {
+            StaticView.prototype.initialize.apply(this, arguments);
+            this.title = coalesce(options['title'], this['title']);
+            this.text = coalesce(options['text'], this['text']);
+        },
+        template: '<h2><%-title%></h2><%-text%>',
+        templateParams: function() {
+            console.log('params', _.pick(this, 'title', 'text'))
+            return _.pick(this, 'title', 'text');
+        }
+    }
+)
 
 var ModalButton = Backbone.Model.extend(
     {
@@ -211,10 +226,15 @@ var Modal = Backbone.View.extend(
          *     buttons - buttons to display
          *     view - view constructor
          *     model - passed to the view
+         *     help - view providing help, to be displayed in another modal
          */
         initialize: function(options) {
             Backbone.View.prototype.initialize.apply(this, arguments);
             options = coalesce(options, {});
+
+            var helpCons = coalesce(options['help'], this['help']);
+            if(helpCons)
+                this.help = helpCons;
 
             this.$el.append(_.template(this.template)(this.templateParams()));
 
@@ -245,15 +265,20 @@ var Modal = Backbone.View.extend(
         className: 'modal',
         template: '\
 <div class="modal-dialog">\
-    <form class="modal-content">\
-        <div name="modal-content"></div>\
+    <%if(help){%>\
+        <button name="help" class="modal-help-button">\
+        <span class="oi" data-glyph="question-mark" aria-hidden="true"> </span>\
+        </button>\
+    <%}%>\
+    <form>\
+        <div class="modal-content" name="modal-content"></div>\
         <input type="submit" style="display: none;"></input>\
         <div class="modal-button-box" name="buttons"></div>\
     </form>\
 </div>\
             ',
         templateParams: function() {
-            return { buttons: this._buttons };
+            return { buttons: this._buttons, help: _.has(this, 'help') };
         },
         contentEl: function() {
             return this.$('*[name=modal-content]')[0];
@@ -265,6 +290,9 @@ var Modal = Backbone.View.extend(
                 this.view.trigger('save');
                 this.trigger('save');
                 return false;
+            },
+            'click button[name=help]': function() {
+                gApplication.modal(new Modal({ view: this.help }));
             }
         },
         finish: function() {

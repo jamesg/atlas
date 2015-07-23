@@ -27,7 +27,7 @@ body {
     background: rgba(0, 0, 0, 0.2);
 }
 
-.modal-dialog {
+.modal-content {
     background-color: #fff;
     border: 1px solid black;
     border-bottom: none;
