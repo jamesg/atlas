@@ -19,10 +19,6 @@ body {
  * Modal dialogs hide all content on the screen.
  */
 
-/*
- * Use a repeating pattern to create a 'false translucency'.  This works well
- * when multiple dialogs are stacked.
- */
 .modal {
     background: rgba(0, 0, 0, 0.2);
 }

@@ -77,7 +77,7 @@ namespace atlas
 
                 styx::int_type& date()
                 {
-                    return tuple_type::template get_string<Attribute>();
+                    return tuple_type::template get_int<Attribute>();
                 }
 
                 /*!

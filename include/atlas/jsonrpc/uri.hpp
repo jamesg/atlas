@@ -27,7 +27,7 @@ namespace atlas
                 boost::shared_ptr<boost::asio::io_service> callback_io,
                 api::server&,
                 mg_connection *conn,
-                boost::smatch,
+                http::uri_parameters_type,
                 http::uri_callback_type success,
                 http::uri_callback_type error
                 );
@@ -35,4 +35,3 @@ namespace atlas
 }
 
 #endif
-

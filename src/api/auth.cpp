@@ -108,9 +108,9 @@ void atlas::api::auth::install(
                 return user.destroy(conn);
             }
             );
-    server.install<styx::list, int>(
+    server.install<styx::list, styx::int_type>(
             "permissions",
-            [&conn](int user_id) {
+            [&conn](styx::int_type user_id) {
                 std::vector<atlas::user_permission> permissions =
                     atlas::db::user_permission::user_permissions(
                         conn,
@@ -151,4 +151,3 @@ void atlas::api::auth::install(
             }
             );
 }
-

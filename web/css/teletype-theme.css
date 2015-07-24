@@ -27,7 +27,7 @@ body {
     background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQImWO4e/fufwYYuHv37n8AQDgHLf1vMaoAAAAASUVORK5CYII=) repeat;
 }
 
-.modal-dialog {
+.modal-content {
     background-color: #eee;
     border: 1px solid black;
     border-bottom: none;
@@ -94,4 +94,3 @@ span.disabled {
 .navigation-breadcrumbs > :last-child a {
     color: black;
 }
-
