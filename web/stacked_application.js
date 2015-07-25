@@ -298,6 +298,7 @@ var Modal = Backbone.View.extend(
         finish: function() {
             this.remove();
             this.trigger('finished');
+            gApplication.currentPage().reset();
         },
         _end: function(button) {
             var action = button.get('action');
