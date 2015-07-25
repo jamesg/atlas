@@ -12,30 +12,32 @@
 }
 
 .modal-dialog {
-    overflow: auto;
     position: fixed;
     top: 10%;
-    max-height: 70%;
-    /*left: 50%;*/
     left: 20%;
     right: 20%;
     width: auto;
     z-index: 1050;
-    /*width: 560px;*/
-    /*margin-left: -280px;*/
     background-clip: padding-box;
+}
+
+.modal-content {
+    position: fixed;
+    top: 10%;
+    left: 20%;
+    right: 20%;
+    overflow: auto;
+    height: 70%;
 }
 
 .modal-button-box {
     text-align: right;
-    /*position: fixed;
-    top: 80%;*/
+    position: fixed;
+    top: 80%;
     left: 20%;
     right: 20%;
     width: auto;
     z-index: 1050;
-    /*width: 560px;*/
-    /*margin-left: -280px;*/
 }
 
 .modal-help-button {
