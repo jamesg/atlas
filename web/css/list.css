@@ -21,6 +21,18 @@
     background-color: lightgrey;
 }
 
+/*
+ A list with check boxes.
+ */
+.check-list {
+    list-style-type: none;
+    padding: 0;
+}
+.check-list li {
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
+}
+
 .text-list li {
     border-bottom: 1px dashed silver;
 }
@@ -53,4 +65,3 @@
 .image-list li:hover {
     background-color: lightgrey;
 }
-
