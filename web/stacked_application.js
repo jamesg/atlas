@@ -565,9 +565,33 @@ var CheckedCollectionView = CollectionView.extend(
             setCheckedIds: function(ids) {
                 this.each(
                     function(view) {
-                        this.view.$('input[type=checkbox]').prop(
+                        view.$('input[type=checkbox]').prop(
                             'checked',
                             _.some(ids, function(id) { return id == view.model.id })
+                        );
+                    }
+                );
+            },
+            checkAll: function() {
+                this.each(
+                    function(view) {
+                        view.$('input[type=checkbox]').prop('checked', true);
+                    }
+                );
+            },
+            checkNone: function() {
+                this.each(
+                    function(view) {
+                        view.$('input[type=checkbox]').prop('checked', false);
+                    }
+                );
+            },
+            invert: function() {
+                this.each(
+                    function(view) {
+                        view.$('input[type=checkbox]').prop(
+                            'checked',
+                            !view.$('input[type=checkbox]').prop('checked')
                         );
                     }
                 );
