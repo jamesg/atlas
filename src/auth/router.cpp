@@ -93,9 +93,9 @@ atlas::auth::router::router(
                 styx::list users(
                         hades::outer_join<user, user_session, user_enabled, user_super>(
                             conn,
-                            "atlas_user.user_id = atlas_user_session.user_id AND "
-                            "atlas_user.user_id = atlas_user_enabled.user_id AND "
-                            "atlas_user.user_id = atlas_user_super.user_id ",
+                            "atlas_user.user_id = atlas_user_session.user_id",
+                            "atlas_user.user_id = atlas_user_enabled.user_id",
+                            "atlas_user.user_id = atlas_user_super.user_id",
                             hades::where(
                                 "atlas_user_session.token == ? ",
                                 hades::row<std::string>(token)
