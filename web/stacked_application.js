@@ -366,6 +366,8 @@ var CollectionView = Backbone.View.extend(
                 this['filter'],
                 function(model) { return true; }
                 );
+            this.constructView =
+                coalesce(options['constructView'], this['constructView']);
             this.emptyView = coalesce(options['emptyView'], this['emptyView']);
             this._offset = coalesce(options['offset'], 0);
             this._limit = coalesce(options['limit'], -1);
