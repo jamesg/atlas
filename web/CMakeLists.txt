@@ -21,8 +21,6 @@ atlas_add_web_library(
         "d3/d3.min.js"
         "jquery.js"
         "jquery.min.js"
-        "modal.css"
-        "modal.js"
         "moment.min.js"
         "open-iconic/font/css/open-iconic.css"
         "open-iconic/font/fonts/open-iconic.ttf"
@@ -48,4 +46,3 @@ target_link_libraries(
     atlas-com-http-server
     ${CMAKE_CURRENT_BINARY_DIR}/static.a
     )
-
