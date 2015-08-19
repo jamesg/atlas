@@ -265,13 +265,16 @@ var Modal = Backbone.View.extend(
         className: 'modal',
         template: '\
 <div class="modal-dialog">\
-    <%if(help){%>\
-        <button name="help" class="modal-help-button">\
-        <span class="oi" data-glyph="question-mark" aria-hidden="true"> </span>\
-        </button>\
-    <%}%>\
     <form>\
-        <div class="modal-content" name="modal-content"></div>\
+        <div class="modal-content">\
+            <%if(help){%>\
+                <button type="button" name="help" class="modal-help-button">\
+                <span class="oi" data-glyph="question-mark" aria-hidden="true"> </span>\
+                Help\
+                </button>\
+            <%}%>\
+            <div name="modal-content"></div>\
+            </div>\
         <input type="submit" style="display: none;"></input>\
         <div class="modal-button-box" name="buttons"></div>\
     </form>\
@@ -511,6 +514,8 @@ var TableView = StaticView.extend(
                 view: options.trView,
                 model: this.model
             });
+            if(_.has(options, 'filter'))
+                this._tbody.filter = options.filter;
             this._tbody.render();
 
             this.emptyView = coalesce(options['emptyView'], this['emptyView']);
