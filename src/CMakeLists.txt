@@ -11,4 +11,4 @@ add_subdirectory(task)
 
 file(GLOB atlas_common_sources log/*.cpp *.cpp)
 add_library(atlas-com-common ${atlas_common_sources})
-
+target_link_libraries(atlas-com-common ${Boost_LIBRARIES})
